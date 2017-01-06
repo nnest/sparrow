@@ -1,0 +1,38 @@
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>sparrow-rest</artifactId>
+	<packaging>jar</packaging>
+	<name>sparrow-rest</name>
+	<url>https://github.com/nnest/sparrow</url>
+
+	<parent>
+		<groupId>com.github.nnest</groupId>
+		<artifactId>sparrow-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../sparrow-parent</relativePath>
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>rest</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.github.nnest</groupId>
+			<artifactId>sparrow-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
+</project>
