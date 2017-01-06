@@ -36,7 +36,7 @@ public abstract class AbstractElasticDocumentValidator implements ElasticDocumen
 
 	/**
 	 * do validation. throws {@linkplain ElasticDocumentValidationException} if
-	 * failed. fail fast.
+	 * failed.
 	 * 
 	 * @param document
 	 */

@@ -49,6 +49,33 @@ public class AnnotationTest {
 		validator.validate(doc);
 	}
 
+	@Test
+	public void test004DuplicatedIdOnFields() {
+		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_DUPLICATED_ID));
+
+		AnnotatedElasticDocumentValidator validator = createValidator();
+		AnnotatedDocumentDuplicatedIdOnFields doc = new AnnotatedDocumentDuplicatedIdOnFields();
+		validator.validate(doc);
+	}
+
+	@Test
+	public void test005InvalidIdAssignOnField() {
+		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN));
+
+		AnnotatedElasticDocumentValidator validator = createValidator();
+		AnnotatedDocumentInvalidIdAssignOnField doc = new AnnotatedDocumentInvalidIdAssignOnField();
+		validator.validate(doc);
+	}
+
+	@Test
+	public void test006InvalidIdAssignOnGetter() {
+		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN));
+
+		AnnotatedElasticDocumentValidator validator = createValidator();
+		AnnotatedDocumentInvalidIdAssignOnGetter doc = new AnnotatedDocumentInvalidIdAssignOnGetter();
+		validator.validate(doc);
+	}
+
 	private AnnotatedElasticDocumentValidator createValidator() {
 		AnnotatedElasticDocumentValidator validator = new AnnotatedElasticDocumentValidator();
 		return validator;

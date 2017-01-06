@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow;
 
+import java.util.Date;
+
 import com.github.nnest.sparrow.annotation.ElasticDocument;
 import com.github.nnest.sparrow.annotation.ElasticId;
 
@@ -12,15 +14,9 @@ import com.github.nnest.sparrow.annotation.ElasticId;
  * @version 0.0.1
  */
 @ElasticDocument(index = "index", type = "type")
-public class AnnotatedDocumentDuplicatedId {
+public class AnnotatedDocumentInvalidIdAssignOnGetter {
 	@ElasticId
-	private Long id = null;
-
-	@ElasticId
-	public String getId1() {
+	public Date getId() {
 		return null;
-	}
-
-	public void setId1(String id) {
 	}
 }

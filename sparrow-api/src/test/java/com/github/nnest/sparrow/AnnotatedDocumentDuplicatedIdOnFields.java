@@ -12,15 +12,9 @@ import com.github.nnest.sparrow.annotation.ElasticId;
  * @version 0.0.1
  */
 @ElasticDocument(index = "index", type = "type")
-public class AnnotatedDocumentDuplicatedId {
+public class AnnotatedDocumentDuplicatedIdOnFields {
 	@ElasticId
 	private Long id = null;
-
 	@ElasticId
-	public String getId1() {
-		return null;
-	}
-
-	public void setId1(String id) {
-	}
+	private Long id1 = null;
 }

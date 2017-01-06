@@ -3,8 +3,10 @@
  */
 package com.github.nnest.sparrow.annotation;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import com.github.nnest.sparrow.AbstractElasticDocumentValidator;
 import com.github.nnest.sparrow.ElasticDocumentValidationException;
@@ -43,16 +45,10 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 			for (Field field : fields) {
 				ElasticId id = field.getAnnotation(ElasticId.class);
 				if (id != null) {
-					if (!this.isIdTypeValid(field.getType())) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
-								String.format(
-										"Field[%1s] is illgeal for assign ElasticId, return type must be Integer, Long or String.",
-										field.getName()));
-					}
+					this.checkIdFieldType(field);
 					if (idProperty != null) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID,
-								String.format("Duplicated ids[%1s, %2s] found on document[%3s].", idProperty,
-										field.getName(), type.getName()));
+						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String.format(
+								"Duplicated ids[%1s, %2s] found on document[%3s].", idProperty, field.getName(), type));
 					}
 					idProperty = field.getName();
 				}
@@ -63,13 +59,17 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 				ElasticId id = method.getAnnotation(ElasticId.class);
 				if (id != null) {
 					// check id on correct method
-					String name = this.guessIdName(method);
+					String name = this.checkMethod(type, method, id);
 					if (idProperty != null) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID,
-								String.format("Duplicated ids[%1s, %2s] found on document[%3s].", idProperty, method,
-										type.getName()));
+						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String
+								.format("Duplicated ids[%1s, %2s] found on document[%3s].", idProperty, method, type));
 					}
 					idProperty = name;
+				} else {
+					ElasticField field = method.getAnnotation(ElasticField.class);
+					if (field != null) {
+						this.checkMethod(type, method, field);
+					}
 				}
 			}
 
@@ -77,6 +77,22 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ID_NOT_FOUND,
 						String.format("Id not found on document[%1s]", type.getName()));
 			}
+		}
+	}
+
+	protected void checkMethodPair(Method method) {
+
+	}
+
+	/**
+	 * check method modifier
+	 * 
+	 * @param method
+	 */
+	protected void checkMethodModifier(Method method) {
+		if (method.getModifiers() != Modifier.PUBLIC) {
+			throw new ElasticDocumentValidationException(ErrorCodes.ERR_METHOD_NOT_PUBLIC,
+					String.format("Method[%1s] is illegal for assign, it must be public", method));
 		}
 	}
 
@@ -104,67 +120,133 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	 * guess field name by given method. if method is standard getter or setter,
 	 * return its property name. otherwise return null, getClass returns null
 	 * 
+	 * @param type
 	 * @param method
+	 * @param annotation
 	 * @return
 	 */
-	protected String guessIdName(Method method) {
+	protected String checkMethod(Class<?> type, Method method, Annotation annotation) {
+		String errorCode = annotation instanceof ElasticId ? ErrorCodes.ERR_ILLEGAL_ID_ASSIGN
+				: ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN;
+
+		this.checkMethodModifier(method);
+
 		String methodName = method.getName();
 		if ("getClass".equals(methodName)) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String.format(
-					"Cannot assign ElasticId to getClass on document[%1s]", method.getDeclaringClass().getName()));
+			throw new ElasticDocumentValidationException(errorCode, String.format(
+					"Method[getClass] is illegal for assign on document[%1s]", method.getDeclaringClass().getName()));
 		}
 
 		int length = methodName.length();
-		if (length <= 3) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
-					String.format("Method[%1s] is illgeal for assign ElasticId on class[%2s]", method,
-							method.getDeclaringClass().getName()));
+		if (length <= 2) {
+			throw new ElasticDocumentValidationException(errorCode, String
+					.format("Method[%1s] is illgeal for assign, should be a java bean getter or setter.", method));
 		}
 
-		// at least 4 digits
-		if (methodName.startsWith("get")) {
+		String propertyName = null;
+		String pairName = null;
+		Class<?>[] pairParamTypes = null;
+		// at least 3 digits
+		if (methodName.startsWith("is")) {
 			if (method.getParameterCount() != 0) {
-				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String
-						.format("Method[%1s] is illgeal for assign ElasticId, should be a java bean getter.", method));
+				throw new ElasticDocumentValidationException(errorCode,
+						String.format("Method[%1s] is illgeal for assign, should be a java bean getter.", method));
 			}
-			Class<?> returnType = method.getReturnType();
-			if (!isIdTypeValid(returnType)) {
-				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
-						String.format(
-								"Method[%1s] is illgeal for assign ElasticId, return type must be Integer, Long or String.",
-								method));
+			this.checkReturnType(annotation, method);
+			propertyName = methodName.substring(2);
+			pairName = "set" + propertyName;
+			pairParamTypes = new Class<?>[] { method.getReturnType() };
+		} else if (methodName.startsWith("get")) {
+			if (method.getParameterCount() != 0) {
+				throw new ElasticDocumentValidationException(errorCode,
+						String.format("Method[%1s] is illgeal for assign, should be a java bean getter.", method));
 			}
-			// getX, must returns something
-			return methodName.substring(3);
+			this.checkReturnType(annotation, method);
+			propertyName = methodName.substring(3);
+			pairName = "set" + propertyName;
+			pairParamTypes = new Class<?>[] { method.getReturnType() };
 		} else if (methodName.startsWith("set")) {
 			// getX, must returns something
 			if (method.getParameterCount() != 1 || method.getReturnType() != Void.class) {
-				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String
-						.format("Method[%1s] is illgeal for assign ElasticId, should be a java bean setter.", method));
+				throw new ElasticDocumentValidationException(errorCode,
+						String.format("Method[%1s] is illgeal for assign, should be a java bean setter.", method));
 			}
-			Class<?> paramType = method.getParameterTypes()[0];
-			if (!isIdTypeValid(paramType)) {
-				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
-						String.format(
-								"Method[%1s] is illgeal for assign ElasticId, return type must be Integer, Long or String.",
-								method));
-			}
-			return methodName.substring(3);
+			this.checkParamType(annotation, method);
+			propertyName = methodName.substring(3);
+			pairName = "get" + propertyName;
+			pairParamTypes = null;
 		} else {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
-					String.format("Method[%1s] is illgeal for assign ElasticId on class[%2s]", method,
-							method.getDeclaringClass().getName()));
+			throw new ElasticDocumentValidationException(errorCode, String
+					.format("Method[%1s] is illgeal for assign, should be a java bean getter or setter.", method));
+		}
+
+		try {
+			Method pairMethod = type.getDeclaredMethod(pairName, pairParamTypes);
+			// if pair method found, check its modifier
+			this.checkMethodModifier(pairMethod);
+		} catch (Exception e) {
+			throw new ElasticDocumentValidationException(errorCode,
+					String.format("Method[%1s] is illegal for assign, no pair method found.", method), e);
+		}
+
+		return propertyName;
+	}
+
+	protected void checkParamType(Annotation annotation, Method method) {
+		if (annotation instanceof ElasticId) {
+			this.checkIdParamType(method);
+		} else if (annotation instanceof ElasticField) {
+			this.checkFieldParamType(method);
 		}
 	}
 
-	/**
-	 * check id type, must be {@linkplain Integer}, {@linkplain Long} or
-	 * {@linkplain String}
-	 * 
-	 * @param type
-	 * @return
-	 */
-	protected boolean isIdTypeValid(Class<?> type) {
-		return type == Integer.class || type == Long.class || type == String.class;
+	protected void checkFieldParamType(Method method) {
+		Class<?> type = method.getParameterTypes()[0];
+		if (type == Void.class || type == null) {
+			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
+					String.format("Method[%1s] is illgeal for assign, parameter type cannot be void.", method));
+		}
+	}
+
+	protected void checkIdParamType(Method method) {
+		Class<?> type = method.getParameterTypes()[0];
+		if (type != Integer.class && type != Long.class && type != String.class) {
+			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String.format(
+					"Method[%1s] is illgeal for assign, parameter type must be Integer, Long or String.", method));
+		}
+	}
+
+	protected void checkReturnType(Annotation annotation, Method method) {
+		if (annotation instanceof ElasticId) {
+			this.checkIdReturnType(method);
+		} else if (annotation instanceof ElasticField) {
+			this.checkFieldReturnType(method);
+		}
+	}
+
+	protected void checkFieldReturnType(Method method) {
+		Class<?> type = method.getReturnType();
+		if (type == Void.class || type == null) {
+			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
+					String.format("Method[%1s] is illgeal for assign, return type cannot be void.", method));
+		}
+	}
+
+	protected void checkIdReturnType(Method method) {
+		Class<?> type = method.getReturnType();
+		if (type != Integer.class && type != Long.class && type != String.class) {
+			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String
+					.format("Method[%1s] is illgeal for assign, return type must be Integer, Long or String.", method));
+		}
+	}
+
+	protected void checkIdFieldType(Field field) {
+		Class<?> type = field.getType();
+		if (type != Integer.class && type != Long.class && type != String.class) {
+			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
+					String.format(
+							"Field[%1s] is illgeal for assign ElasticId, return type must be Integer, Long or String.",
+							field.getName()));
+		}
 	}
 }

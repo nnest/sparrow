@@ -5,7 +5,6 @@ package com.github.nnest.sparrow.rest;
 
 import com.github.nnest.sparrow.AbstractElasticCommandExecutor;
 import com.github.nnest.sparrow.ElasticCommand;
-import com.github.nnest.sparrow.ElasticCommandException;
 import com.github.nnest.sparrow.ElasticCommandResult;
 import com.github.nnest.sparrow.ElasticCommandResultHanlder;
 import com.github.nnest.sparrow.ElasticSettings;
@@ -41,16 +40,6 @@ public class RestElasticCommandExecutor extends AbstractElasticCommandExecutor {
 	 */
 	@Override
 	public void executeAsync(ElasticCommand command, ElasticCommandResultHanlder commandResultHandler) {
-		// TODO Auto-generated method stub
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see com.github.nnest.sparrow.ElasticCommandExecutor#close()
-	 */
-	@Override
-	public void close() throws ElasticCommandException {
 		// TODO Auto-generated method stub
 	}
 }

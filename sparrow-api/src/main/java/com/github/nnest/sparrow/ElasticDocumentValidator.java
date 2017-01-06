@@ -13,7 +13,7 @@ package com.github.nnest.sparrow;
 public interface ElasticDocumentValidator {
 	/**
 	 * validate given bean can be persist to elastic or not. throws
-	 * {@linkplain ElasticDocumentValidationException} if not passed, fail fast.
+	 * {@linkplain ElasticDocumentValidationException} if not passed.
 	 * 
 	 * @param document
 	 */
