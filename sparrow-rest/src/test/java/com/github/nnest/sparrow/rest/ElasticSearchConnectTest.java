@@ -29,14 +29,14 @@ import com.google.common.collect.Lists;
 public class ElasticSearchConnectTest {
 	@Test
 	public void test() throws ElasticCommandException, ElasticExecutorException {
-		ElasticClient client = createClient();
-		TwitterTweet tt = new TwitterTweet();
-		tt.setId("1");
-		tt.setUser("kimchy");
-		tt.setPostDate("2009-11-15T14:12:12");
-		tt.setMessage("trying out Elasticsearch");
-
-		client.index(tt);
+//		ElasticClient client = createClient();
+//		TwitterTweet tt = new TwitterTweet();
+//		tt.setId("1");
+//		tt.setUser("kimchy");
+//		tt.setPostDate("2009-11-15T14:12:12");
+//		tt.setMessage("trying out Elasticsearch");
+//
+//		client.index(tt);
 	}
 
 	private ElasticClient createClient() {
