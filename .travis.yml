@@ -1,7 +1,10 @@
 language: java
 jdk:
   - oraclejdk8
-sudo: false
+before_script:
+  - sleep 10
 script:
   - cd sparrow-parent
   - mvn clean verify
+before_install:
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb && sudo service elasticsearch restart
