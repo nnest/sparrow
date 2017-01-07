@@ -80,10 +80,6 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		}
 	}
 
-	protected void checkMethodPair(Method method) {
-
-	}
-
 	/**
 	 * check method modifier
 	 * 
