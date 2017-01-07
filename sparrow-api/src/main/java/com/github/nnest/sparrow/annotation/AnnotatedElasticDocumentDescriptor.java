@@ -107,7 +107,7 @@ public class AnnotatedElasticDocumentDescriptor implements ElasticDocumentDescri
 	 */
 	public synchronized void registerField(String name, ElasticField field) {
 		this.fieldDescriptors.put(name, field);
-		if (!this.ignoredFields.contains(name) && !this.fields.contains(name)) {
+		if (!this.ignoredFields.contains(name) && !this.fields.contains(name) && !this.idField.equals(name)) {
 			this.fields.add(name);
 		}
 	}

@@ -86,7 +86,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	 * @param method
 	 */
 	protected void checkMethodModifier(Method method) {
-		if (method.getModifiers() != Modifier.PUBLIC) {
+		if ((method.getModifiers() & Modifier.PUBLIC) == 0) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_METHOD_NOT_PUBLIC,
 					String.format("Method[%1s] is illegal for assign, it must be public", method));
 		}

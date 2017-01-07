@@ -7,6 +7,7 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -331,10 +332,14 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 			if (fieldAnnotation != null) {
 				descriptor.registerField(this.getPropertyName(method, true), fieldAnnotation);
 			} else {
-				String propertyName = this.getPropertyName(method, false);
+				String propertyName = this.getPropertyName(method, true);
 				try {
-					new PropertyDescriptor(propertyName, method.getDeclaringClass());
-					descriptor.registerField(propertyName, fieldAnnotation);
+					PropertyDescriptor propertyDescriptor = new PropertyDescriptor(propertyName,
+							method.getDeclaringClass());
+					if ((propertyDescriptor.getReadMethod().getModifiers() & Modifier.PUBLIC) != 0
+							&& (propertyDescriptor.getWriteMethod().getModifiers() & Modifier.PUBLIC) != 0) {
+						descriptor.registerField(propertyName, fieldAnnotation);
+					}
 				} catch (IntrospectionException e) {
 					// no getter/setter
 					// ignored
@@ -353,7 +358,9 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		@Override
 		protected boolean doDetect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticField fieldAnnotation = field.getAnnotation(ElasticField.class);
-			descriptor.registerField(field.getName(), fieldAnnotation);
+			if (fieldAnnotation != null) {
+				descriptor.registerField(field.getName(), fieldAnnotation);
+			}
 			// always return false
 			return false;
 		}
