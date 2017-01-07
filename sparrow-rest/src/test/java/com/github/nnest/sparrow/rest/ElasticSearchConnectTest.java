@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 public class ElasticSearchConnectTest {
 	@Test
 	public void test() throws ElasticCommandException, ElasticExecutorException {
+		
 //		ElasticClient client = createClient();
 //		TwitterTweet tt = new TwitterTweet();
 //		tt.setId("1");
