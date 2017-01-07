@@ -33,7 +33,19 @@ public abstract class AbstractElasticDocumentAnalyzer implements ElasticDocument
 	 * 
 	 * @return
 	 */
-	protected abstract ElasticCommand doAnalysis(ElasticCommandKind commandKind, Object document);
+	protected ElasticCommand doAnalysis(ElasticCommandKind commandKind, Object document) {
+		ElasticDocumentDescriptor descriptor = this.getDocumentDescriptor(commandKind, document);
+		return new DefaultElasticCommand(commandKind, document, descriptor);
+	}
+
+	/**
+	 * get document descriptor by given command kind and document instance
+	 * 
+	 * @param commandKind
+	 * @param document
+	 * @return
+	 */
+	protected abstract ElasticDocumentDescriptor getDocumentDescriptor(ElasticCommandKind commandKind, Object document);
 
 	/**
 	 * validate document, throw {@linkplain ElasticDocumentValidationException}

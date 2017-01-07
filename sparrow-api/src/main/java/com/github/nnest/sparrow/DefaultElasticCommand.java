@@ -14,12 +14,16 @@ public class DefaultElasticCommand implements ElasticCommand {
 	private ElasticCommandKind kind = null;
 	private Object originalDocument = null;
 
+	private ElasticDocumentDescriptor descriptor = null;
+
 	public DefaultElasticCommand() {
 	}
 
-	public DefaultElasticCommand(ElasticCommandKind kind, Object originalDocument) {
+	public DefaultElasticCommand(ElasticCommandKind kind, Object originalDocument,
+			ElasticDocumentDescriptor descriptor) {
 		this.setKind(kind);
 		this.setOriginalDocument(originalDocument);
+		this.setDescriptor(descriptor);
 	}
 
 	/**
@@ -58,5 +62,25 @@ public class DefaultElasticCommand implements ElasticCommand {
 		assert kind != null : "Elastic command kind cannot be null.";
 
 		this.kind = kind;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.ElasticCommand#getDescriptor()
+	 */
+	@Override
+	public ElasticDocumentDescriptor getDescriptor() {
+		return descriptor;
+	}
+
+	/**
+	 * @param descriptor
+	 *            the descriptor to set
+	 */
+	public void setDescriptor(ElasticDocumentDescriptor descriptor) {
+		assert descriptor != null : "Elastic document descriptor cannot be null.";
+		
+		this.descriptor = descriptor;
 	}
 }

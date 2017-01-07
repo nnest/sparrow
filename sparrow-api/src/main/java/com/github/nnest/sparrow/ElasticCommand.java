@@ -24,4 +24,11 @@ public interface ElasticCommand {
 	 * @return
 	 */
 	ElasticCommandKind getKind();
+
+	/**
+	 * get document descriptor
+	 * 
+	 * @return
+	 */
+	ElasticDocumentDescriptor getDescriptor();
 }
