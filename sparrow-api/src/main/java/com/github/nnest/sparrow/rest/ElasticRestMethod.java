@@ -13,13 +13,13 @@ import java.util.Map;
  * @since 0.0.1
  * @version 0.0.1
  */
-public enum ElasitcRestMethod {
+public enum ElasticRestMethod {
 	GET, HEAD, POST, PUT, PATCH, DELETE, OPTIONS, TRACE;
 
-	private static final Map<String, ElasitcRestMethod> mappings = new HashMap<String, ElasitcRestMethod>(8);
+	private static final Map<String, ElasticRestMethod> mappings = new HashMap<String, ElasticRestMethod>(8);
 
 	static {
-		for (ElasitcRestMethod httpMethod : values()) {
+		for (ElasticRestMethod httpMethod : values()) {
 			mappings.put(httpMethod.name(), httpMethod);
 		}
 	}
@@ -33,7 +33,7 @@ public enum ElasitcRestMethod {
 	 *         not found
 	 * @since 4.2.4
 	 */
-	public static ElasitcRestMethod resolve(String method) {
+	public static ElasticRestMethod resolve(String method) {
 		return (method != null ? mappings.get(method) : null);
 	}
 

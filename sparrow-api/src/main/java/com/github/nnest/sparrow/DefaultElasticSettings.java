@@ -31,7 +31,7 @@ public class DefaultElasticSettings implements ElasticSettings {
 	 */
 	public void setHosts(List<ElasticHost> hosts) {
 		assert hosts != null && hosts.size() != 0 : "Hosts cannot be null or empty.";
-		
+
 		this.hosts = hosts;
 	}
 }

@@ -10,11 +10,18 @@ package com.github.nnest.sparrow;
  * @since 0.0.1
  * @version 0.0.1
  */
-public interface ElasticCommandResultHanlder {
+public interface ElasticCommandResultHandler {
 	/**
-	 * handle elastic command result
+	 * handle elastic command result on fail
 	 * 
 	 * @param result
 	 */
-	void handle(ElasticCommandResult result);
+	void handleSuccess(ElasticCommandResult result);
+
+	/**
+	 * handle elastic command result on success
+	 * 
+	 * @param exception
+	 */
+	void handleFail(Exception exception);
 }

@@ -13,12 +13,12 @@ package com.github.nnest.sparrow;
  */
 public interface ElasticCommandExecutor {
 	/**
-	 * close rest client
+	 * close command executor
 	 * 
 	 * @throws ElasticCommandException
 	 * 
 	 */
-	void close() throws ElasticCommandException;
+	void close() throws ElasticExecutorException;
 
 	/**
 	 * execute command and return result
@@ -34,8 +34,6 @@ public interface ElasticCommandExecutor {
 	 * 
 	 * @param command
 	 * @param commandResultHandler
-	 * @throws ElasticCommandException
 	 */
-	void executeAsync(ElasticCommand command, ElasticCommandResultHanlder commandResultHandler)
-			throws ElasticCommandException;
+	void executeAsync(ElasticCommand command, ElasticCommandResultHandler commandResultHandler);
 }

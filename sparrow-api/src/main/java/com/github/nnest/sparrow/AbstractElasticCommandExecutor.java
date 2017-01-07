@@ -40,6 +40,6 @@ public abstract class AbstractElasticCommandExecutor implements ElasticCommandEx
 	 * @see com.github.nnest.sparrow.ElasticCommandExecutor#close()
 	 */
 	@Override
-	public void close() throws ElasticCommandException {
+	public void close() throws ElasticExecutorException {
 	}
 }

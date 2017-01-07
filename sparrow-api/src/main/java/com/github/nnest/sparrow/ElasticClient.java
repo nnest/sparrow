@@ -16,7 +16,8 @@ public interface ElasticClient {
 	 * 
 	 * @param bean
 	 * @return
-	 * @throws ElasticCommandException 
+	 * @throws ElasticCommandException
+	 * @throws ElasticExecutorException
 	 */
-	<T> T index(T bean) throws ElasticCommandException;
+	<T> T index(T bean) throws ElasticCommandException, ElasticExecutorException;
 }
