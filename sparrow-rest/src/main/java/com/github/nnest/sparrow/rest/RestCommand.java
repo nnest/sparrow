@@ -3,14 +3,13 @@
  */
 package com.github.nnest.sparrow.rest;
 
-import java.io.IOException;
-
 import org.elasticsearch.client.RestClient;
 
 import com.github.nnest.sparrow.ElasticCommand;
 import com.github.nnest.sparrow.ElasticCommandException;
 import com.github.nnest.sparrow.ElasticCommandResult;
 import com.github.nnest.sparrow.ElasticCommandResultHandler;
+import com.github.nnest.sparrow.ElasticExecutorException;
 
 /**
  * rest command<br>
@@ -27,9 +26,11 @@ public interface RestCommand {
 	 * @param restClient
 	 * @param command
 	 * @return
-	 * @throws IOException
+	 * @throws ElasticExecutorException
+	 * @throws ElasticCommandException
 	 */
-	ElasticCommandResult performRequest(RestClient restClient, ElasticCommand command) throws ElasticCommandException;
+	ElasticCommandResult performRequest(RestClient restClient, ElasticCommand command)
+			throws ElasticCommandException, ElasticExecutorException;
 
 	/**
 	 * perform request asynchronized

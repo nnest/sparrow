@@ -71,11 +71,13 @@ public class RestElasticCommandExecutor extends AbstractElasticCommandExecutor {
 	 * (non-Javadoc)
 	 * 
 	 * @throws ElasticCommandException
+	 * @throws ElasticExecutorException
 	 * 
 	 * @see com.github.nnest.sparrow.ElasticCommander#execute(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
-	public ElasticCommandResult execute(ElasticCommand command) throws ElasticCommandException {
+	public ElasticCommandResult execute(ElasticCommand command)
+			throws ElasticCommandException, ElasticExecutorException {
 		return RestCommandSet.get(command.getKind()).performRequest(this.getRestClient(), command);
 	}
 

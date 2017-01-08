@@ -26,8 +26,9 @@ public interface ElasticCommandExecutor {
 	 * @param command
 	 * @return
 	 * @throws ElasticCommandException
+	 * @throws ElasticExecutorException
 	 */
-	ElasticCommandResult execute(ElasticCommand command) throws ElasticCommandException;
+	ElasticCommandResult execute(ElasticCommand command) throws ElasticCommandException, ElasticExecutorException;
 
 	/**
 	 * execute command asynchronized and handle result by result handler
