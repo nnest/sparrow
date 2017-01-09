@@ -10,7 +10,7 @@ before_script:
   - sleep 10
 script:
   - cd sparrow-parent
-  - mvn clean verify
+  - mvn clean verify -DskipTests
 before_install:
   - java -version
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb && sudo service elasticsearch restart
