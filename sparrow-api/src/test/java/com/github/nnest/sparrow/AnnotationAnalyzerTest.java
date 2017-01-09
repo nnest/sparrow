@@ -5,6 +5,8 @@ package com.github.nnest.sparrow;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Set;
+
 import org.junit.Test;
 
 import com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer;
@@ -28,8 +30,8 @@ public class AnnotationAnalyzerTest {
 		assertEquals("testType", descriptor.getType());
 		assertEquals("id", descriptor.getIdField());
 
-		String[] fields = descriptor.getFields();
-		assertEquals(3, fields.length);
+		Set<String> fields = descriptor.getFields();
+		assertEquals(3, fields.size());
 	}
 
 	@ElasticDocument(index = "testIndex", type = "testType")
@@ -47,7 +49,7 @@ public class AnnotationAnalyzerTest {
 
 		@ElasticIgnored
 		private String testProp3 = null;
-		
+
 		@ElasticField
 		private String testProp4 = null;
 

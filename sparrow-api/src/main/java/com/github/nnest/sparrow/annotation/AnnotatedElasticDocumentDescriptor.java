@@ -4,9 +4,9 @@
 package com.github.nnest.sparrow.annotation;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 
@@ -21,8 +21,8 @@ public class AnnotatedElasticDocumentDescriptor implements ElasticDocumentDescri
 	private Class<?> documentClass = null;
 	private ElasticDocument document = null;
 	private String idField = null;
-	private List<String> fields = new LinkedList<String>();
-	private List<String> ignoredFields = new LinkedList<String>();
+	private Set<String> fields = new HashSet<String>();
+	private Set<String> ignoredFields = new HashSet<String>();
 	private Map<String, ElasticField> fieldDescriptors = new HashMap<String, ElasticField>();
 
 	/**
@@ -95,8 +95,8 @@ public class AnnotatedElasticDocumentDescriptor implements ElasticDocumentDescri
 	 * @see com.github.nnest.sparrow.ElasticDocumentDescriptor#getFields()
 	 */
 	@Override
-	public String[] getFields() {
-		return this.fields.toArray(new String[this.fields.size()]);
+	public Set<String> getFields() {
+		return fields;
 	}
 
 	/**

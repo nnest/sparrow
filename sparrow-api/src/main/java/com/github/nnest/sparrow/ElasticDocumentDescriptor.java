@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow;
 
+import java.util.Set;
+
 /**
  * Elastic document descriptor
  * 
@@ -45,5 +47,5 @@ public interface ElasticDocumentDescriptor {
 	 * 
 	 * @return
 	 */
-	String[] getFields();
+	Set<String> getFields();
 }

@@ -16,10 +16,14 @@ import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import com.github.nnest.sparrow.ElasticCommand;
 import com.github.nnest.sparrow.ElasticCommandException;
 import com.github.nnest.sparrow.ElasticCommandResult;
 import com.github.nnest.sparrow.ElasticCommandResultHandler;
+import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 
 /**
@@ -34,8 +38,6 @@ public abstract class AbstractRestCommand implements RestCommand {
 
 	/**
 	 * (non-Javadoc)
-	 * 
-	 * @throws ElasticExecutorException
 	 * 
 	 * @see com.github.nnest.sparrow.rest.RestCommand#performRequest(org.elasticsearch.client.RestClient,
 	 *      com.github.nnest.sparrow.ElasticCommand)
@@ -146,13 +148,25 @@ public abstract class AbstractRestCommand implements RestCommand {
 	}
 
 	/**
+	 * create {@linkplain ObjectMapper} according to given document descriptor
+	 * 
+	 * @param documentDescriptor
+	 * @return
+	 */
+	protected ObjectMapper createObjectMapper(ElasticDocumentDescriptor documentDescriptor) {
+		ObjectMapper mapper = new ObjectMapper();
+		return mapper
+				.setVisibility(new DocumentFieldVisibilityChecker(mapper.getVisibilityChecker(), documentDescriptor));
+	}
+
+	/**
 	 * document id visitor
 	 * 
 	 * @author brad.wu
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	private static class DocumentIdVisitor {
+	public static class DocumentIdVisitor {
 		private static final Class<?>[] NO_PARAM_TYPES = new Class<?>[0];
 		private static final Object[] NO_PARAM_OBJECTS = new Object[0];
 
@@ -290,6 +304,115 @@ public abstract class AbstractRestCommand implements RestCommand {
 		 */
 		public void setHeaders(Header[] headers) {
 			this.headers = headers;
+		}
+	}
+
+	/**
+	 * document field visibility checker
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.1
+	 * @version 0.0.1
+	 */
+	@SuppressWarnings("rawtypes")
+	public static class DocumentFieldVisibilityChecker extends VisibilityChecker.Std {
+		private static final long serialVersionUID = 6321985313833406329L;
+
+		private VisibilityChecker parentChecker = null;
+		private ElasticDocumentDescriptor documentDescriptor = null;
+
+		public DocumentFieldVisibilityChecker(VisibilityChecker parentChecker,
+				ElasticDocumentDescriptor documentDescriptor) {
+			super(Visibility.DEFAULT);
+			this.parentChecker = parentChecker;
+			this.documentDescriptor = documentDescriptor;
+		}
+
+		/**
+		 * @return the parentChecker
+		 */
+		public VisibilityChecker getParentChecker() {
+			return parentChecker;
+		}
+
+		/**
+		 * @return the documentDescriptor
+		 */
+		public ElasticDocumentDescriptor getDocumentDescriptor() {
+			return documentDescriptor;
+		}
+
+		/**
+		 * the visibility of given property name
+		 * 
+		 * @param name
+		 * @return
+		 */
+		protected boolean isPropertyVisible(String name) {
+			ElasticDocumentDescriptor descriptor = this.getDocumentDescriptor();
+			return descriptor.getIdField().equals(name) || descriptor.getFields().contains(name);
+		}
+
+		/**
+		 * get property name by given method. method should be getter or setter
+		 * 
+		 * @param method
+		 * @return
+		 */
+		protected String getPropertyName(Method method) {
+			String methodName = method.getName().substring(3);
+			return methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
+		}
+
+		/**
+		 * get property name by given method. method should be is-getter
+		 * 
+		 * @param method
+		 * @return
+		 */
+		protected String getIsPropertyName(Method method) {
+			String methodName = method.getName().substring(2);
+			return methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isFieldVisible(java.lang.reflect.Field)
+		 */
+		@Override
+		public boolean isFieldVisible(Field f) {
+			return this.isPropertyVisible(f.getName()) && super.isFieldVisible(f);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isGetterVisible(java.lang.reflect.Method)
+		 */
+		@Override
+		public boolean isGetterVisible(Method m) {
+			return this.isPropertyVisible(this.getPropertyName(m)) && super.isGetterVisible(m);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isIsGetterVisible(java.lang.reflect.Method)
+		 */
+		@Override
+		public boolean isIsGetterVisible(Method m) {
+			return this.isPropertyVisible(this.getIsPropertyName(m)) && super.isIsGetterVisible(m);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isSetterVisible(java.lang.reflect.Method)
+		 */
+		@Override
+		public boolean isSetterVisible(Method m) {
+			return this.isPropertyVisible(this.getPropertyName(m)) && super.isSetterVisible(m);
 		}
 	}
 }
