@@ -13,4 +13,5 @@ script:
   - mvn clean verify -DskipTests
 before_install:
   - java -version
+  - echo $JAVA_HOME
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb && sudo service elasticsearch restart
