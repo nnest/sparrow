@@ -4,6 +4,8 @@ jdk:
   - oraclejdk8
 os:
   - linux
+services:
+  - docker
 before_script:
   - sleep 10
 script:
