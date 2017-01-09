@@ -177,7 +177,7 @@ public class DefaultElasticClient implements ElasticClient {
 				this.getCommandExecutor().close();
 			} catch (ElasticExecutorException e) {
 				// never throw this exception
-				this.getLogger().warn(String.format("Fail to close command executor[%1s]", this.getCommandExecutor()),
+				this.getLogger().warn(String.format("Fail to close command executor[%1$s]", this.getCommandExecutor()),
 						e);
 			}
 		}

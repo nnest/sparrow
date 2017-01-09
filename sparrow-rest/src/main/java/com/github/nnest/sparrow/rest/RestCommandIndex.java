@@ -55,9 +55,9 @@ public class RestCommandIndex extends AbstractRestCommand {
 
 		if (Strings.nullToEmpty(idValue).trim().length() == 0) {
 			// no id identified
-			request.setEndpoint(String.format("%1s/%2s", descriptor.getIndex(), descriptor.getType()));
+			request.setEndpoint(String.format("%1$s/%2$s", descriptor.getIndex(), descriptor.getType()));
 		} else {
-			request.setEndpoint(String.format("%1s/%2s/%3$s", descriptor.getIndex(), descriptor.getType(), idValue));
+			request.setEndpoint(String.format("%1$s/%2$s/%3$s", descriptor.getIndex(), descriptor.getType(), idValue));
 		}
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -65,7 +65,7 @@ public class RestCommandIndex extends AbstractRestCommand {
 		try {
 			documentJSONString = mapper.writeValueAsString(document);
 		} catch (JsonProcessingException e) {
-			throw new ElasticExecutorException(String.format("Fail to parse document[%1s] to JSON.", documentType), e);
+			throw new ElasticExecutorException(String.format("Fail to parse document[%1$s] to JSON.", documentType), e);
 		}
 		request.setEntity(new StringEntity(documentJSONString, "UTF-8"));
 		return request;

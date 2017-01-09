@@ -111,7 +111,7 @@ public class AnnotationTest {
 			 */
 			@Override
 			public void describeTo(Description description) {
-				description.appendText(String.format("Error code should be [%1s]", code));
+				description.appendText(String.format("Error code should be [%1$s]", code));
 			}
 		};
 	}

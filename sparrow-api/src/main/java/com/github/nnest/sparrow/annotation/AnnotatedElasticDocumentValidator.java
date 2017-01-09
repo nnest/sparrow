@@ -48,7 +48,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 					this.checkIdFieldType(field);
 					if (idProperty != null) {
 						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String.format(
-								"Duplicated ids[%1s, %2s] found on document[%3s].", idProperty, field.getName(), type));
+								"Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, field.getName(), type));
 					}
 					idProperty = field.getName();
 				}
@@ -62,7 +62,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 					String name = this.checkMethod(type, method, id);
 					if (idProperty != null) {
 						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String
-								.format("Duplicated ids[%1s, %2s] found on document[%3s].", idProperty, method, type));
+								.format("Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, method, type));
 					}
 					idProperty = name;
 				} else {
@@ -75,7 +75,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 
 			if (idProperty == null) {
 				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ID_NOT_FOUND,
-						String.format("Id not found on document[%1s]", type.getName()));
+						String.format("Id not found on document[%1$s]", type.getName()));
 			}
 		}
 	}
@@ -88,7 +88,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	protected void checkMethodModifier(Method method) {
 		if ((method.getModifiers() & Modifier.PUBLIC) == 0) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_METHOD_NOT_PUBLIC,
-					String.format("Method[%1s] is illegal for assign, it must be public", method));
+					String.format("Method[%1$s] is illegal for assign, it must be public", method));
 		}
 	}
 
@@ -102,13 +102,13 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		String index = elasticDoc.index();
 		if (Strings.nullToEmpty(index).trim().length() == 0) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_INDEX_NOT_FOUND,
-					String.format("Index not found on document[%1s]", clazz));
+					String.format("Index not found on document[%1$s]", clazz));
 		}
 
 		String type = elasticDoc.type();
 		if (Strings.nullToEmpty(type).trim().length() == 0) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_TYPE_NOT_FOUND,
-					String.format("Index not found on document[%1s]", clazz));
+					String.format("Index not found on document[%1$s]", clazz));
 		}
 	}
 
@@ -130,13 +130,13 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		String methodName = method.getName();
 		if ("getClass".equals(methodName)) {
 			throw new ElasticDocumentValidationException(errorCode, String.format(
-					"Method[getClass] is illegal for assign on document[%1s]", method.getDeclaringClass().getName()));
+					"Method[getClass] is illegal for assign on document[%1$s]", method.getDeclaringClass().getName()));
 		}
 
 		int length = methodName.length();
 		if (length <= 2) {
 			throw new ElasticDocumentValidationException(errorCode, String
-					.format("Method[%1s] is illgeal for assign, should be a java bean getter or setter.", method));
+					.format("Method[%1$s] is illgeal for assign, should be a java bean getter or setter.", method));
 		}
 
 		String propertyName = null;
@@ -146,7 +146,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		if (methodName.startsWith("is")) {
 			if (method.getParameterCount() != 0) {
 				throw new ElasticDocumentValidationException(errorCode,
-						String.format("Method[%1s] is illgeal for assign, should be a java bean getter.", method));
+						String.format("Method[%1$s] is illgeal for assign, should be a java bean getter.", method));
 			}
 			this.checkReturnType(annotation, method);
 			propertyName = methodName.substring(2);
@@ -155,7 +155,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		} else if (methodName.startsWith("get")) {
 			if (method.getParameterCount() != 0) {
 				throw new ElasticDocumentValidationException(errorCode,
-						String.format("Method[%1s] is illgeal for assign, should be a java bean getter.", method));
+						String.format("Method[%1$s] is illgeal for assign, should be a java bean getter.", method));
 			}
 			this.checkReturnType(annotation, method);
 			propertyName = methodName.substring(3);
@@ -165,7 +165,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 			// getX, must returns something
 			if (method.getParameterCount() != 1 || method.getReturnType() != Void.class) {
 				throw new ElasticDocumentValidationException(errorCode,
-						String.format("Method[%1s] is illgeal for assign, should be a java bean setter.", method));
+						String.format("Method[%1$s] is illgeal for assign, should be a java bean setter.", method));
 			}
 			this.checkParamType(annotation, method);
 			propertyName = methodName.substring(3);
@@ -173,7 +173,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 			pairParamTypes = null;
 		} else {
 			throw new ElasticDocumentValidationException(errorCode, String
-					.format("Method[%1s] is illgeal for assign, should be a java bean getter or setter.", method));
+					.format("Method[%1$s] is illgeal for assign, should be a java bean getter or setter.", method));
 		}
 
 		try {
@@ -182,7 +182,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 			this.checkMethodModifier(pairMethod);
 		} catch (Exception e) {
 			throw new ElasticDocumentValidationException(errorCode,
-					String.format("Method[%1s] is illegal for assign, no pair method found.", method), e);
+					String.format("Method[%1$s] is illegal for assign, no pair method found.", method), e);
 		}
 
 		return propertyName;
@@ -200,7 +200,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		Class<?> type = method.getParameterTypes()[0];
 		if (type == Void.class || type == null) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
-					String.format("Method[%1s] is illgeal for assign, parameter type cannot be void.", method));
+					String.format("Method[%1$s] is illgeal for assign, parameter type cannot be void.", method));
 		}
 	}
 
@@ -208,7 +208,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		Class<?> type = method.getParameterTypes()[0];
 		if (type != Integer.class && type != Long.class && type != String.class) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String.format(
-					"Method[%1s] is illgeal for assign, parameter type must be Integer, Long or String.", method));
+					"Method[%1$s] is illgeal for assign, parameter type must be Integer, Long or String.", method));
 		}
 	}
 
@@ -224,7 +224,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		Class<?> type = method.getReturnType();
 		if (type == Void.class || type == null) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
-					String.format("Method[%1s] is illgeal for assign, return type cannot be void.", method));
+					String.format("Method[%1$s] is illgeal for assign, return type cannot be void.", method));
 		}
 	}
 
@@ -232,7 +232,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		Class<?> type = method.getReturnType();
 		if (type != Integer.class && type != Long.class && type != String.class) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String
-					.format("Method[%1s] is illgeal for assign, return type must be Integer, Long or String.", method));
+					.format("Method[%1$s] is illgeal for assign, return type must be Integer, Long or String.", method));
 		}
 	}
 
@@ -241,7 +241,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		if (type != Integer.class && type != Long.class && type != String.class) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
 					String.format(
-							"Field[%1s] is illgeal for assign ElasticId, return type must be Integer, Long or String.",
+							"Field[%1$s] is illgeal for assign ElasticId, return type must be Integer, Long or String.",
 							field.getName()));
 		}
 	}

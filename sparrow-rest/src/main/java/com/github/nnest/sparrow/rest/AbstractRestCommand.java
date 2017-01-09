@@ -49,7 +49,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 			response = restClient.performRequest(request.getMethod(), request.getEndpoint(), request.getParams(),
 					request.getEntity(), request.getHeaders());
 		} catch (IOException e) {
-			throw new ElasticCommandException(String.format("Fail to perform request with command[%1s]", command));
+			throw new ElasticCommandException(String.format("Fail to perform request with command[%1$s]", command));
 		}
 		return this.convertToCommandResult(response, command);
 	}
@@ -170,7 +170,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 					this.field.setAccessible(true);
 				} catch (Exception ex) {
 					throw new ElasticExecutorException(String.format(
-							"Fail to find visitor of id field[%1s] on document[%2s]", idFieldName, documentType));
+							"Fail to find visitor of id field[%1$s] on document[%2$s]", idFieldName, documentType));
 				}
 			}
 		}
@@ -190,13 +190,13 @@ public abstract class AbstractRestCommand implements RestCommand {
 					return this.field.get(document);
 				} else {
 					throw new ElasticExecutorException(
-							String.format("Fail to find visitor on document[%2s]", document.getClass()));
+							String.format("Fail to find visitor on document[%2$s]", document.getClass()));
 				}
 			} catch (ElasticExecutorException e) {
 				throw e;
 			} catch (Exception e) {
 				throw new ElasticExecutorException(
-						String.format("Failed to visit id value on document[%2s]", document.getClass()), e);
+						String.format("Failed to visit id value on document[%2$s]", document.getClass()), e);
 			}
 		}
 	}

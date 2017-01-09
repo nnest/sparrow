@@ -166,7 +166,7 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 				propertyName = methodName.substring(2);
 			} else {
 				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
-						String.format("Method[%1s] name should be a java bean getter or setter.", method));
+						String.format("Method[%1$s] name should be a java bean getter or setter.", method));
 			}
 
 			if (lowercaseFirst) {
