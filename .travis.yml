@@ -1,11 +1,9 @@
-sudo: true
+sudo: required
 language: java
 jdk:
   - oraclejdk8
-# addons:
-#   apt:
-#     packages:
-#       - oracle-java8-set-default
+os:
+  - linux
 before_script:
   - sleep 10
 script:
@@ -14,4 +12,5 @@ script:
 before_install:
   - java -version
   - echo $JAVA_HOME
-  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.0.2.deb && sudo dpkg -i --force-confnew elasticsearch-5.0.2.deb && sudo service elasticsearch restart
+  - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb
+  - sudo service elasticsearch start
