@@ -5,14 +5,16 @@ package com.github.nnest.sparrow.rest;
 
 import java.io.StringWriter;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.entity.StringEntity;
 import org.elasticsearch.client.Response;
 
-import com.github.nnest.sparrow.DefaultElasticCommandResult;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nnest.sparrow.ElasticCommand;
 import com.github.nnest.sparrow.ElasticCommandResult;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
+import com.github.nnest.sparrow.rest.response.RestResponseObject;
 import com.google.common.base.Strings;
 
 /**
@@ -30,8 +32,16 @@ public class RestCommandIndex extends AbstractRestCommand {
 	 *      com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
-	protected ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command) {
-		return new DefaultElasticCommandResult(command.getOriginalDocument());
+	protected ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command)
+			throws ElasticExecutorException {
+		HttpEntity entity = response.getEntity();
+		try {
+			RestResponseObject responseObject = new ObjectMapper().readValue(entity.getContent(),
+					RestResponseObject.class);
+			return new RestElasticCommandResult(command.getOriginalDocument(), responseObject);
+		} catch (Exception e) {
+			throw new ElasticExecutorException("Fail to read data from response", e);
+		}
 	}
 
 	/**
@@ -44,7 +54,6 @@ public class RestCommandIndex extends AbstractRestCommand {
 		ElasticDocumentDescriptor descriptor = command.getDescriptor();
 
 		RestRequest request = new RestRequest();
-		request.setMethod(ElasticRestMethod.PUT.name());
 
 		Object document = command.getOriginalDocument();
 		Class<?> documentType = document.getClass();
@@ -54,8 +63,12 @@ public class RestCommandIndex extends AbstractRestCommand {
 		if (Strings.nullToEmpty(idValue).trim().length() == 0) {
 			// no id identified
 			request.setEndpoint(String.format("%1$s/%2$s", descriptor.getIndex(), descriptor.getType()));
+			// use POST for auto id creation
+			request.setMethod(ElasticRestMethod.POST.name());
 		} else {
 			request.setEndpoint(String.format("%1$s/%2$s/%3$s", descriptor.getIndex(), descriptor.getType(), idValue));
+			// use PUT for id given
+			request.setMethod(ElasticRestMethod.PUT.name());
 		}
 
 		StringWriter documentJSONString = new StringWriter();

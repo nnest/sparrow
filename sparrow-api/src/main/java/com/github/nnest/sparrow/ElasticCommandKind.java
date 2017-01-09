@@ -11,5 +11,6 @@ package com.github.nnest.sparrow;
  * @version 0.0.1
  */
 public enum ElasticCommandKind {
-	INDEX
+	INDEX, // index document, create if not exists and update if exists
+	CREATE_INDEX // create document, fail if exists
 }

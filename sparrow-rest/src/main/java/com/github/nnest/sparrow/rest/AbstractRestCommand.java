@@ -64,8 +64,11 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * @param command
 	 *            command to execute
 	 * @return command execution result
+	 * @throws ElasticExecutorException
+	 *             executor exception
 	 */
-	protected abstract ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command);
+	protected abstract ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command)
+			throws ElasticExecutorException;
 
 	/**
 	 * convert command to rest request
@@ -117,7 +120,11 @@ public abstract class AbstractRestCommand implements RestCommand {
 			 */
 			@Override
 			public void onSuccess(Response response) {
-				commandResultHandler.handleSuccess(convertToCommandResult(response, command));
+				try {
+					commandResultHandler.handleSuccess(convertToCommandResult(response, command));
+				} catch (ElasticExecutorException e) {
+					this.onFailure(e);
+				}
 			}
 
 			/**

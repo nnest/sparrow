@@ -11,32 +11,32 @@ package com.github.nnest.sparrow;
  * @version 0.0.1
  */
 public class DefaultElasticCommandResult implements ElasticCommandResult {
-	private Object resultObject = null;
+	private Object originalDocument = null;
 
 	public DefaultElasticCommandResult() {
 
 	}
 
-	public DefaultElasticCommandResult(Object resultObject) {
-		this.setResultObject(resultObject);
+	public DefaultElasticCommandResult(Object originalDocument) {
+		this.setOriginalDocument(originalDocument);
 	}
 
 	/**
-	 * @param resultObject
-	 *            the resultObject to set
+	 * @param originalDocument
+	 *            the originalDocument to set
 	 */
-	public void setResultObject(Object resultObject) {
-		this.resultObject = resultObject;
+	public void setOriginalDocument(Object originalDocument) {
+		this.originalDocument = originalDocument;
 	}
 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.ElasticCommandResult#getResultObject()
+	 * @see com.github.nnest.sparrow.ElasticCommandResult#getOriginalDocument()
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getResultObject() {
-		return (T) this.resultObject;
+	public <T> T getOriginalDocument() {
+		return (T) this.originalDocument;
 	}
 }

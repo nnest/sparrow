@@ -74,7 +74,7 @@ public class DefaultElasticClient implements ElasticClient {
 	@Override
 	public <T> T index(T document) throws ElasticCommandException, ElasticExecutorException {
 		ElasticCommand command = this.getDocumentAnalyzer().analysis(ElasticCommandKind.INDEX, document);
-		return this.executeCommand(command).getResultObject();
+		return this.executeCommand(command).getOriginalDocument();
 	}
 
 	/**
