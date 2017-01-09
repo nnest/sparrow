@@ -20,7 +20,7 @@
 		<url>https://github.com/nnest/sparrow/issues</url>
 	</issueManagement>
 	<scm>
-		<developerConnection>bradwoo8621</developerConnection>
+		<developerConnection>https://github.com/nnest/sparrow.git</developerConnection>
 		<url>https://github.com/nnest/sparrow.git</url>
 		<connection>https://github.com/nnest/sparrow.git</connection>
 	</scm>
@@ -34,6 +34,12 @@
 			<url>https://opensource.org/licenses/MIT</url>
 		</license>
 	</licenses>
+	<developers>
+		<developer>
+			<name>bradwoo8621</name>
+			<email>bradwoo8621@gmail.com</email>
+		</developer>
+	</developers>
 
 	<properties>
 		<java.version>1.8</java.version>
