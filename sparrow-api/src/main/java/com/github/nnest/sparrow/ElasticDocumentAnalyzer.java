@@ -16,9 +16,10 @@ public interface ElasticDocumentAnalyzer {
 	 * analysis document
 	 * 
 	 * @param commandKind
+	 *            command kind
 	 * @param document
-	 * 
-	 * @return
+	 *            document
+	 * @return command to execute
 	 */
 	ElasticCommand analysis(ElasticCommandKind commandKind, Object document);
 }

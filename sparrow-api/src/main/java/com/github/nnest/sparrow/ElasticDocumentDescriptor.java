@@ -16,28 +16,28 @@ public interface ElasticDocumentDescriptor {
 	/**
 	 * get document class
 	 * 
-	 * @return
+	 * @return document class
 	 */
 	Class<?> getDocumentClass();
 
 	/**
 	 * get index name
 	 * 
-	 * @return
+	 * @return index name
 	 */
 	String getIndex();
 
 	/**
 	 * get type name
 	 * 
-	 * @return
+	 * @return type name
 	 */
 	String getType();
 
 	/**
 	 * get id field
 	 * 
-	 * @return
+	 * @return id field name
 	 */
 	String getIdField();
 
@@ -45,7 +45,7 @@ public interface ElasticDocumentDescriptor {
 	 * get fields. id field is not included, visit id field via
 	 * {@linkplain #getIdField()}
 	 * 
-	 * @return
+	 * @return field set
 	 */
 	Set<String> getFields();
 }

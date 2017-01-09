@@ -14,7 +14,7 @@ public interface ElasticCommandResult {
 	/**
 	 * get result object
 	 * 
-	 * @return
+	 * @return result object
 	 */
 	<T> T getResultObject();
 }

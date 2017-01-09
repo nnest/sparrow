@@ -15,7 +15,8 @@ public interface ElasticCommandExecutorCreator {
 	 * create command executor by given settings
 	 * 
 	 * @param settings
-	 * @return
+	 *            settings
+	 * @return command executor
 	 */
 	ElasticCommandExecutor create(ElasticSettings settings);
 }

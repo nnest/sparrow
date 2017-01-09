@@ -57,7 +57,8 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 	 * read document type to descriptor
 	 * 
 	 * @param docType
-	 * @return
+	 *            document class
+	 * @return document descriptor
 	 */
 	protected ElasticDocumentDescriptor readToDocumentDescriptor(Class<?> docType) {
 		AnnotatedElasticDocumentDescriptor descriptor = new AnnotatedElasticDocumentDescriptor();

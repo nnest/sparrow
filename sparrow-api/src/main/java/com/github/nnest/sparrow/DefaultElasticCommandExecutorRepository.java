@@ -81,6 +81,6 @@ public class DefaultElasticCommandExecutorRepository implements ElasticCommandEx
 	 * @see com.github.nnest.sparrow.ElasticCommandExecutorRepository#destroy()
 	 */
 	@Override
-	public void destroy() throws ElasticCommandException {
+	public void destroy() throws ElasticExecutorException {
 	}
 }

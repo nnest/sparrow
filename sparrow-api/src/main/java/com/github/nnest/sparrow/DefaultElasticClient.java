@@ -60,7 +60,7 @@ public class DefaultElasticClient implements ElasticClient {
 	/**
 	 * get rest client
 	 * 
-	 * @return
+	 * @return command executor
 	 */
 	protected ElasticCommandExecutor getCommandExecutor() {
 		return this.getCommandExecutorRepository().getCommandExecutor();
@@ -69,7 +69,7 @@ public class DefaultElasticClient implements ElasticClient {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @throws ElasticCommandException
+	 * @see com.github.nnest.sparrow.ElasticClient#index(java.lang.Object)
 	 */
 	@Override
 	public <T> T index(T document) throws ElasticCommandException, ElasticExecutorException {
@@ -77,8 +77,14 @@ public class DefaultElasticClient implements ElasticClient {
 		return this.executeCommand(command).getResultObject();
 	}
 
-	public <T> void indexAsync(T document, ElasticCommandResultHandler commandResultHandler)
-			throws ElasticCommandException {
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.ElasticClient#indexAsync(java.lang.Object,
+	 *      com.github.nnest.sparrow.ElasticCommandResultHandler)
+	 */
+	@Override
+	public <T> void indexAsync(T document, ElasticCommandResultHandler commandResultHandler) {
 		ElasticCommand command = this.getDocumentAnalyzer().analysis(ElasticCommandKind.INDEX, document);
 		this.executeCommandAsync(command, commandResultHandler);
 	}
@@ -87,7 +93,9 @@ public class DefaultElasticClient implements ElasticClient {
 	 * execute command asynchronized
 	 * 
 	 * @param command
+	 *            command to execute
 	 * @param commandResultHandler
+	 *            command execution result handler
 	 */
 	protected void executeCommandAsync(ElasticCommand command, ElasticCommandResultHandler commandResultHandler) {
 		ElasticCommandExecutor commandExecutor = this.getCommandExecutor();
@@ -98,7 +106,12 @@ public class DefaultElasticClient implements ElasticClient {
 	 * execute command
 	 * 
 	 * @param command
-	 * @return
+	 *            command to execute
+	 * @return command execution result
+	 * @throws ElasticCommandException
+	 *             command exception
+	 * @throws ElasticExecutorException
+	 *             executor exception
 	 */
 	protected ElasticCommandResult executeCommand(ElasticCommand command)
 			throws ElasticCommandException, ElasticExecutorException {

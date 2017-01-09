@@ -103,7 +103,9 @@ public class AnnotatedElasticDocumentDescriptor implements ElasticDocumentDescri
 	 * register field
 	 * 
 	 * @param name
+	 *            field name
 	 * @param field
+	 *            field annotation
 	 */
 	public synchronized void registerField(String name, ElasticField field) {
 		this.fieldDescriptors.put(name, field);
@@ -116,6 +118,7 @@ public class AnnotatedElasticDocumentDescriptor implements ElasticDocumentDescri
 	 * register field as ignored
 	 * 
 	 * @param field
+	 *            field name
 	 */
 	public synchronized void registerAsIgnored(String field) {
 		ignoredFields.add(field);

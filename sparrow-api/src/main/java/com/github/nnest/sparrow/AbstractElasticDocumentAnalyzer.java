@@ -29,9 +29,10 @@ public abstract class AbstractElasticDocumentAnalyzer implements ElasticDocument
 	 * analysis document, implements by sub classes.
 	 * 
 	 * @param commandKind
+	 *            command kind
 	 * @param document
-	 * 
-	 * @return
+	 *            document
+	 * @return command to execute
 	 */
 	protected ElasticCommand doAnalysis(ElasticCommandKind commandKind, Object document) {
 		ElasticDocumentDescriptor descriptor = this.getDocumentDescriptor(commandKind, document);
@@ -42,8 +43,10 @@ public abstract class AbstractElasticDocumentAnalyzer implements ElasticDocument
 	 * get document descriptor by given command kind and document instance
 	 * 
 	 * @param commandKind
+	 *            command kind
 	 * @param document
-	 * @return
+	 *            document
+	 * @return document descriptor
 	 */
 	protected abstract ElasticDocumentDescriptor getDocumentDescriptor(ElasticCommandKind commandKind, Object document);
 
@@ -52,6 +55,7 @@ public abstract class AbstractElasticDocumentAnalyzer implements ElasticDocument
 	 * if failed.
 	 * 
 	 * @param document
+	 *            document
 	 */
 	protected void validate(Object document) {
 		ElasticDocumentValidator validator = this.getValidator();
@@ -61,13 +65,17 @@ public abstract class AbstractElasticDocumentAnalyzer implements ElasticDocument
 	}
 
 	/**
-	 * @return the validator
+	 * get document validator
+	 * 
+	 * @return document validator
 	 */
 	public ElasticDocumentValidator getValidator() {
 		return validator;
 	}
 
 	/**
+	 * set document validator
+	 * 
 	 * @param validator
 	 *            the validator to set
 	 */

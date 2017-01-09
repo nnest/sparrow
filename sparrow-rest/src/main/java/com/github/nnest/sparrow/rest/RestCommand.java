@@ -24,10 +24,14 @@ public interface RestCommand {
 	 * perform request
 	 * 
 	 * @param restClient
+	 *            rest client
 	 * @param command
-	 * @return
+	 *            command to execute
+	 * @return command execution result
 	 * @throws ElasticExecutorException
+	 *             executor exception
 	 * @throws ElasticCommandException
+	 *             command exception
 	 */
 	ElasticCommandResult performRequest(RestClient restClient, ElasticCommand command)
 			throws ElasticCommandException, ElasticExecutorException;
@@ -36,8 +40,11 @@ public interface RestCommand {
 	 * perform request asynchronized
 	 * 
 	 * @param restClient
+	 *            rest client
 	 * @param command
+	 *            ommand to execute
 	 * @param commandResultHandler
+	 *            command execution result
 	 */
 	void performRequestAsync(RestClient restClient, ElasticCommand command,
 			ElasticCommandResultHandler commandResultHandler);

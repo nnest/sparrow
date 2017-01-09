@@ -39,7 +39,7 @@ public class RestElasticCommandExecutor extends AbstractElasticCommandExecutor {
 	/**
 	 * create rest client
 	 * 
-	 * @return
+	 * @return rest client
 	 */
 	protected RestClient createRestClient() {
 		ElasticSettings settings = this.getSettings();
@@ -70,10 +70,7 @@ public class RestElasticCommandExecutor extends AbstractElasticCommandExecutor {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @throws ElasticCommandException
-	 * @throws ElasticExecutorException
-	 * 
-	 * @see com.github.nnest.sparrow.ElasticCommander#execute(com.github.nnest.sparrow.ElasticCommand)
+	 * @see com.github.nnest.sparrow.ElasticCommandExecutor#execute(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
 	public ElasticCommandResult execute(ElasticCommand command)
@@ -84,7 +81,7 @@ public class RestElasticCommandExecutor extends AbstractElasticCommandExecutor {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.ElasticCommander#executeAsync(com.github.nnest.sparrow.ElasticCommand,
+	 * @see com.github.nnest.sparrow.ElasticCommandExecutor#executeAsync(com.github.nnest.sparrow.ElasticCommand,
 	 *      com.github.nnest.sparrow.ElasticCommandResultHandler)
 	 */
 	@Override

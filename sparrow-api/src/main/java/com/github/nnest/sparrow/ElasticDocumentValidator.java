@@ -16,6 +16,7 @@ public interface ElasticDocumentValidator {
 	 * {@linkplain ElasticDocumentValidationException} if not passed.
 	 * 
 	 * @param document
+	 *            document to validate
 	 */
 	void validate(Object document);
 }

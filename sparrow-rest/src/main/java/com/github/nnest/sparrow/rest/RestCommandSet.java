@@ -26,7 +26,8 @@ public class RestCommandSet {
 	 * get rest command
 	 * 
 	 * @param commandKind
-	 * @return
+	 *            command kind
+	 * @return command
 	 */
 	public static RestCommand get(ElasticCommandKind commandKind) {
 		return commands.get(commandKind);
@@ -36,7 +37,9 @@ public class RestCommandSet {
 	 * register given command for given kind
 	 * 
 	 * @param commandKind
+	 *            command kind
 	 * @param command
+	 *            command
 	 */
 	public static void register(ElasticCommandKind commandKind, RestCommand command) {
 		commands.put(commandKind, command);

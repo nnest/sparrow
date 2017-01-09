@@ -60,8 +60,10 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * convert rest response to result
 	 * 
 	 * @param response
+	 *            response of rest client
 	 * @param command
-	 * @return
+	 *            command to execute
+	 * @return command execution result
 	 */
 	protected abstract ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command);
 
@@ -69,15 +71,15 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * convert command to rest request
 	 * 
 	 * @param command
-	 * @return
+	 *            command to execute
+	 * @return rest request
 	 * @throws ElasticExecutorException
+	 *             executor exception
 	 */
 	protected abstract RestRequest convertToRestRequest(ElasticCommand command) throws ElasticExecutorException;
 
 	/**
 	 * (non-Javadoc)
-	 * 
-	 * @throws ElasticExecutorException
 	 * 
 	 * @see com.github.nnest.sparrow.rest.RestCommand#performRequestAsync(org.elasticsearch.client.RestClient,
 	 *      com.github.nnest.sparrow.ElasticCommand,
@@ -100,8 +102,10 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * get response listener from command result handler
 	 * 
 	 * @param command
+	 *            command to execute
 	 * @param commandResultHandler
-	 * @return
+	 *            command execution result handler
+	 * @return response listener
 	 */
 	protected ResponseListener getResponseListener(ElasticCommand command,
 			ElasticCommandResultHandler commandResultHandler) {
@@ -132,9 +136,12 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * get id value of given document and id field
 	 * 
 	 * @param document
+	 *            document
 	 * @param idField
-	 * @return
+	 *            id field name
+	 * @return value of id field, convert to string
 	 * @throws ElasticExecutorException
+	 *             executor exception
 	 */
 	protected String getIdValue(Object document, String idField) throws ElasticExecutorException {
 		Class<?> documentType = document.getClass();
@@ -151,7 +158,8 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * create {@linkplain ObjectMapper} according to given document descriptor
 	 * 
 	 * @param documentDescriptor
-	 * @return
+	 *            document descriptor
+	 * @return object mapper
 	 */
 	protected ObjectMapper createObjectMapper(ElasticDocumentDescriptor documentDescriptor) {
 		ObjectMapper mapper = new ObjectMapper();
@@ -193,8 +201,10 @@ public abstract class AbstractRestCommand implements RestCommand {
 		 * get id value of given document
 		 * 
 		 * @param document
-		 * @return
+		 *            document
+		 * @return id value of document
 		 * @throws ElasticExecutorException
+		 *             executor exception
 		 */
 		public Object getIdValue(Object document) throws ElasticExecutorException {
 			try {
@@ -346,7 +356,8 @@ public abstract class AbstractRestCommand implements RestCommand {
 		 * the visibility of given property name
 		 * 
 		 * @param name
-		 * @return
+		 *            property name
+		 * @return true if visible
 		 */
 		protected boolean isPropertyVisible(String name) {
 			ElasticDocumentDescriptor descriptor = this.getDocumentDescriptor();
@@ -357,7 +368,8 @@ public abstract class AbstractRestCommand implements RestCommand {
 		 * get property name by given method. method should be getter or setter
 		 * 
 		 * @param method
-		 * @return
+		 *            method
+		 * @return property name
 		 */
 		protected String getPropertyName(Method method) {
 			String methodName = method.getName().substring(3);
@@ -368,7 +380,8 @@ public abstract class AbstractRestCommand implements RestCommand {
 		 * get property name by given method. method should be is-getter
 		 * 
 		 * @param method
-		 * @return
+		 *            method
+		 * @return property name
 		 */
 		protected String getIsPropertyName(Method method) {
 			String methodName = method.getName().substring(2);

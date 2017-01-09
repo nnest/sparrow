@@ -15,8 +15,8 @@ public interface ElasticCommandExecutor {
 	/**
 	 * close command executor
 	 * 
-	 * @throws ElasticCommandException
-	 * 
+	 * @throws ElasticExecutorException
+	 *             executor exception
 	 */
 	void close() throws ElasticExecutorException;
 
@@ -24,9 +24,12 @@ public interface ElasticCommandExecutor {
 	 * execute command and return result
 	 * 
 	 * @param command
-	 * @return
+	 *            command to execute
+	 * @return command execution result
 	 * @throws ElasticCommandException
+	 *             command exception
 	 * @throws ElasticExecutorException
+	 *             executor exception
 	 */
 	ElasticCommandResult execute(ElasticCommand command) throws ElasticCommandException, ElasticExecutorException;
 
@@ -34,7 +37,9 @@ public interface ElasticCommandExecutor {
 	 * execute command asynchronized and handle result by result handler
 	 * 
 	 * @param command
+	 *            command to execute
 	 * @param commandResultHandler
+	 *            command execution result handler
 	 */
 	void executeAsync(ElasticCommand command, ElasticCommandResultHandler commandResultHandler);
 }

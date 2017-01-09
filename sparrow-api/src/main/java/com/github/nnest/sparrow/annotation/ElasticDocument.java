@@ -22,7 +22,7 @@ import java.lang.annotation.Target;
  * getter/setter format. Only one time for per field, like spring data
  * bean,</li>
  * <li>if don't want to keep value in elastic, annotate field or method with
- * {@linkplain ElasticIngored},</li>
+ * {@linkplain ElasticIgnored},</li>
  * <li>any getter/setter (must existed both) which not be annotated, is default
  * persist to elastic,</li>
  * </ol>
@@ -38,14 +38,14 @@ public @interface ElasticDocument {
 	/**
 	 * the index name
 	 * 
-	 * @return
+	 * @return index name
 	 */
 	String index();
 
 	/**
 	 * the type name
 	 * 
-	 * @return
+	 * @return type name
 	 */
 	String type();
 }

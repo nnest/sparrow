@@ -14,21 +14,21 @@ public interface ElasticCommand {
 	/**
 	 * get original document
 	 * 
-	 * @return
+	 * @return original document object instance
 	 */
 	Object getOriginalDocument();
 
 	/**
 	 * get kind of command
 	 * 
-	 * @return
+	 * @return command kind
 	 */
 	ElasticCommandKind getKind();
 
 	/**
 	 * get document descriptor
 	 * 
-	 * @return
+	 * @return document descriptor
 	 */
 	ElasticDocumentDescriptor getDescriptor();
 }

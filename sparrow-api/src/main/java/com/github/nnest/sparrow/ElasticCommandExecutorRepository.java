@@ -14,12 +14,15 @@ public interface ElasticCommandExecutorRepository {
 	/**
 	 * get elastic commander
 	 * 
-	 * @return
+	 * @return command executor
 	 */
 	ElasticCommandExecutor getCommandExecutor();
 
 	/**
 	 * destroy repository
+	 * 
+	 * @throws ElasticExecutorException
+	 *             executor exception
 	 */
-	void destroy() throws ElasticCommandException;
+	void destroy() throws ElasticExecutorException;
 }

@@ -39,6 +39,7 @@ public abstract class AbstractElasticDocumentValidator implements ElasticDocumen
 	 * failed.
 	 * 
 	 * @param document
+	 *            document to validate
 	 */
 	protected abstract void doValidate(Object document);
 }

@@ -47,8 +47,9 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 				if (id != null) {
 					this.checkIdFieldType(field);
 					if (idProperty != null) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String.format(
-								"Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, field.getName(), type));
+						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID,
+								String.format("Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty,
+										field.getName(), type));
 					}
 					idProperty = field.getName();
 				}
@@ -61,8 +62,8 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 					// check id on correct method
 					String name = this.checkMethod(type, method, id);
 					if (idProperty != null) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String
-								.format("Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, method, type));
+						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String.format(
+								"Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, method, type));
 					}
 					idProperty = name;
 				} else {
@@ -84,6 +85,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	 * check method modifier
 	 * 
 	 * @param method
+	 *            method
 	 */
 	protected void checkMethodModifier(Method method) {
 		if ((method.getModifiers() & Modifier.PUBLIC) == 0) {
@@ -96,7 +98,9 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	 * check document
 	 * 
 	 * @param elasticDoc
+	 *            document annotation
 	 * @param clazz
+	 *            document class
 	 */
 	protected void checkDocument(ElasticDocument elasticDoc, Class<?> clazz) {
 		String index = elasticDoc.index();
@@ -117,9 +121,12 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	 * return its property name. otherwise return null, getClass returns null
 	 * 
 	 * @param type
+	 *            document class
 	 * @param method
+	 *            method
 	 * @param annotation
-	 * @return
+	 *            annotation on method
+	 * @return field name
 	 */
 	protected String checkMethod(Class<?> type, Method method, Annotation annotation) {
 		String errorCode = annotation instanceof ElasticId ? ErrorCodes.ERR_ILLEGAL_ID_ASSIGN
@@ -188,15 +195,29 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		return propertyName;
 	}
 
+	/**
+	 * check parameter type
+	 * 
+	 * @param annotation
+	 *            annotation on method
+	 * @param method
+	 *            method
+	 */
 	protected void checkParamType(Annotation annotation, Method method) {
 		if (annotation instanceof ElasticId) {
 			this.checkIdParamType(method);
 		} else if (annotation instanceof ElasticField) {
-			this.checkFieldParamType(method);
+			this.checkFieldParamCount(method);
 		}
 	}
 
-	protected void checkFieldParamType(Method method) {
+	/**
+	 * check parameter type of method, if it is not id of document
+	 * 
+	 * @param method
+	 *            method
+	 */
+	protected void checkFieldParamCount(Method method) {
 		Class<?> type = method.getParameterTypes()[0];
 		if (type == Void.class || type == null) {
 			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
@@ -204,6 +225,12 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		}
 	}
 
+	/**
+	 * check parameter type of method, if it is id of document
+	 * 
+	 * @param method
+	 *            method
+	 */
 	protected void checkIdParamType(Method method) {
 		Class<?> type = method.getParameterTypes()[0];
 		if (type != Integer.class && type != Long.class && type != String.class) {
@@ -212,6 +239,14 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		}
 	}
 
+	/**
+	 * check return type of method
+	 * 
+	 * @param annotation
+	 *            annotation on method
+	 * @param method
+	 *            method
+	 */
 	protected void checkReturnType(Annotation annotation, Method method) {
 		if (annotation instanceof ElasticId) {
 			this.checkIdReturnType(method);
@@ -220,6 +255,12 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		}
 	}
 
+	/**
+	 * check return type of method, if it is not id of document
+	 * 
+	 * @param method
+	 *            method
+	 */
 	protected void checkFieldReturnType(Method method) {
 		Class<?> type = method.getReturnType();
 		if (type == Void.class || type == null) {
@@ -228,14 +269,26 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 		}
 	}
 
+	/**
+	 * check return type of method, if it is id of document
+	 * 
+	 * @param method
+	 *            method
+	 */
 	protected void checkIdReturnType(Method method) {
 		Class<?> type = method.getReturnType();
 		if (type != Integer.class && type != Long.class && type != String.class) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String
-					.format("Method[%1$s] is illgeal for assign, return type must be Integer, Long or String.", method));
+			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String.format(
+					"Method[%1$s] is illgeal for assign, return type must be Integer, Long or String.", method));
 		}
 	}
 
+	/**
+	 * check field type, if it is id of document
+	 * 
+	 * @param field
+	 *            field
+	 */
 	protected void checkIdFieldType(Field field) {
 		Class<?> type = field.getType();
 		if (type != Integer.class && type != Long.class && type != String.class) {

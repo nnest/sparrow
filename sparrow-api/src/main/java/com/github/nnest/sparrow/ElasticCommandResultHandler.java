@@ -15,6 +15,7 @@ public interface ElasticCommandResultHandler {
 	 * handle elastic command result on fail
 	 * 
 	 * @param result
+	 *            command execution result
 	 */
 	void handleSuccess(ElasticCommandResult result);
 
@@ -22,6 +23,7 @@ public interface ElasticCommandResultHandler {
 	 * handle elastic command result on success
 	 * 
 	 * @param exception
+	 *            exception raised by command execution
 	 */
 	void handleFail(Exception exception);
 }

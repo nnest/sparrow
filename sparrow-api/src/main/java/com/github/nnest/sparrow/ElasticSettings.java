@@ -16,7 +16,7 @@ public interface ElasticSettings {
 	/**
 	 * get hosts
 	 * 
-	 * @return
+	 * @return host list
 	 */
 	List<ElasticHost> getHosts();
 }

@@ -37,8 +37,6 @@ public class RestCommandIndex extends AbstractRestCommand {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @throws ElasticExecutorException
-	 * 
 	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override

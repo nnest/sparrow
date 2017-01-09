@@ -11,6 +11,8 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import com.github.nnest.sparrow.ElasticClient;
+
 /**
  * annotate a field or method as id of elastic document.<br>
  * method must be standard java bean format getter or setter.<br>
