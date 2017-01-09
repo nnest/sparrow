@@ -10,7 +10,7 @@ before_script:
   - sleep 10
 script:
   - cd sparrow-parent
-  - mvn clean verify -DskipTests
+  - mvn clean verify
 before_install:
   - java -version
   - echo $JAVA_HOME
