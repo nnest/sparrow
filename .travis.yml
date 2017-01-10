@@ -4,6 +4,8 @@ jdk:
   - oraclejdk8
 os:
   - linux
+env:
+  - CODACY_PROJECT_TOKEN=049da9e8d2a64340a752556c05a4e1b8
 services:
   - docker
 before_script:
@@ -17,3 +19,8 @@ before_install:
   - echo $JAVA_HOME
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.1.1.deb && sudo dpkg -i --force-confnew elasticsearch-5.1.1.deb
   - sudo service elasticsearch start
+  - curl -sL https://github.com/jpm4j/jpm4j.installers/raw/master/dist/biz.aQute.jpm.run.jar >jpm4j.jar
+  - java -jar jpm4j.jar -u init
+  - ~/jpm/bin/jpm install com.codacy:codacy-coverage-reporter:assembly
+after_success:
+  - ~/jpm/bin/codacy-coverage-reporter -l Java -r build/reports/jacoco/test/jacocoTestReport.xml
