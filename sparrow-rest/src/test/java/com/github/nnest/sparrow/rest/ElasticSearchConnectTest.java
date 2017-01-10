@@ -28,13 +28,24 @@ import com.google.common.collect.Lists;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ElasticSearchConnectTest {
 	@Test
-	public void test() throws ElasticCommandException, ElasticExecutorException {
+	public void test001Index() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
 		tt.setId("1");
-		tt.setUser("kimchy");
+		tt.setUser("First User");
 		tt.setPostDate("2017-01-08T14:12:12");
-		tt.setMessage("trying out Elasticsearch");
+		tt.setMessage("Message from first user");
+
+		client.index(tt);
+	}
+
+	@Test
+	public void test002IndexNoId() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		TwitterTweet tt = new TwitterTweet();
+		tt.setUser("Second User");
+		tt.setPostDate("2017-01-08T14:12:12");
+		tt.setMessage("Message from second user");
 
 		client.index(tt);
 	}

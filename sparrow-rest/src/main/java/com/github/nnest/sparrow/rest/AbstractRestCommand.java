@@ -4,9 +4,12 @@
 package com.github.nnest.sparrow.rest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +28,8 @@ import com.github.nnest.sparrow.ElasticCommandResult;
 import com.github.nnest.sparrow.ElasticCommandResultHandler;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
+import com.github.nnest.sparrow.rest.response.RestResponseObject;
+import com.google.common.collect.Lists;
 
 /**
  * abstract rest command
@@ -67,8 +72,27 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * @throws ElasticExecutorException
 	 *             executor exception
 	 */
-	protected abstract ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command)
-			throws ElasticExecutorException;
+	protected ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command)
+			throws ElasticExecutorException {
+		HttpEntity entity = response.getEntity();
+		try {
+			return new RestElasticCommandResult(command.getOriginalDocument(),
+					this.readRestResponse(entity.getContent()));
+		} catch (ElasticExecutorException e) {
+			throw e;
+		} catch (Exception e) {
+			throw new ElasticExecutorException("Fail to read data from response.", e);
+		}
+	}
+
+	/**
+	 * read rest response from input stream
+	 * 
+	 * @param stream
+	 * @return
+	 * @throws ElasticExecutorException
+	 */
+	protected abstract RestResponseObject readRestResponse(InputStream stream) throws ElasticExecutorException;
 
 	/**
 	 * convert command to rest request
@@ -140,7 +164,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 	}
 
 	/**
-	 * get id value of given document and id field
+	 * get id value of given document by given id field
 	 * 
 	 * @param document
 	 *            document
@@ -159,6 +183,28 @@ public abstract class AbstractRestCommand implements RestCommand {
 		}
 		Object value = visitor.getIdValue(document);
 		return value == null ? null : value.toString();
+	}
+
+	/**
+	 * set id value to given document by given id field
+	 * 
+	 * @param document
+	 *            document
+	 * @param idField
+	 *            id field name
+	 * @param idValue
+	 *            id value
+	 * @throws ElasticExecutorException
+	 *             executor exception
+	 */
+	protected void setIdValue(Object document, String idField, String idValue) throws ElasticExecutorException {
+		Class<?> documentType = document.getClass();
+		DocumentIdVisitor visitor = idVisitors.get(documentType);
+		if (visitor == null) {
+			visitor = new DocumentIdVisitor(documentType, idField);
+			idVisitors.put(documentType, visitor);
+		}
+		visitor.setIdValue(document, idValue);
 	}
 
 	/**
@@ -182,25 +228,145 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * @version 0.0.1
 	 */
 	public static class DocumentIdVisitor {
-		private static final Class<?>[] NO_PARAM_TYPES = new Class<?>[0];
 		private static final Object[] NO_PARAM_OBJECTS = new Object[0];
 
 		private Field field = null;
-		private Method method = null;
+		private Method getter = null;
+		private Method setter = null;
 
 		public DocumentIdVisitor(Class<?> documentType, String idFieldName) throws ElasticExecutorException {
-			String methodName = idFieldName.substring(0, 1).toUpperCase() + idFieldName.substring(1);
+			this.findGetterSetter(documentType, idFieldName);
+			this.findField(documentType, idFieldName);
+
+			boolean hasField = this.field != null;
+
+			if (!hasField && getter == null) {
+				throw new ElasticExecutorException(
+						String.format("No getter for id[%1$s] on document[%2$s]", idFieldName, documentType));
+			}
+
+			if (!hasField && setter == null) {
+				throw new ElasticExecutorException(
+						String.format("No setter for id[%1$s] on document[%2$s]", idFieldName, documentType));
+			}
+		}
+
+		/**
+		 * find field
+		 * 
+		 * @param documentClass
+		 *            document class
+		 * @param idFieldName
+		 *            id field name
+		 */
+		protected void findField(Class<?> documentClass, String idFieldName) {
 			try {
-				this.method = documentType.getDeclaredMethod("get" + methodName, NO_PARAM_TYPES);
-				this.method.setAccessible(true);
-			} catch (Exception e) {
-				try {
-					this.field = documentType.getDeclaredField(idFieldName);
-					this.field.setAccessible(true);
-				} catch (Exception ex) {
-					throw new ElasticExecutorException(String.format(
-							"Fail to find visitor of id field[%1$s] on document[%2$s]", idFieldName, documentType));
+				this.field = documentClass.getDeclaredField(idFieldName);
+				this.field.setAccessible(true);
+			} catch (Exception ex) {
+				// ignored
+			}
+		}
+
+		/**
+		 * find getter and setter
+		 * 
+		 * @param documentClass
+		 *            document class
+		 * @param idFieldName
+		 *            id field name
+		 */
+		protected void findGetterSetter(Class<?> documentClass, String idFieldName) {
+			String methodName = idFieldName.substring(0, 1).toUpperCase() + idFieldName.substring(1);
+			String getterName = "get" + methodName;
+			String setterName = "set" + methodName;
+			Map<Integer, Method> setterMap = new HashMap<Integer, Method>();
+			Method[] methods = documentClass.getDeclaredMethods();
+			for (Method method : methods) {
+				String name = method.getName();
+				if (name.equals(getterName)) {
+					// found getter
+					if (method.getParameterCount() == 0 && method.getReturnType() != Void.class) {
+						// exactly the getter
+						this.getter = method;
+						this.getter.setAccessible(true);
+					}
+				} else if (name.equals(setterName)) {
+					// found setter
+					if (method.getReturnType() == Void.class && method.getParameterCount() == 1) {
+						// no return, only one parameter, exactly the setter
+						Class<?> paramType = method.getParameterTypes()[0];
+						if (paramType == String.class) {
+							// string as highest score
+							setterMap.put(Integer.valueOf(100), method);
+						} else if (paramType == Long.class) {
+							// Long as highest score
+							setterMap.put(Integer.valueOf(10), method);
+						} else if (paramType == Integer.class) {
+							// Long as highest score
+							setterMap.put(Integer.valueOf(1), method);
+						}
+					}
 				}
+			}
+
+			// found the highest score, as setter
+			if (setterMap.size() > 0) {
+				List<Integer> scores = Lists.newArrayList(setterMap.keySet());
+				Collections.sort(scores);
+				this.setter = setterMap.get(scores.get(scores.size() - 1));
+				this.setter.setAccessible(true);
+			}
+		}
+
+		/**
+		 * set id value to given document
+		 * 
+		 * @param document
+		 *            document
+		 * @param idValue
+		 *            id value of document
+		 */
+		public void setIdValue(Object document, String idValue) throws ElasticExecutorException {
+			try {
+				if (this.setter != null) {
+					Object value = this.castValue(idValue, this.setter.getParameterTypes()[0]);
+					this.setter.invoke(document, value);
+				} else if (this.field != null) {
+					Object value = this.castValue(idValue, this.field.getType());
+					this.field.set(document, value);
+				} else {
+					throw new ElasticExecutorException(
+							String.format("Fail to find visitor on document[%1$s]", document.getClass()));
+				}
+			} catch (ElasticExecutorException e) {
+				throw e;
+			} catch (Exception e) {
+				throw new ElasticExecutorException(
+						String.format("Fail to set id value on document[%1$s]", document.getClass()), e);
+			}
+		}
+
+		/**
+		 * cast string value to given class
+		 * 
+		 * @param value
+		 *            string value
+		 * @param type
+		 *            target class, should be string, long or integer
+		 * @return value casted
+		 * @throws ElasticExecutorException
+		 *             executor exception
+		 */
+		protected Object castValue(String value, Class<?> type) throws ElasticExecutorException {
+			if (type == String.class) {
+				return value;
+			} else if (type == Long.class) {
+				return Long.valueOf(value);
+			} else if (type == Integer.class) {
+				return Integer.valueOf(value);
+			} else {
+				throw new ElasticExecutorException(String.format("Fail to cast id value[%1$s] to [%2$s]", value, type));
 			}
 		}
 
@@ -215,19 +381,19 @@ public abstract class AbstractRestCommand implements RestCommand {
 		 */
 		public Object getIdValue(Object document) throws ElasticExecutorException {
 			try {
-				if (this.method != null) {
-					return this.method.invoke(document, NO_PARAM_OBJECTS);
+				if (this.getter != null) {
+					return this.getter.invoke(document, NO_PARAM_OBJECTS);
 				} else if (this.field != null) {
 					return this.field.get(document);
 				} else {
 					throw new ElasticExecutorException(
-							String.format("Fail to find visitor on document[%2$s]", document.getClass()));
+							String.format("Fail to find visitor on document[%1$s]", document.getClass()));
 				}
 			} catch (ElasticExecutorException e) {
 				throw e;
 			} catch (Exception e) {
 				throw new ElasticExecutorException(
-						String.format("Failed to visit id value on document[%2$s]", document.getClass()), e);
+						String.format("Fail to visit id value on document[%1$s]", document.getClass()), e);
 			}
 		}
 	}

@@ -20,6 +20,7 @@ public class RestCommandSet {
 
 	static {
 		commands.put(ElasticCommandKind.INDEX, new RestCommandIndex());
+		commands.put(ElasticCommandKind.INDEX_CREATE_ONLY, new RestCommandIndexCreateOnly());
 	}
 
 	/**

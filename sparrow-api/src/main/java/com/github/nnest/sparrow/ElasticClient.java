@@ -34,4 +34,22 @@ public interface ElasticClient {
 	 *            command execution result handler
 	 */
 	<T> void indexAsync(T document, ElasticCommandResultHandler commandResultHandler);
+
+	/**
+	 * create a document, success if index not exists
+	 * 
+	 * @param document
+	 * @return
+	 * @throws ElasticCommandException
+	 * @throws ElasticExecutorException
+	 */
+	<T> T indexCreateOnly(T document) throws ElasticCommandException, ElasticExecutorException;
+
+	/**
+	 * create a document asynchronized, success if index not exists
+	 * 
+	 * @param document
+	 * @param commandResultHandler
+	 */
+	<T> void indexCreateOnlyAsync(T document, ElasticCommandResultHandler commandResultHandler);
 }
