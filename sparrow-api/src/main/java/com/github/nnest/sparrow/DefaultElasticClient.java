@@ -73,7 +73,7 @@ public class DefaultElasticClient implements ElasticClient {
 	 */
 	@Override
 	public <T> T index(T document) throws ElasticCommandException, ElasticExecutorException {
-		return this.executeCommand(document, ElasticCommandKind.INDEX);
+		return this.executeCommand(document, ElasticCommandKind.INDEX).getOriginalDocument();
 	}
 
 	/**
@@ -94,7 +94,7 @@ public class DefaultElasticClient implements ElasticClient {
 	 */
 	@Override
 	public <T> T indexCreateOnly(T document) throws ElasticCommandException, ElasticExecutorException {
-		return this.executeCommand(document, ElasticCommandKind.INDEX_CREATE_ONLY);
+		return this.executeCommand(document, ElasticCommandKind.INDEX_CREATE_ONLY).getOriginalDocument();
 	}
 
 	/**
@@ -142,16 +142,16 @@ public class DefaultElasticClient implements ElasticClient {
 	 *            document
 	 * @param kind
 	 *            command kind
-	 * @return ths original document
+	 * @return command exection result
 	 * @throws ElasticCommandException
 	 *             command exception
 	 * @throws ElasticExecutorException
 	 *             executor exception
 	 */
-	protected <T> T executeCommand(T document, ElasticCommandKind kind)
+	protected ElasticCommandResult executeCommand(Object document, ElasticCommandKind kind)
 			throws ElasticCommandException, ElasticExecutorException {
 		ElasticCommand command = this.getDocumentAnalyzer().analysis(kind, document);
-		return this.executeCommand(command).getOriginalDocument();
+		return this.executeCommand(command);
 	}
 
 	/**
