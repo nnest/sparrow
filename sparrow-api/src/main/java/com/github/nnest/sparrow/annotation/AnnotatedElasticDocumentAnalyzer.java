@@ -9,6 +9,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.nnest.sparrow.AbstractElasticDocumentAnalyzer;
@@ -152,11 +153,14 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		/**
 		 * get property name from method name
 		 * 
-		 * @param methodName
-		 * @param lowercaseFirst
+		 * @param method
+		 *            method
+		 * @param mustbe
+		 *            must get property, if method is not getter/setter, throw
+		 *            exception
 		 * @return
 		 */
-		protected String getPropertyName(Method method, boolean lowercaseFirst) {
+		protected Optional<String> getPropertyName(Method method, boolean mustbe) {
 			String methodName = method.getName();
 			String propertyName = null;
 			if (methodName.startsWith("set")) {
@@ -165,16 +169,14 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 				propertyName = methodName.substring(3);
 			} else if (methodName.startsWith("is")) {
 				propertyName = methodName.substring(2);
-			} else {
+			} else if (mustbe) {
 				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
 						String.format("Method[%1$s] name should be a java bean getter or setter.", method));
+			} else {
+				return Optional.empty();
 			}
 
-			if (lowercaseFirst) {
-				return propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1);
-			} else {
-				return propertyName;
-			}
+			return Optional.of(propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1));
 		}
 
 		/**
@@ -224,7 +226,7 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		protected boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticId id = method.getAnnotation(ElasticId.class);
 			if (id != null) {
-				descriptor.setIdField(this.getPropertyName(method, true));
+				descriptor.setIdField(this.getPropertyName(method, true).get());
 				return true;
 			} else {
 				return false;
@@ -277,7 +279,7 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		protected boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticIgnored ignored = method.getAnnotation(ElasticIgnored.class);
 			if (ignored != null) {
-				descriptor.registerAsIgnored(this.getPropertyName(method, true));
+				descriptor.registerAsIgnored(this.getPropertyName(method, true).get());
 				return true;
 			} else {
 				return false;
@@ -331,19 +333,22 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		protected boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticField fieldAnnotation = method.getAnnotation(ElasticField.class);
 			if (fieldAnnotation != null) {
-				descriptor.registerField(this.getPropertyName(method, true), fieldAnnotation);
+				descriptor.registerField(this.getPropertyName(method, true).get(), fieldAnnotation);
 			} else {
-				String propertyName = this.getPropertyName(method, true);
-				try {
-					PropertyDescriptor propertyDescriptor = new PropertyDescriptor(propertyName,
-							method.getDeclaringClass());
-					if ((propertyDescriptor.getReadMethod().getModifiers() & Modifier.PUBLIC) != 0
-							&& (propertyDescriptor.getWriteMethod().getModifiers() & Modifier.PUBLIC) != 0) {
-						descriptor.registerField(propertyName, fieldAnnotation);
+				Optional<String> property = this.getPropertyName(method, false);
+				if (property.isPresent()) {
+					String propertyName = property.get();
+					try {
+						PropertyDescriptor propertyDescriptor = new PropertyDescriptor(propertyName,
+								method.getDeclaringClass());
+						if ((propertyDescriptor.getReadMethod().getModifiers() & Modifier.PUBLIC) != 0
+								&& (propertyDescriptor.getWriteMethod().getModifiers() & Modifier.PUBLIC) != 0) {
+							descriptor.registerField(propertyName, fieldAnnotation);
+						}
+					} catch (IntrospectionException e) {
+						// no getter/setter
+						// ignored
 					}
-				} catch (IntrospectionException e) {
-					// no getter/setter
-					// ignored
 				}
 			}
 			// always return false
