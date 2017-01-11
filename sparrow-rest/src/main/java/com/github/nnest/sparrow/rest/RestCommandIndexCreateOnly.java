@@ -3,9 +3,9 @@
  */
 package com.github.nnest.sparrow.rest;
 
-import com.github.nnest.sparrow.ElasticCommand;
+import java.util.List;
+
 import com.github.nnest.sparrow.ElasticCommandKind;
-import com.github.nnest.sparrow.ElasticExecutorException;
 
 /**
  * rest command index create only,
@@ -17,15 +17,12 @@ import com.github.nnest.sparrow.ElasticExecutorException;
  */
 public class RestCommandIndexCreateOnly extends RestCommandIndex {
 	/**
-	 * add {@code /_create} as suffix of endpoint of request
+	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.RestCommandIndex#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
+	 * @see com.github.nnest.sparrow.rest.RestCommandIndex#moreParts(java.util.List)
 	 */
 	@Override
-	protected RestRequest convertToRestRequest(ElasticCommand command) throws ElasticExecutorException {
-		RestRequest request = super.convertToRestRequest(command);
-		String endpoint = request.getEndpoint();
-		request.setEndpoint(endpoint + "/_create");
-		return request;
+	protected void moreParts(List<String> parts) {
+		parts.add("_create");
 	}
 }

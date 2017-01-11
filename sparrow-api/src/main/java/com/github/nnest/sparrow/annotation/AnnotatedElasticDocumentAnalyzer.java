@@ -30,6 +30,7 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 
 	private static PropertyDetective idDetective = new IdProperrtyDetective();
 	private static PropertyDetective ignoredDetective = new IgnoredPropertyDetective();
+	private static PropertyDetective versionDetective = new VersionPropertyDetective();
 	private static PropertyDetective normalDetective = new NormalPropertyDetective();
 
 	/**
@@ -266,7 +267,7 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		 */
 		@Override
 		public PropertyDetective getNext() {
-			return normalDetective;
+			return versionDetective;
 		}
 
 		/**
@@ -297,6 +298,59 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 			ElasticIgnored ignored = field.getAnnotation(ElasticIgnored.class);
 			if (ignored != null) {
 				descriptor.registerAsIgnored(field.getName());
+				return true;
+			} else {
+				return false;
+			}
+		}
+	}
+
+	/**
+	 * Version property detective
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.1
+	 * @version 0.0.1
+	 */
+	private static class VersionPropertyDetective extends AbstractPropertyDetective {
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#getNext()
+		 */
+		@Override
+		public PropertyDetective getNext() {
+			return normalDetective;
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Method,
+		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
+		 */
+		@Override
+		protected boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
+			ElasticVersioning ver = method.getAnnotation(ElasticVersioning.class);
+			if (ver != null) {
+				descriptor.setVersionField(this.getPropertyName(method, true).get());
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Field,
+		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
+		 */
+		@Override
+		protected boolean doDetect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
+			ElasticVersioning ver = field.getAnnotation(ElasticVersioning.class);
+			if (ver != null) {
+				descriptor.setVersionField(field.getName());
 				return true;
 			} else {
 				return false;

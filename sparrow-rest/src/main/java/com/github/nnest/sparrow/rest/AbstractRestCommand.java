@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,8 @@ import com.google.common.collect.Lists;
  * @version 0.0.1
  */
 public abstract class AbstractRestCommand implements RestCommand {
-	private static Map<Class<?>, DocumentIdVisitor> idVisitors = new ConcurrentHashMap<Class<?>, DocumentIdVisitor>();
+	private static Map<Class<?>, DocumentFieldValueVisitor> idVisitors = new ConcurrentHashMap<Class<?>, DocumentFieldValueVisitor>();
+	private static Map<Class<?>, DocumentFieldValueVisitor> versionVisitors = new ConcurrentHashMap<Class<?>, DocumentFieldValueVisitor>();
 
 	/**
 	 * (non-Javadoc)
@@ -175,14 +177,53 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 *             executor exception
 	 */
 	protected String getIdValue(Object document, String idField) throws ElasticExecutorException {
+		return this.getFieldValue(document, idField, idVisitors);
+	}
+
+	/**
+	 * get version value of given document by given version field
+	 * 
+	 * @param document
+	 *            document
+	 * @param versionField
+	 *            version field name
+	 * @return value of version field, convert to string
+	 * @throws ElasticExecutorException
+	 *             executor exception
+	 */
+	protected String getVersionValue(Object document, String versionField) throws ElasticExecutorException {
+		return this.getFieldValue(document, versionField, versionVisitors);
+	}
+
+	/**
+	 * get field value of given document
+	 * 
+	 * @param document
+	 *            document
+	 * @param fieldName
+	 *            field name
+	 * @param visitors
+	 *            field visitors map
+	 * @return value of field, convert to string
+	 * @throws ElasticExecutorException
+	 *             executor exception
+	 */
+	protected String getFieldValue(Object document, String fieldName, Map<Class<?>, DocumentFieldValueVisitor> visitors)
+			throws ElasticExecutorException {
 		Class<?> documentType = document.getClass();
-		DocumentIdVisitor visitor = idVisitors.get(documentType);
+		DocumentFieldValueVisitor visitor = visitors.get(documentType);
 		if (visitor == null) {
-			visitor = new DocumentIdVisitor(documentType, idField);
-			idVisitors.put(documentType, visitor);
+			visitor = new DocumentFieldValueVisitor(documentType, fieldName);
+			visitors.put(documentType, visitor);
 		}
-		Object value = visitor.getIdValue(document);
-		return value == null ? null : value.toString();
+		Object value = visitor.getValue(document);
+		if (value == null) {
+			return null;
+		} else if (value instanceof Date) {
+			return String.valueOf(((Date) value).getTime());
+		} else {
+			return value.toString();
+		}
 	}
 
 	/**
@@ -199,12 +240,12 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 */
 	protected void setIdValue(Object document, String idField, String idValue) throws ElasticExecutorException {
 		Class<?> documentType = document.getClass();
-		DocumentIdVisitor visitor = idVisitors.get(documentType);
+		DocumentFieldValueVisitor visitor = idVisitors.get(documentType);
 		if (visitor == null) {
-			visitor = new DocumentIdVisitor(documentType, idField);
+			visitor = new DocumentFieldValueVisitor(documentType, idField);
 			idVisitors.put(documentType, visitor);
 		}
-		visitor.setIdValue(document, idValue);
+		visitor.setValue(document, idValue);
 	}
 
 	/**
@@ -221,33 +262,33 @@ public abstract class AbstractRestCommand implements RestCommand {
 	}
 
 	/**
-	 * document id visitor
+	 * document field value visitor
 	 * 
 	 * @author brad.wu
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	public static class DocumentIdVisitor {
+	public static class DocumentFieldValueVisitor {
 		private static final Object[] NO_PARAM_OBJECTS = new Object[0];
 
 		private Field field = null;
 		private Method getter = null;
 		private Method setter = null;
 
-		public DocumentIdVisitor(Class<?> documentType, String idFieldName) throws ElasticExecutorException {
-			this.findGetterSetter(documentType, idFieldName);
-			this.findField(documentType, idFieldName);
+		public DocumentFieldValueVisitor(Class<?> documentType, String fieldName) throws ElasticExecutorException {
+			this.findGetterSetter(documentType, fieldName);
+			this.findField(documentType, fieldName);
 
 			boolean hasField = this.field != null;
 
 			if (!hasField && getter == null) {
 				throw new ElasticExecutorException(
-						String.format("No getter for id[%1$s] on document[%2$s]", idFieldName, documentType));
+						String.format("No getter for field[%1$s] on document[%2$s]", fieldName, documentType));
 			}
 
 			if (!hasField && setter == null) {
 				throw new ElasticExecutorException(
-						String.format("No setter for id[%1$s] on document[%2$s]", idFieldName, documentType));
+						String.format("No setter for field[%1$s] on document[%2$s]", fieldName, documentType));
 			}
 		}
 
@@ -320,14 +361,14 @@ public abstract class AbstractRestCommand implements RestCommand {
 		}
 
 		/**
-		 * set id value to given document
+		 * set value to given document
 		 * 
 		 * @param document
 		 *            document
 		 * @param idValue
 		 *            id value of document
 		 */
-		public void setIdValue(Object document, String idValue) throws ElasticExecutorException {
+		public void setValue(Object document, String idValue) throws ElasticExecutorException {
 			try {
 				if (this.setter != null) {
 					Object value = this.castValue(idValue, this.setter.getParameterTypes()[0]);
@@ -371,7 +412,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 		}
 
 		/**
-		 * get id value of given document
+		 * get value of given document
 		 * 
 		 * @param document
 		 *            document
@@ -379,7 +420,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 		 * @throws ElasticExecutorException
 		 *             executor exception
 		 */
-		public Object getIdValue(Object document) throws ElasticExecutorException {
+		public Object getValue(Object document) throws ElasticExecutorException {
 			try {
 				if (this.getter != null) {
 					return this.getter.invoke(document, NO_PARAM_OBJECTS);
@@ -534,7 +575,8 @@ public abstract class AbstractRestCommand implements RestCommand {
 		 */
 		protected boolean isPropertyVisible(String name) {
 			ElasticDocumentDescriptor descriptor = this.getDocumentDescriptor();
-			return descriptor.getIdField().equals(name) || descriptor.getFields().contains(name);
+			return descriptor.getIdField().equals(name) || descriptor.getFields().contains(name)
+					|| name.equals(descriptor.getVersionField());
 		}
 
 		/**

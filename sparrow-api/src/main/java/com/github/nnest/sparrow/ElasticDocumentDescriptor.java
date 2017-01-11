@@ -42,8 +42,15 @@ public interface ElasticDocumentDescriptor {
 	String getIdField();
 
 	/**
+	 * get version field
+	 * 
+	 * @return
+	 */
+	String getVersionField();
+
+	/**
 	 * get fields. id field is not included, visit id field via
-	 * {@linkplain #getIdField()}
+	 * {@linkplain #getIdField()}, never returns null.
 	 * 
 	 * @return field set
 	 */

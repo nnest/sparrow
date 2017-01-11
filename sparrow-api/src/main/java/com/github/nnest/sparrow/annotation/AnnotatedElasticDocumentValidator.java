@@ -40,36 +40,56 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 			this.checkDocument(elasticDoc, type);
 
 			String idProperty = null;
+			String versionProperty = null;
 
 			Field[] fields = type.getDeclaredFields();
 			for (Field field : fields) {
 				ElasticId id = field.getAnnotation(ElasticId.class);
+				ElasticVersioning version = field.getAnnotation(ElasticVersioning.class);
 				if (id != null) {
 					this.checkIdFieldType(field);
 					if (idProperty != null) {
 						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID,
 								String.format("Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty,
 										field.getName(), type));
+					} else {
+						idProperty = field.getName();
 					}
-					idProperty = field.getName();
+				} else if (version != null) {
+					if (versionProperty != null) {
+						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_VERSIONING,
+								String.format("Duplicated versioning fields[%1$s, %2$s] found on document[%3$s].",
+										versionProperty, field.getName(), type));
+					} else {
+						versionProperty = field.getName();
+					}
 				}
 			}
 
 			Method[] methods = type.getDeclaredMethods();
 			for (Method method : methods) {
 				ElasticId id = method.getAnnotation(ElasticId.class);
+				ElasticVersioning version = method.getAnnotation(ElasticVersioning.class);
+				ElasticField field = method.getAnnotation(ElasticField.class);
 				if (id != null) {
 					// check id on correct method
 					String name = this.checkMethod(type, method, id);
 					if (idProperty != null) {
 						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String.format(
 								"Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, method, type));
+					} else {
+						idProperty = name;
 					}
-					idProperty = name;
-				} else {
-					ElasticField field = method.getAnnotation(ElasticField.class);
-					if (field != null) {
-						this.checkMethod(type, method, field);
+				} else if (field != null || version != null) {
+					String name = this.checkMethod(type, method, field);
+					if (version != null) {
+						if (versionProperty != null) {
+							throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_VERSIONING,
+									String.format("Duplicated versioning fields[%1$s, %2$s] found on document[%3$s].",
+											versionProperty, name, type));
+						} else {
+							versionProperty = name;
+						}
 					}
 				}
 			}
@@ -79,6 +99,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 						String.format("Id not found on document[%1$s]", type.getName()));
 			}
 		}
+
 	}
 
 	/**

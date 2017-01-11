@@ -21,6 +21,7 @@ public class AnnotatedElasticDocumentDescriptor implements ElasticDocumentDescri
 	private Class<?> documentClass = null;
 	private ElasticDocument document = null;
 	private String idField = null;
+	private String versionField = null;
 	private Set<String> fields = new HashSet<String>();
 	private Set<String> ignoredFields = new HashSet<String>();
 	private Map<String, ElasticField> fieldDescriptors = new HashMap<String, ElasticField>();
@@ -87,6 +88,21 @@ public class AnnotatedElasticDocumentDescriptor implements ElasticDocumentDescri
 	 */
 	public void setIdField(String idField) {
 		this.idField = idField;
+	}
+
+	/**
+	 * @return the versionField
+	 */
+	public String getVersionField() {
+		return versionField;
+	}
+
+	/**
+	 * @param versionField
+	 *            the versionField to set
+	 */
+	public void setVersionField(String versionField) {
+		this.versionField = versionField;
 	}
 
 	/**
