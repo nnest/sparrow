@@ -9,6 +9,7 @@ import java.util.Map;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.rest.RestCommand;
 import com.github.nnest.sparrow.rest.command.document.RestCommandCreate;
+import com.github.nnest.sparrow.rest.command.document.RestCommandExist;
 import com.github.nnest.sparrow.rest.command.document.RestCommandGet;
 import com.github.nnest.sparrow.rest.command.document.RestCommandIndex;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
@@ -29,6 +30,7 @@ public class RestCommandSet {
 		commands.put(ElasticCommandKind.INDEX, new RestCommandIndex());
 		commands.put(ElasticCommandKind.CREATE, new RestCommandCreate());
 		commands.put(ElasticCommandKind.GET, new RestCommandGet());
+		commands.put(ElasticCommandKind.EXIST, new RestCommandExist());
 
 		// indices
 		commands.put(ElasticCommandKind.DROP_INDEX, new RestCommandDropIndex());

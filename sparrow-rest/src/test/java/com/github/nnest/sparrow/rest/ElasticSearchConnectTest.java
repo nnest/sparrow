@@ -4,6 +4,7 @@
 package com.github.nnest.sparrow.rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -25,6 +26,8 @@ import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.ElasticHost;
 import com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.command.document.Create;
+import com.github.nnest.sparrow.command.document.Exist;
+import com.github.nnest.sparrow.command.document.ExistResultData;
 import com.github.nnest.sparrow.command.document.Get;
 import com.github.nnest.sparrow.command.document.GetResultData;
 import com.github.nnest.sparrow.command.document.Index;
@@ -202,6 +205,30 @@ public class ElasticSearchConnectTest {
 		assertEquals("1st User Changed", tt.getUser());
 		assertEquals("2017-01-08T14:12:12", tt.getPostDate());
 		assertEquals("Message from 1st user changed", tt.getMessage());
+	}
+
+	@Test
+	public void test009Exists1stUser() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		ElasticCommand cmd = new Exist(TwitterTweet.class, "1");
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		ExistResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(data.isFound());
+	}
+
+	@Test
+	public void test010ExistsUserFailed() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		ElasticCommand cmd = new Exist(TwitterTweet.class, "0");
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		ExistResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertFalse(data.isFound());
 	}
 
 	private ElasticClient createClient() {

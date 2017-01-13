@@ -15,6 +15,7 @@ public enum ElasticCommandKind {
 	INDEX, // index document, create if not exists and update if exists
 	CREATE, // create document, fail if exists
 	GET, // get particular document by given id
+	EXIST, // check document exists or not by given id
 
 	// indices command
 	DROP_INDEX, // delete index
