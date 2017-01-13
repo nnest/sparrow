@@ -44,7 +44,7 @@ public interface ElasticDocumentDescriptor {
 	/**
 	 * get version field
 	 * 
-	 * @return
+	 * @return version field name
 	 */
 	String getVersionField();
 

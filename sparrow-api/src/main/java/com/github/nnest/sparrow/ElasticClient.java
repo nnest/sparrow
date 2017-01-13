@@ -16,6 +16,8 @@ public interface ElasticClient {
 	 * 
 	 * @param command
 	 *            command
+	 * @param <T>
+	 *            command result
 	 * @return command result
 	 * @throws ElasticCommandException
 	 *             command exception

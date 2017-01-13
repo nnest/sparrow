@@ -176,7 +176,8 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		 * @param mustbe
 		 *            must get property, if method is not getter/setter, throw
 		 *            exception
-		 * @return
+		 * @return property name. might not found, then return
+		 *         {@linkplain Optional#empty()}
 		 */
 		protected Optional<String> getPropertyName(Method method, boolean mustbe) {
 			String methodName = method.getName();

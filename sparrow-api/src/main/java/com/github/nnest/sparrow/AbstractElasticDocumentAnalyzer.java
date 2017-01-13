@@ -37,8 +37,8 @@ public abstract class AbstractElasticDocumentAnalyzer implements ElasticDocument
 	 * validate document, throw {@linkplain ElasticDocumentValidationException}
 	 * if failed.
 	 * 
-	 * @param document
-	 *            document
+	 * @param documentType
+	 *            document type
 	 */
 	protected void validate(Class<?> documentType) {
 		ElasticDocumentValidator validator = this.getValidator();

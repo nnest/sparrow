@@ -21,6 +21,8 @@ public interface ElasticCommandResult {
 	/**
 	 * get result data
 	 * 
+	 * @param <T>
+	 *            command result data
 	 * @return data
 	 */
 	<T extends ElasticCommandResultData> T getResultData();

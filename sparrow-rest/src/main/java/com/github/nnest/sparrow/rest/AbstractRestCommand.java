@@ -371,6 +371,8 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 		 *            document
 		 * @param idValue
 		 *            id value of document
+		 * @throws ElasticExecutorException
+		 *             executor exception
 		 */
 		public void setValue(Object document, String idValue) throws ElasticExecutorException {
 			try {

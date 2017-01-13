@@ -14,6 +14,8 @@ import com.github.nnest.sparrow.ElasticCommandResultData;
  */
 public interface IndexResultData extends ElasticCommandResultData {
 	/**
+	 * @param <T>
+	 *            document
 	 * @return the document
 	 */
 	public <T> T getDocument();

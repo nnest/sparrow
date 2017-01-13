@@ -147,6 +147,8 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C> {
 	 * add into parts if there are more, default do nothing
 	 * 
 	 * @param parts
+	 *            more parts which should add to uri
+	 * @see #buildEndpoint(ElasticDocumentDescriptor, String, String)
 	 */
 	protected void moreParts(List<String> parts) {
 	}

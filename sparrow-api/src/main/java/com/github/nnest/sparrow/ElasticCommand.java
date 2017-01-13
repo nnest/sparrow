@@ -22,6 +22,7 @@ public interface ElasticCommand {
 	 * analysis current command by given analyzer
 	 * 
 	 * @param documentAnalyzer
+	 *            document analyzer
 	 * @return returns myself or a new command if want, according to
 	 *         implementation
 	 */

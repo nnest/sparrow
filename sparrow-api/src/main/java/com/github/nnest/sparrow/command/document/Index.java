@@ -36,6 +36,8 @@ public class Index implements ElasticCommand {
 	}
 
 	/**
+	 * @param <T>
+	 *            document
 	 * @return the document
 	 */
 	@SuppressWarnings("unchecked")
