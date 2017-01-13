@@ -3,11 +3,14 @@
  */
 package com.github.nnest.sparrow.command.document;
 
+import java.util.Set;
+
 import com.github.nnest.sparrow.ElasticCommand;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 /**
  * get document
@@ -20,6 +23,8 @@ public class Get implements ElasticCommand {
 	private Class<?> documentType = null;
 	private String id = null;
 	private ElasticDocumentDescriptor documentDescriptor = null;
+	private Set<String> includes = null;
+	private Set<String> excludes = null;
 
 	public Get(Class<?> documentType, String id) {
 		assert documentType != null : "Document type cannot be null.";
@@ -56,6 +61,62 @@ public class Get implements ElasticCommand {
 	 */
 	protected void setDocumentDescriptor(ElasticDocumentDescriptor documentDescriptor) {
 		this.documentDescriptor = documentDescriptor;
+	}
+
+	/**
+	 * @return the includes
+	 */
+	public Set<String> getIncludes() {
+		return includes;
+	}
+
+	/**
+	 * with includes
+	 * 
+	 * @param includes
+	 *            the includes to set
+	 * @return this
+	 */
+	public Get withIncludes(String... includes) {
+		return this.withIncludes(Sets.newHashSet(includes));
+	}
+
+	/**
+	 * @param includes
+	 *            the includes to set
+	 * @return this
+	 */
+	public Get withIncludes(Set<String> includes) {
+		this.includes = includes;
+		return this;
+	}
+
+	/**
+	 * @return the excludes
+	 */
+	public Set<String> getExcludes() {
+		return excludes;
+	}
+
+	/**
+	 * with excludes
+	 * 
+	 * @param excludes
+	 *            the excludes to set
+	 * @return this
+	 */
+	public Get withExcludes(String... excludes) {
+		return this.withExcludes(Sets.newHashSet(excludes));
+	}
+
+	/**
+	 * @param excludes
+	 *            the excludes to set
+	 * @return this
+	 */
+	public Get withExcludes(Set<String> excludes) {
+		this.excludes = excludes;
+		return this;
 	}
 
 	/**

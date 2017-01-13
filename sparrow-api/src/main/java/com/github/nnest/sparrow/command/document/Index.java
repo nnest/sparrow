@@ -44,6 +44,14 @@ public class Index implements ElasticCommand {
 	}
 
 	/**
+	 * @param document
+	 *            the document to set
+	 */
+	protected void setDocument(Object document) {
+		this.document = document;
+	}
+
+	/**
 	 * get document type
 	 * 
 	 * @return document type

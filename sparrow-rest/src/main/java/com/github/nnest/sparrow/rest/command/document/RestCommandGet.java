@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,6 +24,7 @@ import com.github.nnest.sparrow.command.document.Get;
 import com.github.nnest.sparrow.rest.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 
 /**
  * rest command get, {@linkplain ElasticCommandKind#GET}
@@ -62,7 +64,7 @@ public class RestCommandGet extends AbstractRestCommand<Get> {
 		ElasticDocumentDescriptor descriptor = command.getDocumentDescriptor();
 
 		RestRequest request = new RestRequest();
-		String endpoint = this.buildEndpoint(descriptor, command.getId());
+		String endpoint = this.buildEndpoint(descriptor, command.getId(), command.getIncludes(), command.getExcludes());
 		request.setEndpoint(endpoint);
 		// use PUT for id given
 		request.setMethod(ElasticRestMethod.GET.name());
@@ -76,16 +78,35 @@ public class RestCommandGet extends AbstractRestCommand<Get> {
 	 *            document descriptor
 	 * @param idValue
 	 *            id value
+	 * @param includes
+	 *            including properties
+	 * @param excludes
+	 *            excluding properties
 	 * @return endpoint uri
 	 */
-	protected String buildEndpoint(ElasticDocumentDescriptor descriptor, String idValue) {
+	protected String buildEndpoint(ElasticDocumentDescriptor descriptor, String idValue, Set<String> includes,
+			Set<String> excludes) {
 		List<String> parts = new LinkedList<String>();
 		parts.add(descriptor.getIndex());
 		parts.add(descriptor.getType());
 		if (idValue != null) {
 			parts.add(idValue);
 		}
-		return Joiner.on('/').join(parts);
+		String excludePart = excludes == null ? null : Joiner.on(",").join(excludes);
+		if (Strings.nullToEmpty(excludePart).length() != 0) {
+			excludePart = "_source_exclude=" + excludePart;
+		}
+		String includePart = includes == null ? null : Joiner.on(",").join(includes);
+		if (Strings.nullToEmpty(includePart).length() != 0) {
+			includePart = "_source_include=" + includePart;
+		}
+		String queryString = Joiner.on("&").skipNulls().join(new String[] { includePart, excludePart });
+
+		if (Strings.nullToEmpty(queryString).length() == 0) {
+			return Joiner.on('/').join(parts);
+		} else {
+			return Joiner.on('/').join(parts) + "?" + queryString;
+		}
 	}
 
 	/**

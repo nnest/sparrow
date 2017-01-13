@@ -6,6 +6,7 @@ package com.github.nnest.sparrow.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.FixMethodOrder;
@@ -229,6 +230,40 @@ public class ElasticSearchConnectTest {
 		ExistResultData data = result.getResultData();
 		assertTrue(data.isSuccessful());
 		assertFalse(data.isFound());
+	}
+
+	@Test
+	public void test011Get1stUserWithIncludes() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		ElasticCommand cmd = new Get(TwitterTweet.class, "1").withIncludes("id", "user");
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		GetResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(TwitterTweet.class == data.getDocument().getClass());
+		TwitterTweet tt = data.getDocument();
+		assertEquals("1", tt.getId());
+		assertEquals("1st User Changed", tt.getUser());
+		assertNull(tt.getPostDate());
+		assertNull(tt.getMessage());
+	}
+
+	@Test
+	public void test012Get1stUserWithExcludes() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		ElasticCommand cmd = new Get(TwitterTweet.class, "1").withExcludes("postDate", "message");
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		GetResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(TwitterTweet.class == data.getDocument().getClass());
+		TwitterTweet tt = data.getDocument();
+		assertEquals("1", tt.getId());
+		assertEquals("1st User Changed", tt.getUser());
+		assertNull(tt.getPostDate());
+		assertNull(tt.getMessage());
 	}
 
 	private ElasticClient createClient() {
