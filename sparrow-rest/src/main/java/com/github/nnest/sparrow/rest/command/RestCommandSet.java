@@ -1,12 +1,17 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.rest;
+package com.github.nnest.sparrow.rest.command;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import com.github.nnest.sparrow.ElasticCommandKind;
+import com.github.nnest.sparrow.rest.RestCommand;
+import com.github.nnest.sparrow.rest.command.document.RestCommandCreate;
+import com.github.nnest.sparrow.rest.command.document.RestCommandGet;
+import com.github.nnest.sparrow.rest.command.document.RestCommandIndex;
+import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
 
 /**
  * rest command set
@@ -15,12 +20,19 @@ import com.github.nnest.sparrow.ElasticCommandKind;
  * @since 0.0.1
  * @version 0.0.1
  */
+@SuppressWarnings("rawtypes")
 public class RestCommandSet {
 	private static Map<ElasticCommandKind, RestCommand> commands = new HashMap<ElasticCommandKind, RestCommand>();
 
 	static {
+		// document
 		commands.put(ElasticCommandKind.INDEX, new RestCommandIndex());
-		commands.put(ElasticCommandKind.INDEX_CREATE_ONLY, new RestCommandIndexCreateOnly());
+		commands.put(ElasticCommandKind.CREATE, new RestCommandCreate());
+		commands.put(ElasticCommandKind.GET, new RestCommandGet());
+
+		// indices
+		commands.put(ElasticCommandKind.DROP_INDEX, new RestCommandDropIndex());
+
 	}
 
 	/**

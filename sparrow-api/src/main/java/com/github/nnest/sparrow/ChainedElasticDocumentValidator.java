@@ -39,12 +39,12 @@ public class ChainedElasticDocumentValidator implements ElasticDocumentValidator
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.ElasticDocumentValidator#validate(java.lang.Object)
+	 * @see com.github.nnest.sparrow.ElasticDocumentValidator#validate(java.lang.Class)
 	 */
 	@Override
-	public void validate(Object document) {
+	public void validate(Class<?> documentType) {
 		for (ElasticDocumentValidator validator : this.getValidators()) {
-			validator.validate(document);
+			validator.validate(documentType);
 		}
 	}
 }

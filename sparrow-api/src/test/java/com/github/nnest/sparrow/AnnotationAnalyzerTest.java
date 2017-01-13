@@ -24,8 +24,7 @@ public class AnnotationAnalyzerTest {
 	@Test
 	public void test() {
 		AnnotatedElasticDocumentAnalyzer analyzer = new AnnotatedElasticDocumentAnalyzer();
-		ElasticCommand command = analyzer.analysis(ElasticCommandKind.INDEX, new TestBeanA());
-		ElasticDocumentDescriptor descriptor = command.getDescriptor();
+		ElasticDocumentDescriptor descriptor = analyzer.analysis(TestBeanA.class);
 		assertEquals("testIndex", descriptor.getIndex());
 		assertEquals("testType", descriptor.getType());
 		assertEquals("id", descriptor.getIdField());

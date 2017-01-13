@@ -1,9 +1,12 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.rest.response;
+package com.github.nnest.sparrow.rest.command.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.nnest.sparrow.command.document.IndexResultData;
+import com.github.nnest.sparrow.command.document.IndexResultType;
 
 /**
  * index response
@@ -12,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class IndexResponse implements RestResponseObject {
+public class IndexResponse implements IndexResultData {
 	@JsonProperty("_shards")
 	private RestResponseShards shards = null;
 	@JsonProperty("_index")
@@ -25,6 +28,8 @@ public class IndexResponse implements RestResponseObject {
 	private String version = null;
 	private boolean created = false;
 	private String result = null;
+	@JsonIgnore
+	private Object document = null;
 
 	/**
 	 * @return the shards
@@ -129,5 +134,49 @@ public class IndexResponse implements RestResponseObject {
 	 */
 	public void setResult(String result) {
 		this.result = result;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.IndexResultData#getDocument()
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T> T getDocument() {
+		return (T) this.document;
+	}
+
+	/**
+	 * @param document
+	 *            the document to set
+	 */
+	@JsonIgnore
+	public void setDocument(Object document) {
+		this.document = document;
+	}
+
+	/**
+	 * never returns null. but check {@linkplain #isSuccessful()} first.
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.IndexResultData#getResultType()
+	 */
+	@Override
+	public IndexResultType getResultType() {
+		if (this.isSuccessful()) {
+			return this.isCreated() ? IndexResultType.CREATED : IndexResultType.UPDATED;
+		} else {
+			return IndexResultType.FAIL;
+		}
+	}
+
+	/**
+	 * returns true when at least one shard succeed
+	 * 
+	 * @see com.github.nnest.sparrow.ElasticCommandResultData#isSuccessful()
+	 */
+	@Override
+	public boolean isSuccessful() {
+		return this.getShards().getSuccessful() > 0;
 	}
 }

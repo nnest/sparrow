@@ -19,18 +19,15 @@ public abstract class AbstractElasticDocumentValidator implements ElasticDocumen
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.ElasticDocumentValidator#validate(java.lang.Object)
+	 * @see com.github.nnest.sparrow.ElasticDocumentValidator#validate(java.lang.Class)
 	 */
 	@Override
-	public void validate(Object document) {
-		if (document != null) {
-			Class<?> documentClass = document.getClass();
-			if (validatedClasses.containsKey(documentClass)) {
-				// already validated, pass again
-			} else {
-				this.doValidate(document);
-				validatedClasses.put(documentClass, Boolean.TRUE);
-			}
+	public void validate(Class<?> documentType) {
+		if (validatedClasses.containsKey(documentType)) {
+			// already validated, pass again
+		} else {
+			this.doValidate(documentType);
+			validatedClasses.put(documentType, Boolean.TRUE);
 		}
 	}
 
@@ -38,8 +35,8 @@ public abstract class AbstractElasticDocumentValidator implements ElasticDocumen
 	 * do validation. throws {@linkplain ElasticDocumentValidationException} if
 	 * failed.
 	 * 
-	 * @param document
-	 *            document to validate
+	 * @param documentType
+	 *            document type to validate
 	 */
-	protected abstract void doValidate(Object document);
+	protected abstract void doValidate(Class<?> documentType);
 }

@@ -12,9 +12,16 @@ package com.github.nnest.sparrow;
  */
 public interface ElasticCommandResult {
 	/**
-	 * get original document
+	 * get command which executed
 	 * 
-	 * @return original document
+	 * @return command
 	 */
-	<T> T getOriginalDocument();
+	ElasticCommand getCommand();
+
+	/**
+	 * get result data
+	 * 
+	 * @return data
+	 */
+	<T extends ElasticCommandResultData> T getResultData();
 }

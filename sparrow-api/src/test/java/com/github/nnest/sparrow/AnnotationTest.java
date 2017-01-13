@@ -27,8 +27,7 @@ public class AnnotationTest {
 	@Test
 	public void test001NoAnnotation() {
 		AnnotatedElasticDocumentValidator validator = createValidator();
-		NoAnnotatedDocument doc = new NoAnnotatedDocument();
-		validator.validate(doc);
+		validator.validate(NoAnnotatedDocument.class);
 	}
 
 	@Test
@@ -36,8 +35,7 @@ public class AnnotationTest {
 		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_ID_NOT_FOUND));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
-		AnnotatedDocumentNoId doc = new AnnotatedDocumentNoId();
-		validator.validate(doc);
+		validator.validate(AnnotatedDocumentNoId.class);
 	}
 
 	@Test
@@ -45,8 +43,7 @@ public class AnnotationTest {
 		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_DUPLICATED_ID));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
-		AnnotatedDocumentDuplicatedId doc = new AnnotatedDocumentDuplicatedId();
-		validator.validate(doc);
+		validator.validate(AnnotatedDocumentDuplicatedId.class);
 	}
 
 	@Test
@@ -54,8 +51,7 @@ public class AnnotationTest {
 		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_DUPLICATED_ID));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
-		AnnotatedDocumentDuplicatedIdOnFields doc = new AnnotatedDocumentDuplicatedIdOnFields();
-		validator.validate(doc);
+		validator.validate(AnnotatedDocumentDuplicatedIdOnFields.class);
 	}
 
 	@Test
@@ -63,8 +59,7 @@ public class AnnotationTest {
 		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
-		AnnotatedDocumentInvalidIdAssignOnField doc = new AnnotatedDocumentInvalidIdAssignOnField();
-		validator.validate(doc);
+		validator.validate(AnnotatedDocumentInvalidIdAssignOnField.class);
 	}
 
 	@Test
@@ -72,8 +67,7 @@ public class AnnotationTest {
 		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
-		AnnotatedDocumentInvalidIdAssignOnGetter doc = new AnnotatedDocumentInvalidIdAssignOnGetter();
-		validator.validate(doc);
+		validator.validate(AnnotatedDocumentInvalidIdAssignOnGetter.class);
 	}
 
 	private AnnotatedElasticDocumentValidator createValidator() {

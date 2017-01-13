@@ -12,23 +12,18 @@ package com.github.nnest.sparrow;
  */
 public interface ElasticCommand {
 	/**
-	 * get original document
-	 * 
-	 * @return original document object instance
-	 */
-	Object getOriginalDocument();
-
-	/**
-	 * get kind of command
+	 * get command kind
 	 * 
 	 * @return command kind
 	 */
-	ElasticCommandKind getKind();
+	ElasticCommandKind getCommandKind();
 
 	/**
-	 * get document descriptor
+	 * analysis current command by given analyzer
 	 * 
-	 * @return document descriptor
+	 * @param documentAnalyzer
+	 * @return returns myself or a new command if want, according to
+	 *         implementation
 	 */
-	ElasticDocumentDescriptor getDescriptor();
+	ElasticCommand analysis(ElasticDocumentAnalyzer documentAnalyzer);
 }

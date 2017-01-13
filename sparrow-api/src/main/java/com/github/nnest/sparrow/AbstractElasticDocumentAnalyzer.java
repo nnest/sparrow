@@ -16,39 +16,22 @@ public abstract class AbstractElasticDocumentAnalyzer implements ElasticDocument
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.ElasticDocumentAnalyzer#analysis(com.github.nnest.sparrow.ElasticCommandKind,
-	 *      java.lang.Object)
+	 * @see com.github.nnest.sparrow.ElasticDocumentAnalyzer#analysis(java.lang.Class)
 	 */
 	@Override
-	public ElasticCommand analysis(ElasticCommandKind commandKind, Object document) {
-		this.validate(document);
-		return this.doAnalysis(commandKind, document);
+	public ElasticDocumentDescriptor analysis(Class<?> documentType) {
+		this.validate(documentType);
+		return this.doAnalysis(documentType);
 	}
 
 	/**
-	 * analysis document, implements by sub classes.
+	 * analysis document type, get document descriptor
 	 * 
-	 * @param commandKind
-	 *            command kind
-	 * @param document
-	 *            document
-	 * @return command to execute
-	 */
-	protected ElasticCommand doAnalysis(ElasticCommandKind commandKind, Object document) {
-		ElasticDocumentDescriptor descriptor = this.getDocumentDescriptor(commandKind, document);
-		return new DefaultElasticCommand(commandKind, document, descriptor);
-	}
-
-	/**
-	 * get document descriptor by given command kind and document instance
-	 * 
-	 * @param commandKind
-	 *            command kind
-	 * @param document
-	 *            document
+	 * @param documentType
+	 *            document type
 	 * @return document descriptor
 	 */
-	protected abstract ElasticDocumentDescriptor getDocumentDescriptor(ElasticCommandKind commandKind, Object document);
+	protected abstract ElasticDocumentDescriptor doAnalysis(Class<?> documentType);
 
 	/**
 	 * validate document, throw {@linkplain ElasticDocumentValidationException}
@@ -57,10 +40,10 @@ public abstract class AbstractElasticDocumentAnalyzer implements ElasticDocument
 	 * @param document
 	 *            document
 	 */
-	protected void validate(Object document) {
+	protected void validate(Class<?> documentType) {
 		ElasticDocumentValidator validator = this.getValidator();
 		if (validator != null) {
-			validator.validate(document);
+			validator.validate(documentType);
 		}
 	}
 

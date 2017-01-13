@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.rest.response;
+package com.github.nnest.sparrow.rest.command.document;
 
 /**
  * Rest response shards part

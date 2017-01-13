@@ -12,11 +12,11 @@ package com.github.nnest.sparrow;
  */
 public interface ElasticDocumentValidator {
 	/**
-	 * validate given bean can be persist to elastic or not. throws
+	 * validate given document type can be persist to elastic or not. throws
 	 * {@linkplain ElasticDocumentValidationException} if not passed.
 	 * 
-	 * @param document
-	 *            document to validate
+	 * @param documentType
+	 *            document type to validate
 	 */
-	void validate(Object document);
+	void validate(Class<?> documentType);
 }

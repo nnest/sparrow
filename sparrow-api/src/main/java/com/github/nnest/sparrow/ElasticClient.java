@@ -12,44 +12,26 @@ package com.github.nnest.sparrow;
  */
 public interface ElasticClient {
 	/**
-	 * index a document, if index not exists, auto create by elastic server.
+	 * execute elastic command
 	 * 
-	 * @param document
-	 *            document to index
-	 * @return indexed document
+	 * @param command
+	 *            command
+	 * @return command result
 	 * @throws ElasticCommandException
 	 *             command exception
 	 * @throws ElasticExecutorException
 	 *             executor exception
 	 */
-	<T> T index(T document) throws ElasticCommandException, ElasticExecutorException;
+	<T extends ElasticCommandResult> T execute(ElasticCommand command)
+			throws ElasticCommandException, ElasticExecutorException;
 
 	/**
-	 * index a document asynchronized, if index not exists, auto create by
-	 * elastic server.
+	 * execute elastic command asynchronzied
 	 * 
-	 * @param document
-	 *            document to index
+	 * @param command
+	 *            command
 	 * @param commandResultHandler
-	 *            command execution result handler
+	 *            command result handler
 	 */
-	<T> void indexAsync(T document, ElasticCommandResultHandler commandResultHandler);
-
-	/**
-	 * create a document, success if index not exists
-	 * 
-	 * @param document
-	 * @return
-	 * @throws ElasticCommandException
-	 * @throws ElasticExecutorException
-	 */
-	<T> T indexCreateOnly(T document) throws ElasticCommandException, ElasticExecutorException;
-
-	/**
-	 * create a document asynchronized, success if index not exists
-	 * 
-	 * @param document
-	 * @param commandResultHandler
-	 */
-	<T> void indexCreateOnlyAsync(T document, ElasticCommandResultHandler commandResultHandler);
+	void executeAysnc(ElasticCommand command, ElasticCommandResultHandler commandResultHandler);
 }

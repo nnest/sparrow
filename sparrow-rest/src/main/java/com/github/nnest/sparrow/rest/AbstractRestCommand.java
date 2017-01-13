@@ -23,13 +23,14 @@ import org.elasticsearch.client.RestClient;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
+import com.github.nnest.sparrow.DefaultElasticCommandResult;
 import com.github.nnest.sparrow.ElasticCommand;
 import com.github.nnest.sparrow.ElasticCommandException;
 import com.github.nnest.sparrow.ElasticCommandResult;
+import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticCommandResultHandler;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
-import com.github.nnest.sparrow.rest.response.RestResponseObject;
 import com.google.common.collect.Lists;
 
 /**
@@ -39,7 +40,7 @@ import com.google.common.collect.Lists;
  * @since 0.0.1
  * @version 0.0.1
  */
-public abstract class AbstractRestCommand implements RestCommand {
+public abstract class AbstractRestCommand<C extends ElasticCommand> implements RestCommand<C> {
 	private static Map<Class<?>, DocumentFieldValueVisitor> idVisitors = new ConcurrentHashMap<Class<?>, DocumentFieldValueVisitor>();
 	private static Map<Class<?>, DocumentFieldValueVisitor> versionVisitors = new ConcurrentHashMap<Class<?>, DocumentFieldValueVisitor>();
 
@@ -50,7 +51,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 *      com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
-	public ElasticCommandResult performRequest(RestClient restClient, ElasticCommand command)
+	public ElasticCommandResult performRequest(RestClient restClient, C command)
 			throws ElasticCommandException, ElasticExecutorException {
 		RestRequest request = this.convertToRestRequest(command);
 		Response response;
@@ -58,7 +59,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 			response = restClient.performRequest(request.getMethod(), request.getEndpoint(), request.getParams(),
 					request.getEntity(), request.getHeaders());
 		} catch (IOException e) {
-			throw new ElasticCommandException(String.format("Fail to perform request with command[%1$s]", command));
+			throw new ElasticCommandException(String.format("Fail to perform request with command[%1$s]", command), e);
 		}
 		return this.convertToCommandResult(response, command);
 	}
@@ -74,12 +75,11 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * @throws ElasticExecutorException
 	 *             executor exception
 	 */
-	protected ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command)
+	protected ElasticCommandResult convertToCommandResult(Response response, C command)
 			throws ElasticExecutorException {
 		HttpEntity entity = response.getEntity();
 		try {
-			return new RestElasticCommandResult(command.getOriginalDocument(),
-					this.readRestResponse(entity.getContent()));
+			return new DefaultElasticCommandResult(command, this.readResponse(command, entity.getContent()));
 		} catch (ElasticExecutorException e) {
 			throw e;
 		} catch (Exception e) {
@@ -88,13 +88,18 @@ public abstract class AbstractRestCommand implements RestCommand {
 	}
 
 	/**
-	 * read rest response from input stream
+	 * read result data from input stream
 	 * 
+	 * @param command
+	 *            command
 	 * @param stream
-	 * @return
+	 *            input stream
+	 * @return result data
 	 * @throws ElasticExecutorException
+	 *             executor exception
 	 */
-	protected abstract RestResponseObject readRestResponse(InputStream stream) throws ElasticExecutorException;
+	protected abstract ElasticCommandResultData readResponse(C command, InputStream stream)
+			throws ElasticExecutorException;
 
 	/**
 	 * convert command to rest request
@@ -105,7 +110,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 * @throws ElasticExecutorException
 	 *             executor exception
 	 */
-	protected abstract RestRequest convertToRestRequest(ElasticCommand command) throws ElasticExecutorException;
+	protected abstract RestRequest convertToRestRequest(C command) throws ElasticExecutorException;
 
 	/**
 	 * (non-Javadoc)
@@ -115,7 +120,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 *      com.github.nnest.sparrow.ElasticCommandResultHandler)
 	 */
 	@Override
-	public void performRequestAsync(RestClient restClient, ElasticCommand command,
+	public void performRequestAsync(RestClient restClient, C command,
 			ElasticCommandResultHandler commandResultHandler) {
 		try {
 			RestRequest request = this.convertToRestRequest(command);
@@ -136,8 +141,7 @@ public abstract class AbstractRestCommand implements RestCommand {
 	 *            command execution result handler
 	 * @return response listener
 	 */
-	protected ResponseListener getResponseListener(ElasticCommand command,
-			ElasticCommandResultHandler commandResultHandler) {
+	protected ResponseListener getResponseListener(C command, ElasticCommandResultHandler commandResultHandler) {
 		return new ResponseListener() {
 			/**
 			 * (non-Javadoc)

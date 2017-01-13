@@ -24,6 +24,31 @@ public class DefaultElasticClient implements ElasticClient {
 	}
 
 	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.ElasticClient#execute(com.github.nnest.sparrow.ElasticCommand)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends ElasticCommandResult> T execute(ElasticCommand command)
+			throws ElasticCommandException, ElasticExecutorException {
+		return (T) this.getCommandExecutor().execute(command.analysis(this.getDocumentAnalyzer()));
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.ElasticClient#executeAysnc(com.github.nnest.sparrow.ElasticCommand,
+	 *      com.github.nnest.sparrow.ElasticCommandResultHandler)
+	 */
+	@Override
+	public void executeAysnc(ElasticCommand command, ElasticCommandResultHandler commandResultHandler) {
+		this.getCommandExecutor().executeAsync(command.analysis(this.getDocumentAnalyzer()),
+				new AsynchronizedElasticCommandResultHandlerDelegate(this.getCommandExecutor(), commandResultHandler));
+
+	}
+
+	/**
 	 * @return the commanderRepository
 	 */
 	public ElasticCommandExecutorRepository getCommandExecutorRepository() {
@@ -64,113 +89,6 @@ public class DefaultElasticClient implements ElasticClient {
 	 */
 	protected ElasticCommandExecutor getCommandExecutor() {
 		return this.getCommandExecutorRepository().getCommandExecutor();
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see com.github.nnest.sparrow.ElasticClient#index(java.lang.Object)
-	 */
-	@Override
-	public <T> T index(T document) throws ElasticCommandException, ElasticExecutorException {
-		return this.executeCommand(document, ElasticCommandKind.INDEX).getOriginalDocument();
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see com.github.nnest.sparrow.ElasticClient#indexAsync(java.lang.Object,
-	 *      com.github.nnest.sparrow.ElasticCommandResultHandler)
-	 */
-	@Override
-	public <T> void indexAsync(T document, ElasticCommandResultHandler commandResultHandler) {
-		this.executeCommandAsync(document, ElasticCommandKind.INDEX, commandResultHandler);
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see com.github.nnest.sparrow.ElasticClient#indexCreateOnly(java.lang.Object)
-	 */
-	@Override
-	public <T> T indexCreateOnly(T document) throws ElasticCommandException, ElasticExecutorException {
-		return this.executeCommand(document, ElasticCommandKind.INDEX_CREATE_ONLY).getOriginalDocument();
-	}
-
-	/**
-	 * (non-Javadoc)
-	 * 
-	 * @see com.github.nnest.sparrow.ElasticClient#indexCreateOnlyAsync(java.lang.Object,
-	 *      com.github.nnest.sparrow.ElasticCommandResultHandler)
-	 */
-	@Override
-	public <T> void indexCreateOnlyAsync(T document, ElasticCommandResultHandler commandResultHandler) {
-		this.executeCommandAsync(document, ElasticCommandKind.INDEX_CREATE_ONLY, commandResultHandler);
-	}
-
-	/**
-	 * execute command asynchronized
-	 * 
-	 * @param document
-	 * @param kind
-	 * @param commandResultHandler
-	 */
-	protected <T> void executeCommandAsync(T document, ElasticCommandKind kind,
-			ElasticCommandResultHandler commandResultHandler) {
-		ElasticCommand command = this.getDocumentAnalyzer().analysis(kind, document);
-		this.executeCommandAsync(command, commandResultHandler);
-	}
-
-	/**
-	 * execute command asynchronized
-	 * 
-	 * @param command
-	 *            command to execute
-	 * @param commandResultHandler
-	 *            command execution result handler
-	 */
-	protected void executeCommandAsync(ElasticCommand command, ElasticCommandResultHandler commandResultHandler) {
-		ElasticCommandExecutor commandExecutor = this.getCommandExecutor();
-		commandExecutor.executeAsync(command,
-				new AsynchronizedElasticCommandResultHandlerDelegate(commandExecutor, commandResultHandler));
-	}
-
-	/**
-	 * execute command by given document and command kind
-	 * 
-	 * @param document
-	 *            document
-	 * @param kind
-	 *            command kind
-	 * @return command exection result
-	 * @throws ElasticCommandException
-	 *             command exception
-	 * @throws ElasticExecutorException
-	 *             executor exception
-	 */
-	protected ElasticCommandResult executeCommand(Object document, ElasticCommandKind kind)
-			throws ElasticCommandException, ElasticExecutorException {
-		ElasticCommand command = this.getDocumentAnalyzer().analysis(kind, document);
-		return this.executeCommand(command);
-	}
-
-	/**
-	 * execute command
-	 * 
-	 * @param command
-	 *            command to execute
-	 * @return command execution result
-	 * @throws ElasticCommandException
-	 *             command exception
-	 * @throws ElasticExecutorException
-	 *             executor exception
-	 */
-	protected ElasticCommandResult executeCommand(ElasticCommand command)
-			throws ElasticCommandException, ElasticExecutorException {
-		ElasticCommandExecutor commandExecutor = this.getCommandExecutor();
-		ElasticCommandResult result = commandExecutor.execute(command);
-		commandExecutor.close();
-		return result;
 	}
 
 	/**

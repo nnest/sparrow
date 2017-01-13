@@ -8,12 +8,13 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.nnest.sparrow.AbstractElasticDocumentAnalyzer;
-import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticDocumentValidationException;
 import com.github.nnest.sparrow.ErrorCodes;
@@ -26,99 +27,75 @@ import com.github.nnest.sparrow.ErrorCodes;
  * @version 0.0.1
  */
 public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAnalyzer {
-	private Map<Class<?>, ElasticDocumentDescriptor> descriptorMap = new ConcurrentHashMap<Class<?>, ElasticDocumentDescriptor>();
+	private static PropertyDetective detective = new PropertyDetectiveChain(Arrays.asList(new IdProperrtyDetective(),
+			new IgnoredPropertyDetective(), new VersionPropertyDetective(), new NormalPropertyDetective()));
 
-	private static PropertyDetective idDetective = new IdProperrtyDetective();
-	private static PropertyDetective ignoredDetective = new IgnoredPropertyDetective();
-	private static PropertyDetective versionDetective = new VersionPropertyDetective();
-	private static PropertyDetective normalDetective = new NormalPropertyDetective();
+	private Map<Class<?>, ElasticDocumentDescriptor> descriptorMap = new ConcurrentHashMap<Class<?>, ElasticDocumentDescriptor>();
 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.AbstractElasticDocumentAnalyzer#getDocumentDescriptor(com.github.nnest.sparrow.ElasticCommandKind,
-	 *      java.lang.Object)
+	 * @see com.github.nnest.sparrow.AbstractElasticDocumentAnalyzer#doAnalysis(java.lang.Class)
 	 */
 	@Override
-	protected ElasticDocumentDescriptor getDocumentDescriptor(ElasticCommandKind commandKind, Object document) {
-		Class<?> docType = document.getClass();
-
+	protected ElasticDocumentDescriptor doAnalysis(Class<?> documentType) {
 		{
-			ElasticDocumentDescriptor descriptor = descriptorMap.get(docType);
+			ElasticDocumentDescriptor descriptor = descriptorMap.get(documentType);
 			if (descriptor != null) {
 				return descriptor;
 			}
 		}
 
-		ElasticDocumentDescriptor descriptor = readToDocumentDescriptor(docType);
-		descriptorMap.put(docType, descriptor);
+		ElasticDocumentDescriptor descriptor = readToDocumentDescriptor(documentType);
+		descriptorMap.put(documentType, descriptor);
 		return descriptor;
 	}
 
 	/**
 	 * read document type to descriptor
 	 * 
-	 * @param docType
-	 *            document class
+	 * @param documentType
+	 *            document type
 	 * @return document descriptor
 	 */
-	protected ElasticDocumentDescriptor readToDocumentDescriptor(Class<?> docType) {
+	protected ElasticDocumentDescriptor readToDocumentDescriptor(Class<?> documentType) {
 		AnnotatedElasticDocumentDescriptor descriptor = new AnnotatedElasticDocumentDescriptor();
-		ElasticDocument doc = docType.getAnnotation(ElasticDocument.class);
-		descriptor.setDocumentClass(docType);
+		ElasticDocument doc = documentType.getAnnotation(ElasticDocument.class);
+		descriptor.setDocumentClass(documentType);
 		descriptor.setDocument(doc);
 
-		Field[] fields = docType.getDeclaredFields();
+		Field[] fields = documentType.getDeclaredFields();
 		for (Field field : fields) {
-			idDetective.detect(field, descriptor);
+			detective.detect(field, descriptor);
 		}
-		Method[] methods = docType.getDeclaredMethods();
+		Method[] methods = documentType.getDeclaredMethods();
 		for (Method method : methods) {
-			idDetective.detect(method, descriptor);
+			detective.detect(method, descriptor);
 		}
 		return descriptor;
 	}
 
 	/**
-	 * property descriptor detective
+	 * detective chain
 	 * 
 	 * @author brad.wu
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	private static interface PropertyDetective {
-		/**
-		 * detect field
-		 * 
-		 * @param field
-		 * @param descriptor
-		 */
-		public void detect(Field field, AnnotatedElasticDocumentDescriptor descriptor);
+	public static class PropertyDetectiveChain implements PropertyDetective {
+		private List<PropertyDetective> detectives = null;
+
+		public PropertyDetectiveChain(List<PropertyDetective> detectives) {
+			this.detectives = detectives;
+		}
 
 		/**
-		 * detect method
-		 * 
-		 * @param method
-		 * @param descriptor
+		 * @return the detectives
 		 */
-		public void detect(Method method, AnnotatedElasticDocumentDescriptor descriptor);
+		protected List<PropertyDetective> getDetectives() {
+			return detectives;
+		}
 
-		/**
-		 * get next detective
-		 * 
-		 * @return
-		 */
-		public PropertyDetective getNext();
-	}
-
-	/**
-	 * abstract property detective
-	 * 
-	 * @author brad.wu
-	 * @since 0.0.1
-	 * @version 0.0.1
-	 */
-	private static abstract class AbstractPropertyDetective implements PropertyDetective {
 		/**
 		 * (non-Javadoc)
 		 * 
@@ -126,13 +103,13 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		public void detect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
-			if (!this.doDetect(field, descriptor)) {
-				PropertyDetective next = this.getNext();
-				if (next != null) {
-					next.detect(field, descriptor);
+		public boolean detect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
+			for (PropertyDetective detective : this.getDetectives()) {
+				if (detective.detect(field, descriptor)) {
+					return true;
 				}
 			}
+			return false;
 		}
 
 		/**
@@ -142,15 +119,55 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		public void detect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
-			if (!this.doDetect(method, descriptor)) {
-				PropertyDetective next = this.getNext();
-				if (next != null) {
-					next.detect(method, descriptor);
+		public boolean detect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
+			for (PropertyDetective detective : this.getDetectives()) {
+				if (detective.detect(method, descriptor)) {
+					return true;
 				}
 			}
+			return false;
 		}
+	}
 
+	/**
+	 * property descriptor detective
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.1
+	 * @version 0.0.1
+	 */
+	public static interface PropertyDetective {
+		/**
+		 * detect field, write to descriptor if detected
+		 * 
+		 * @param field
+		 *            field
+		 * @param descriptor
+		 *            descriptor
+		 * @return true if detected
+		 */
+		public boolean detect(Field field, AnnotatedElasticDocumentDescriptor descriptor);
+
+		/**
+		 * detect method, write to descriptor if detected
+		 * 
+		 * @param method
+		 *            method
+		 * @param descriptor
+		 *            descriptor
+		 * @return true if detected
+		 */
+		public boolean detect(Method method, AnnotatedElasticDocumentDescriptor descriptor);
+	}
+
+	/**
+	 * abstract property detective
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.1
+	 * @version 0.0.1
+	 */
+	public static abstract class AbstractPropertyDetective implements PropertyDetective {
 		/**
 		 * get property name from method name
 		 * 
@@ -179,24 +196,6 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 
 			return Optional.of(propertyName.substring(0, 1).toLowerCase() + propertyName.substring(1));
 		}
-
-		/**
-		 * do detect, success return true, otherwise return false
-		 * 
-		 * @param method
-		 * @param descriptor
-		 * @return
-		 */
-		protected abstract boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor);
-
-		/**
-		 * do detect, success return true, otherwise return false
-		 * 
-		 * @param field
-		 * @param descriptor
-		 * @return
-		 */
-		protected abstract boolean doDetect(Field field, AnnotatedElasticDocumentDescriptor descriptor);
 	}
 
 	/**
@@ -206,25 +205,15 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	private static class IdProperrtyDetective extends AbstractPropertyDetective {
+	public static class IdProperrtyDetective extends AbstractPropertyDetective {
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#getNext()
-		 */
-		@Override
-		public PropertyDetective getNext() {
-			return ignoredDetective;
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Method,
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Method,
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		protected boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
+		public boolean detect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticId id = method.getAnnotation(ElasticId.class);
 			if (id != null) {
 				descriptor.setIdField(this.getPropertyName(method, true).get());
@@ -237,11 +226,11 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Field,
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Field,
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		protected boolean doDetect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
+		public boolean detect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticId id = field.getAnnotation(ElasticId.class);
 			if (id != null) {
 				descriptor.setIdField(field.getName());
@@ -259,25 +248,15 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	private static class IgnoredPropertyDetective extends AbstractPropertyDetective {
+	public static class IgnoredPropertyDetective extends AbstractPropertyDetective {
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#getNext()
-		 */
-		@Override
-		public PropertyDetective getNext() {
-			return versionDetective;
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Method,
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Method,
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		protected boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
+		public boolean detect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticIgnored ignored = method.getAnnotation(ElasticIgnored.class);
 			if (ignored != null) {
 				descriptor.registerAsIgnored(this.getPropertyName(method, true).get());
@@ -290,11 +269,11 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Field,
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Field,
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		protected boolean doDetect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
+		public boolean detect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticIgnored ignored = field.getAnnotation(ElasticIgnored.class);
 			if (ignored != null) {
 				descriptor.registerAsIgnored(field.getName());
@@ -312,25 +291,15 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	private static class VersionPropertyDetective extends AbstractPropertyDetective {
+	public static class VersionPropertyDetective extends AbstractPropertyDetective {
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#getNext()
-		 */
-		@Override
-		public PropertyDetective getNext() {
-			return normalDetective;
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Method,
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Method,
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		protected boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
+		public boolean detect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticVersioning ver = method.getAnnotation(ElasticVersioning.class);
 			if (ver != null) {
 				descriptor.setVersionField(this.getPropertyName(method, true).get());
@@ -343,11 +312,11 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Field,
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Field,
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		protected boolean doDetect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
+		public boolean detect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticVersioning ver = field.getAnnotation(ElasticVersioning.class);
 			if (ver != null) {
 				descriptor.setVersionField(field.getName());
@@ -366,25 +335,15 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	private static class NormalPropertyDetective extends AbstractPropertyDetective {
+	public static class NormalPropertyDetective extends AbstractPropertyDetective {
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#getNext()
-		 */
-		@Override
-		public PropertyDetective getNext() {
-			return null;
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Method,
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Method,
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		protected boolean doDetect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
+		public boolean detect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticField fieldAnnotation = method.getAnnotation(ElasticField.class);
 			if (fieldAnnotation != null) {
 				descriptor.registerField(this.getPropertyName(method, true).get(), fieldAnnotation);
@@ -412,11 +371,11 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.AbstractPropertyDetective#doDetect(java.lang.reflect.Field,
+		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Field,
 		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
 		 */
 		@Override
-		protected boolean doDetect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
+		public boolean detect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
 			ElasticField fieldAnnotation = field.getAnnotation(ElasticField.class);
 			if (fieldAnnotation != null) {
 				descriptor.registerField(field.getName(), fieldAnnotation);

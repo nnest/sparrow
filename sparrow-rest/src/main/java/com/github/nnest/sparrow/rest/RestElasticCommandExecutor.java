@@ -17,6 +17,7 @@ import com.github.nnest.sparrow.ElasticCommandResultHandler;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.ElasticHost;
 import com.github.nnest.sparrow.ElasticSettings;
+import com.github.nnest.sparrow.rest.command.RestCommandSet;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 
@@ -72,10 +73,11 @@ public class RestElasticCommandExecutor extends AbstractElasticCommandExecutor {
 	 * 
 	 * @see com.github.nnest.sparrow.ElasticCommandExecutor#execute(com.github.nnest.sparrow.ElasticCommand)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public ElasticCommandResult execute(ElasticCommand command)
 			throws ElasticCommandException, ElasticExecutorException {
-		return RestCommandSet.get(command.getKind()).performRequest(this.getRestClient(), command);
+		return RestCommandSet.get(command.getCommandKind()).performRequest(this.getRestClient(), command);
 	}
 
 	/**
@@ -84,9 +86,11 @@ public class RestElasticCommandExecutor extends AbstractElasticCommandExecutor {
 	 * @see com.github.nnest.sparrow.ElasticCommandExecutor#executeAsync(com.github.nnest.sparrow.ElasticCommand,
 	 *      com.github.nnest.sparrow.ElasticCommandResultHandler)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void executeAsync(ElasticCommand command, ElasticCommandResultHandler commandResultHandler) {
-		RestCommandSet.get(command.getKind()).performRequestAsync(this.getRestClient(), command, commandResultHandler);
+		RestCommandSet.get(command.getCommandKind()).performRequestAsync(this.getRestClient(), command,
+				commandResultHandler);
 	}
 
 	/**

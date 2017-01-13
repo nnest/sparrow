@@ -24,25 +24,21 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.AbstractElasticDocumentValidator#doValidate(java.lang.Object)
+	 * @see com.github.nnest.sparrow.AbstractElasticDocumentValidator#doValidate(java.lang.Class)
 	 */
 	@Override
-	protected void doValidate(Object document) {
-		if (document == null)
-			return;
-
-		Class<?> type = document.getClass();
-		ElasticDocument elasticDoc = type.getAnnotation(ElasticDocument.class);
+	protected void doValidate(Class<?> documentType) {
+		ElasticDocument elasticDoc = documentType.getAnnotation(ElasticDocument.class);
 		if (elasticDoc == null) {
 			// no annotated
 			return;
 		} else {
-			this.checkDocument(elasticDoc, type);
+			this.checkDocument(elasticDoc, documentType);
 
 			String idProperty = null;
 			String versionProperty = null;
 
-			Field[] fields = type.getDeclaredFields();
+			Field[] fields = documentType.getDeclaredFields();
 			for (Field field : fields) {
 				ElasticId id = field.getAnnotation(ElasticId.class);
 				ElasticVersioning version = field.getAnnotation(ElasticVersioning.class);
@@ -51,7 +47,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 					if (idProperty != null) {
 						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID,
 								String.format("Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty,
-										field.getName(), type));
+										field.getName(), documentType));
 					} else {
 						idProperty = field.getName();
 					}
@@ -59,34 +55,35 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 					if (versionProperty != null) {
 						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_VERSIONING,
 								String.format("Duplicated versioning fields[%1$s, %2$s] found on document[%3$s].",
-										versionProperty, field.getName(), type));
+										versionProperty, field.getName(), documentType));
 					} else {
 						versionProperty = field.getName();
 					}
 				}
 			}
 
-			Method[] methods = type.getDeclaredMethods();
+			Method[] methods = documentType.getDeclaredMethods();
 			for (Method method : methods) {
 				ElasticId id = method.getAnnotation(ElasticId.class);
 				ElasticVersioning version = method.getAnnotation(ElasticVersioning.class);
 				ElasticField field = method.getAnnotation(ElasticField.class);
 				if (id != null) {
 					// check id on correct method
-					String name = this.checkMethod(type, method, id);
+					String name = this.checkMethod(documentType, method, id);
 					if (idProperty != null) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID, String.format(
-								"Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, method, type));
+						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID,
+								String.format("Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, method,
+										documentType));
 					} else {
 						idProperty = name;
 					}
 				} else if (field != null || version != null) {
-					String name = this.checkMethod(type, method, field);
+					String name = this.checkMethod(documentType, method, field);
 					if (version != null) {
 						if (versionProperty != null) {
 							throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_VERSIONING,
 									String.format("Duplicated versioning fields[%1$s, %2$s] found on document[%3$s].",
-											versionProperty, name, type));
+											versionProperty, name, documentType));
 						} else {
 							versionProperty = name;
 						}
@@ -96,10 +93,9 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 
 			if (idProperty == null) {
 				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ID_NOT_FOUND,
-						String.format("Id not found on document[%1$s]", type.getName()));
+						String.format("Id not found on document[%1$s]", documentType));
 			}
 		}
-
 	}
 
 	/**

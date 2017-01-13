@@ -15,11 +15,9 @@ public interface ElasticDocumentAnalyzer {
 	/**
 	 * analysis document
 	 * 
-	 * @param commandKind
-	 *            command kind
-	 * @param document
-	 *            document
-	 * @return command to execute
+	 * @param documentType
+	 *            document type
+	 * @return document descriptor
 	 */
-	ElasticCommand analysis(ElasticCommandKind commandKind, Object document);
+	ElasticDocumentDescriptor analysis(Class<?> documentType);
 }

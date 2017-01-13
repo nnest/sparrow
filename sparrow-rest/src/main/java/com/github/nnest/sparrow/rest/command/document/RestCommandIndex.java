@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.rest;
+package com.github.nnest.sparrow.rest.command.document;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -12,13 +12,14 @@ import org.apache.http.entity.StringEntity;
 import org.elasticsearch.client.Response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.nnest.sparrow.ElasticCommand;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticCommandResult;
+import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
-import com.github.nnest.sparrow.rest.response.IndexResponse;
-import com.github.nnest.sparrow.rest.response.RestResponseObject;
+import com.github.nnest.sparrow.command.document.Index;
+import com.github.nnest.sparrow.rest.AbstractRestCommand;
+import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 
@@ -29,7 +30,7 @@ import com.google.common.base.Strings;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class RestCommandIndex extends AbstractRestCommand {
+public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C> {
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -37,17 +38,16 @@ public class RestCommandIndex extends AbstractRestCommand {
 	 *      com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
-	protected ElasticCommandResult convertToCommandResult(Response response, ElasticCommand command)
+	protected ElasticCommandResult convertToCommandResult(Response response, C command)
 			throws ElasticExecutorException {
-		RestElasticCommandResult result = (RestElasticCommandResult) super.convertToCommandResult(response, command);
-
-		ElasticDocumentDescriptor descriptor = command.getDescriptor();
-		Object document = command.getOriginalDocument();
+		ElasticCommandResult result = super.convertToCommandResult(response, command);
+		ElasticDocumentDescriptor descriptor = command.getDocumentDescriptor();
+		Object document = command.getDocument();
 		String idField = descriptor.getIdField();
 		String idValue = this.getIdValue(document, idField);
 
 		if (Strings.nullToEmpty(idValue).trim().length() == 0) {
-			IndexResponse indexResponse = (IndexResponse) result.getResponseObject();
+			IndexResponse indexResponse = (IndexResponse) result.getResultData();
 			String resultIdValue = indexResponse.getId();
 			this.setIdValue(document, idField, resultIdValue);
 		}
@@ -58,12 +58,15 @@ public class RestCommandIndex extends AbstractRestCommand {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#readRestResponse(java.io.InputStream)
+	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
+	 *      java.io.InputStream)
 	 */
 	@Override
-	protected RestResponseObject readRestResponse(InputStream stream) throws ElasticExecutorException {
+	protected ElasticCommandResultData readResponse(C command, InputStream stream) throws ElasticExecutorException {
 		try {
-			return new ObjectMapper().readValue(stream, IndexResponse.class);
+			IndexResponse response = new ObjectMapper().readValue(stream, IndexResponse.class);
+			response.setDocument(command.getDocument());
+			return response;
 		} catch (Exception e) {
 			throw new ElasticExecutorException("Fail to read data from response.", e);
 		}
@@ -75,12 +78,12 @@ public class RestCommandIndex extends AbstractRestCommand {
 	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
-	protected RestRequest convertToRestRequest(ElasticCommand command) throws ElasticExecutorException {
-		ElasticDocumentDescriptor descriptor = command.getDescriptor();
+	protected RestRequest convertToRestRequest(C command) throws ElasticExecutorException {
+		ElasticDocumentDescriptor descriptor = command.getDocumentDescriptor();
 
 		RestRequest request = new RestRequest();
 
-		Object document = command.getOriginalDocument();
+		Object document = command.getDocument();
 		Class<?> documentType = document.getClass();
 		String idField = descriptor.getIdField();
 		String idValue = this.getIdValue(document, idField);

@@ -19,7 +19,7 @@ import com.github.nnest.sparrow.ElasticExecutorException;
  * @since 0.0.1
  * @version 0.0.1
  */
-public interface RestCommand {
+public interface RestCommand<C extends ElasticCommand> {
 	/**
 	 * perform request
 	 * 
@@ -33,7 +33,7 @@ public interface RestCommand {
 	 * @throws ElasticCommandException
 	 *             command exception
 	 */
-	ElasticCommandResult performRequest(RestClient restClient, ElasticCommand command)
+	ElasticCommandResult performRequest(RestClient restClient, C command)
 			throws ElasticCommandException, ElasticExecutorException;
 
 	/**
@@ -46,6 +46,5 @@ public interface RestCommand {
 	 * @param commandResultHandler
 	 *            command execution result
 	 */
-	void performRequestAsync(RestClient restClient, ElasticCommand command,
-			ElasticCommandResultHandler commandResultHandler);
+	void performRequestAsync(RestClient restClient, C command, ElasticCommandResultHandler commandResultHandler);
 }
