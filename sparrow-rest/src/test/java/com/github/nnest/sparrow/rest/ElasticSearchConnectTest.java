@@ -27,6 +27,8 @@ import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.ElasticHost;
 import com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.command.document.Create;
+import com.github.nnest.sparrow.command.document.Delete;
+import com.github.nnest.sparrow.command.document.DeleteResultData;
 import com.github.nnest.sparrow.command.document.Exist;
 import com.github.nnest.sparrow.command.document.ExistResultData;
 import com.github.nnest.sparrow.command.document.Get;
@@ -264,6 +266,30 @@ public class ElasticSearchConnectTest {
 		assertEquals("1st User Changed", tt.getUser());
 		assertNull(tt.getPostDate());
 		assertNull(tt.getMessage());
+	}
+
+	@Test
+	public void test013Delete1stUser() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		ElasticCommand cmd = new Delete(TwitterTweet.class, "1");
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		DeleteResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+
+		cmd = new Exist(TwitterTweet.class, "1");
+		result = client.execute(cmd);
+		ExistResultData existResult = result.getResultData();
+		assertTrue(existResult.isSuccessful());
+		assertFalse(existResult.isFound());
+	}
+
+	@Test(expected = ElasticCommandException.class)
+	public void test014Delete1stUserFailed() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		ElasticCommand cmd = new Delete(TwitterTweet.class, "1");
+		client.execute(cmd);
 	}
 
 	private ElasticClient createClient() {
