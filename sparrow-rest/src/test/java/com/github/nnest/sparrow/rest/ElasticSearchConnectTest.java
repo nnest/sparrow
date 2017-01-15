@@ -29,6 +29,8 @@ import com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.command.document.Create;
 import com.github.nnest.sparrow.command.document.Delete;
 import com.github.nnest.sparrow.command.document.DeleteResultData;
+import com.github.nnest.sparrow.command.document.ElasticDocumentIncorrectVersionException;
+import com.github.nnest.sparrow.command.document.ElasticDocumentNotFoundException;
 import com.github.nnest.sparrow.command.document.Exist;
 import com.github.nnest.sparrow.command.document.ExistResultData;
 import com.github.nnest.sparrow.command.document.Get;
@@ -140,7 +142,7 @@ public class ElasticSearchConnectTest {
 		assertNotNull(rtt.getId());
 	}
 
-	@Test(expected = ElasticCommandException.class)
+	@Test(expected = ElasticDocumentIncorrectVersionException.class)
 	public void test005CreateFail() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
@@ -285,7 +287,7 @@ public class ElasticSearchConnectTest {
 		assertFalse(existResult.isFound());
 	}
 
-	@Test(expected = ElasticCommandException.class)
+	@Test(expected = ElasticDocumentNotFoundException.class)
 	public void test014Delete1stUserFailed() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		ElasticCommand cmd = new Delete(TwitterTweet.class, "1");

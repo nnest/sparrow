@@ -3,7 +3,6 @@
  */
 package com.github.nnest.sparrow.rest;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -16,7 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
 import org.elasticsearch.client.Response;
+import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
 
@@ -31,6 +32,8 @@ import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticCommandResultHandler;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
+import com.github.nnest.sparrow.command.document.ElasticDocumentIncorrectVersionException;
+import com.github.nnest.sparrow.command.document.ElasticDocumentNotFoundException;
 import com.google.common.collect.Lists;
 
 /**
@@ -58,10 +61,41 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 		try {
 			response = restClient.performRequest(request.getMethod(), request.getEndpoint(), request.getParams(),
 					request.getEntity(), request.getHeaders());
-		} catch (IOException e) {
-			throw new ElasticCommandException(String.format("Fail to perform request with command[%1$s]", command), e);
+		} catch (Exception e) {
+			throw this.adaptRequestPerformException(e, command);
 		}
 		return this.convertToCommandResult(response, command);
+	}
+
+	/**
+	 * adapt request perform exception
+	 * 
+	 * @param exception
+	 *            exception
+	 * @param command
+	 *            command
+	 * @return might be an exception which is converted or adapted
+	 */
+	protected ElasticCommandException adaptRequestPerformException(Exception exception, C command) {
+		if (exception instanceof ElasticCommandException) {
+			return (ElasticCommandException) exception;
+		} else if (exception instanceof ResponseException) {
+			Response response = ((ResponseException) exception).getResponse();
+			int status = response.getStatusLine().getStatusCode();
+			if (status == HttpStatus.SC_NOT_FOUND) {
+				return new ElasticDocumentNotFoundException(
+						String.format("Document not found with command[%1$s]", command), exception);
+			} else if (status == HttpStatus.SC_CONFLICT) {
+				return new ElasticDocumentIncorrectVersionException(
+						String.format("Incorrect veresion of document with command[%1$s]", command), exception);
+			} else {
+				return new ElasticCommandException(String.format("Fail to perform request with command[%1$s]", command),
+						exception);
+			}
+		} else {
+			return new ElasticCommandException(String.format("Fail to perform request with command[%1$s]", command),
+					exception);
+		}
 	}
 
 	/**
@@ -164,7 +198,7 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 			 */
 			@Override
 			public void onFailure(Exception exception) {
-				commandResultHandler.handleFail(exception);
+				commandResultHandler.handleFail(adaptRequestPerformException(exception, command));
 			}
 		};
 	}
