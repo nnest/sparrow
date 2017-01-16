@@ -136,7 +136,7 @@ public final class RestCommandEndpointBuilder {
 		 * get query parameter string, return null when the parameter can be
 		 * ignored
 		 * 
-		 * @return
+		 * @return query string
 		 */
 		String getQueryParamString();
 	}

@@ -16,7 +16,7 @@ public interface DeleteResultData extends ElasticCommandResultData {
 	/**
 	 * check the given data is deleted or not
 	 * 
-	 * @return
+	 * @return is deleted or not
 	 */
 	boolean isDeleted();
 }

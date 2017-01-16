@@ -119,7 +119,7 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C, In
 	/**
 	 * get endpoint command kind
 	 * 
-	 * @return
+	 * @return endpoint command kind
 	 */
 	protected String getEndpointCommandKind() {
 		return null;

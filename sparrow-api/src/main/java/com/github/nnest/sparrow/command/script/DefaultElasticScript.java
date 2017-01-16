@@ -88,8 +88,10 @@ public class DefaultElasticScript<T extends ElasticScript> implements ElasticScr
 	 * with param as a map, let the {@linkplain #paramsObject} as a map
 	 * 
 	 * @param key
+	 *            key of parameter
 	 * @param value
-	 * @return
+	 *            value of parameter
+	 * @return this
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public T withParam(String key, Object value) {

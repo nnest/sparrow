@@ -70,7 +70,8 @@ public class Delete implements ElasticCommand {
 	 * with specific version
 	 * 
 	 * @param version
-	 * @return
+	 *            version
+	 * @return this
 	 */
 	public Delete withVersion(String version) {
 		this.version = version;

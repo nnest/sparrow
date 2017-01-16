@@ -21,8 +21,6 @@ import java.lang.annotation.Target;
  * field or method. if on method, method must follow the java bean standard
  * getter/setter format. Only one time for per field, like spring data
  * bean,</li>
- * <li>if don't want to keep value in elastic, annotate field or method with
- * {@linkplain ElasticIgnored},</li>
  * <li>any getter/setter (must existed both) which not be annotated, is default
  * persist to elastic,</li>
  * </ol>

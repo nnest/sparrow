@@ -14,21 +14,21 @@ public interface ElasticScript {
 	/**
 	 * get script
 	 * 
-	 * @return
+	 * @return script
 	 */
 	String getScript();
 
 	/**
 	 * get language
 	 * 
-	 * @return
+	 * @return language
 	 */
 	String getLanguage();
 
 	/**
 	 * get parameters object
 	 * 
-	 * @return
+	 * @return parameters
 	 */
 	Object getParamsObject();
 }

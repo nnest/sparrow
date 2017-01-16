@@ -15,10 +15,10 @@ import com.github.nnest.sparrow.ElasticCommandResultData;
 public interface UpdateResultData extends ElasticCommandResultData {
 	/**
 	 * returns true when no change detected. only effective when
-	 * {@linkplain Update#isDetectNoopChanged()} is {@code true}. otherwise always
-	 * return false.
+	 * {@linkplain Update#isDetectNoopChanged()} is {@code true}. otherwise
+	 * always return false.
 	 * 
-	 * @return
+	 * @return is noop changed
 	 */
 	boolean isNoopChanged();
 }
