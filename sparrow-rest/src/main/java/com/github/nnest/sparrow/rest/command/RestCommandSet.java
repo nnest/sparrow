@@ -13,6 +13,7 @@ import com.github.nnest.sparrow.rest.command.document.RestCommandDelete;
 import com.github.nnest.sparrow.rest.command.document.RestCommandExist;
 import com.github.nnest.sparrow.rest.command.document.RestCommandGet;
 import com.github.nnest.sparrow.rest.command.document.RestCommandIndex;
+import com.github.nnest.sparrow.rest.command.document.RestCommandUpdate;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
 
 /**
@@ -33,6 +34,7 @@ public class RestCommandSet {
 		commands.put(ElasticCommandKind.GET, new RestCommandGet());
 		commands.put(ElasticCommandKind.EXIST, new RestCommandExist());
 		commands.put(ElasticCommandKind.DELETE, new RestCommandDelete());
+		commands.put(ElasticCommandKind.UPDATE, new RestCommandUpdate());
 
 		// indices
 		commands.put(ElasticCommandKind.DROP_INDEX, new RestCommandDropIndex());

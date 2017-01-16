@@ -38,6 +38,8 @@ import com.github.nnest.sparrow.command.document.GetResultData;
 import com.github.nnest.sparrow.command.document.Index;
 import com.github.nnest.sparrow.command.document.IndexResultData;
 import com.github.nnest.sparrow.command.document.IndexResultType;
+import com.github.nnest.sparrow.command.document.Update;
+import com.github.nnest.sparrow.command.document.UpdateResultData;
 import com.github.nnest.sparrow.command.indices.DropIndex;
 import com.google.common.collect.Lists;
 
@@ -48,7 +50,7 @@ import com.google.common.collect.Lists;
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ElasticSearchConnectTest {
-	private static String autoCreatedId = null;
+	private static String idOf2ndUser = null;
 
 	@Test
 	public void test000DropIndex() {
@@ -99,7 +101,7 @@ public class ElasticSearchConnectTest {
 		assertTrue(rtt == tt);
 		assertNotNull(rtt.getId());
 
-		autoCreatedId = rtt.getId();
+		idOf2ndUser = rtt.getId();
 	}
 
 	@Test
@@ -179,7 +181,7 @@ public class ElasticSearchConnectTest {
 	public void test007Update2ndUser() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
-		tt.setId(autoCreatedId);
+		tt.setId(idOf2ndUser);
 		tt.setUser("2nd User Changed");
 		tt.setPostDate("2017-01-08T14:12:12");
 		tt.setMessage("Message from 2nd user changed");
@@ -292,6 +294,62 @@ public class ElasticSearchConnectTest {
 		ElasticClient client = createClient();
 		ElasticCommand cmd = new Delete(TwitterTweet.class, "1");
 		client.execute(cmd);
+	}
+
+	@Test
+	public void test015Update2ndUser() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		TwitterTweet tt = new TwitterTweet();
+		tt.setId(idOf2ndUser);
+		tt.setUser("2nd User Changed");
+		tt.setPostDate("2017-01-08T14:12:12");
+		tt.setMessage("Message from 2nd user changed");
+
+		ElasticCommand cmd = new Update(tt).withDetectNoopChanged(false);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		UpdateResultData updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertFalse(updateResult.isNoopChanged());
+
+		// get again for verification
+		cmd = new Get(TwitterTweet.class, idOf2ndUser);
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		GetResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(TwitterTweet.class == data.getDocument().getClass());
+		tt = data.getDocument();
+		assertEquals(idOf2ndUser, tt.getId());
+		assertEquals("2nd User Changed", tt.getUser());
+		assertEquals("2017-01-08T14:12:12", tt.getPostDate());
+		assertEquals("Message from 2nd user changed", tt.getMessage());
+
+		// test data not changed, detect noop changed
+		cmd = new Update(tt).withDetectNoopChanged(true);
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertTrue(updateResult.isNoopChanged());
+
+		// test data changed, not detect noop changed
+		cmd = new Update(tt).withDetectNoopChanged(false);
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertFalse(updateResult.isNoopChanged());
+
+		// test data changed, detect noop changed
+		tt.setPostDate("2017-01-08T23:12:12");
+		cmd = new Update(tt).withDetectNoopChanged(true);
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertFalse(updateResult.isNoopChanged());
 	}
 
 	private ElasticClient createClient() {

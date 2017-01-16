@@ -17,6 +17,8 @@ public enum ElasticCommandKind {
 	GET, // get particular document by given id
 	EXIST, // check document exists or not by given id
 	DELETE, // delete document by given id
+	UPDATE, // update document by given data
+	UPDATE_BY_SCRIPT, // update document by given script
 
 	// indices command
 	DROP_INDEX, // delete index

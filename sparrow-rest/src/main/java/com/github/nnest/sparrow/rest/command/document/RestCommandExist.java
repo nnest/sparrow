@@ -4,8 +4,6 @@
 package com.github.nnest.sparrow.rest.command.document;
 
 import java.io.InputStream;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.elasticsearch.client.Response;
@@ -19,7 +17,7 @@ import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.Exist;
 import com.github.nnest.sparrow.rest.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
-import com.google.common.base.Joiner;
+import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 
 /**
  * rest command {@linkplain ElasticCommandKind#EXIST}
@@ -66,29 +64,10 @@ public class RestCommandExist extends AbstractRestCommand<Exist> {
 		ElasticDocumentDescriptor descriptor = command.getDocumentDescriptor();
 
 		RestRequest request = new RestRequest();
-		String endpoint = this.buildEndpoint(descriptor, command.getId());
+		String endpoint = RestCommandEndpointBuilder.buildEndpoint(descriptor, command.getId());
 		request.setEndpoint(endpoint);
 		// use PUT for id given
 		request.setMethod(ElasticRestMethod.HEAD.name());
 		return request;
-	}
-
-	/**
-	 * build endpoint
-	 * 
-	 * @param descriptor
-	 *            document descriptor
-	 * @param idValue
-	 *            id value
-	 * @return endpoint uri
-	 */
-	protected String buildEndpoint(ElasticDocumentDescriptor descriptor, String idValue) {
-		List<String> parts = new LinkedList<String>();
-		parts.add(descriptor.getIndex());
-		parts.add(descriptor.getType());
-		if (idValue != null) {
-			parts.add(idValue);
-		}
-		return Joiner.on('/').join(parts);
 	}
 }
