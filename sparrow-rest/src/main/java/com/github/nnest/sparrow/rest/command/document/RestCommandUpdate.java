@@ -3,7 +3,6 @@
  */
 package com.github.nnest.sparrow.rest.command.document;
 
-import java.io.InputStream;
 import java.io.StringWriter;
 
 import org.apache.http.entity.StringEntity;
@@ -11,14 +10,12 @@ import org.apache.http.entity.StringEntity;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nnest.sparrow.ElasticCommandKind;
-import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.Update;
-import com.github.nnest.sparrow.rest.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
+import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 import com.google.common.base.Strings;
 
@@ -29,27 +26,21 @@ import com.google.common.base.Strings;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class RestCommandUpdate extends AbstractRestCommand<Update> {
+public class RestCommandUpdate extends AbstractRestCommand<Update, UpdateResponse> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
-	 *      java.io.InputStream)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#getResponseClass()
 	 */
 	@Override
-	protected ElasticCommandResultData readResponse(Update command, InputStream stream)
-			throws ElasticExecutorException {
-		try {
-			return new ObjectMapper().readValue(stream, UpdateResponse.class);
-		} catch (Exception e) {
-			throw new ElasticExecutorException("Fail to read data from response.", e);
-		}
+	protected Class<UpdateResponse> getResponseClass() {
+		return UpdateResponse.class;
 	}
 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
 	protected RestRequest convertToRestRequest(Update command) throws ElasticExecutorException {
@@ -72,7 +63,7 @@ public class RestCommandUpdate extends AbstractRestCommand<Update> {
 
 		StringWriter documentJSONString = new StringWriter();
 		try {
-			this.createObjectMapper(descriptor).writeValue(documentJSONString, new UpdateRequestObject(command));
+			this.createRequestObjectMapper(descriptor).writeValue(documentJSONString, new UpdateRequestObject(command));
 		} catch (Exception e) {
 			throw new ElasticExecutorException(String.format("Fail to parse document[%1$s] to JSON.", documentType), e);
 		}

@@ -3,25 +3,21 @@
  */
 package com.github.nnest.sparrow.rest.command.document;
 
-import java.io.InputStream;
 import java.io.StringWriter;
 
 import org.apache.http.entity.StringEntity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.nnest.sparrow.ElasticCommandKind;
-import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.UpdateByScript;
 import com.github.nnest.sparrow.command.script.ElasticScript;
-import com.github.nnest.sparrow.rest.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
+import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
-import com.github.nnest.sparrow.rest.command.RestCommandSet;
 import com.google.common.base.Strings;
 
 /**
@@ -31,27 +27,21 @@ import com.google.common.base.Strings;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class RestCommandUpdateByScript extends AbstractRestCommand<UpdateByScript> {
+public class RestCommandUpdateByScript extends AbstractRestCommand<UpdateByScript, UpdateResponse> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
-	 *      java.io.InputStream)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#getResponseClass()
 	 */
 	@Override
-	protected ElasticCommandResultData readResponse(UpdateByScript command, InputStream stream)
-			throws ElasticExecutorException {
-		try {
-			return new ObjectMapper().readValue(stream, UpdateResponse.class);
-		} catch (Exception e) {
-			throw new ElasticExecutorException("Fail to read data from response.", e);
-		}
+	protected Class<UpdateResponse> getResponseClass() {
+		return UpdateResponse.class;
 	}
 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
 	protected RestRequest convertToRestRequest(UpdateByScript command) throws ElasticExecutorException {
@@ -84,51 +74,13 @@ public class RestCommandUpdateByScript extends AbstractRestCommand<UpdateByScrip
 
 		StringWriter documentJSONString = new StringWriter();
 		try {
-			this.createObjectMapper(descriptor, command.getScript()).writeValue(documentJSONString,
+			this.createRequestObjectMapper(descriptor).writeValue(documentJSONString,
 					new UpdateByScriptRequestObject(command));
 		} catch (Exception e) {
 			throw new ElasticExecutorException(String.format("Fail to parse document[%1$s] to JSON.", documentType), e);
 		}
 		request.setEntity(new StringEntity(documentJSONString.toString(), "UTF-8"));
 		return request;
-	}
-
-	/**
-	 * create object mapper by given script
-	 * 
-	 * @param documentDescriptor
-	 *            document descriptor
-	 * @param script
-	 *            script
-	 * 
-	 * @return object mapper
-	 */
-	protected ObjectMapper createObjectMapper(ElasticDocumentDescriptor documentDescriptor, ElasticScript script) {
-		ObjectMapper mapper = super.createObjectMapper(documentDescriptor);
-		Class<?> mixinClass = this.getElasticScriptMixinClass(script.getClass());
-		if (mixinClass != null) {
-			mapper.addMixIn(ElasticScript.class, mixinClass);
-		}
-		Object params = script.getParamsObject();
-		if (params != null) {
-			Class<?> paramsMixinClass = this.getElasticScriptMixinClass(params.getClass());
-			if (paramsMixinClass != null) {
-				mapper.addMixIn(params.getClass(), paramsMixinClass);
-			}
-		}
-
-		return mapper;
-	}
-
-	/**
-	 * get elastic script or params mixin class
-	 * 
-	 * @param classToSerialize
-	 *            script class or params class
-	 * @return mixin class
-	 */
-	protected Class<?> getElasticScriptMixinClass(Class<?> classToSerialize) {
-		return RestCommandSet.getScriptMixinClass(classToSerialize);
 	}
 
 	/**

@@ -9,8 +9,8 @@ import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.indices.DropIndex;
-import com.github.nnest.sparrow.rest.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
+import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 
 /**
  * rest command {@linkplain ElasticCommandKind#DROP_INDEX}
@@ -19,11 +19,11 @@ import com.github.nnest.sparrow.rest.ElasticRestMethod;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class RestCommandDropIndex extends AbstractRestCommand<DropIndex> {
+public class RestCommandDropIndex extends AbstractRestCommand<DropIndex, ElasticCommandResultData> {
 	/**
 	 * return null
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
 	 *      java.io.InputStream)
 	 */
 	@Override
@@ -33,9 +33,19 @@ public class RestCommandDropIndex extends AbstractRestCommand<DropIndex> {
 	}
 
 	/**
+	 * no response, return null here
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#getResponseClass()
+	 */
+	@Override
+	protected Class<ElasticCommandResultData> getResponseClass() {
+		return null;
+	}
+
+	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
 	protected RestRequest convertToRestRequest(DropIndex command) throws ElasticExecutorException {

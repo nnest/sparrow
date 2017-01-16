@@ -5,7 +5,6 @@ package com.github.nnest.sparrow.rest;
 
 import com.github.nnest.sparrow.annotation.ElasticDocument;
 import com.github.nnest.sparrow.annotation.ElasticId;
-import com.github.nnest.sparrow.annotation.ElasticIgnored;
 
 /**
  * @author brad.wu
@@ -19,8 +18,6 @@ public class TwitterTweet {
 	private String user = null;
 	private String postDate = null;
 	private String message = null;
-	@ElasticIgnored
-	private String ignoredField = null;
 
 	/**
 	 * @return the id
@@ -80,19 +77,5 @@ public class TwitterTweet {
 	 */
 	public void setMessage(String message) {
 		this.message = message;
-	}
-
-	/**
-	 * @return the ignoredField
-	 */
-	public String getIgnoredField() {
-		return ignoredField;
-	}
-
-	/**
-	 * @param ignoredField the ignoredField to set
-	 */
-	public void setIgnoredField(String ignoredField) {
-		this.ignoredField = ignoredField;
 	}
 }

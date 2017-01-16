@@ -3,21 +3,18 @@
  */
 package com.github.nnest.sparrow.rest.command.document;
 
-import java.io.InputStream;
 import java.io.StringWriter;
 
 import org.apache.http.entity.StringEntity;
 import org.elasticsearch.client.Response;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticCommandResult;
-import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.Index;
-import com.github.nnest.sparrow.rest.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
+import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 import com.google.common.base.Strings;
 
@@ -28,11 +25,11 @@ import com.google.common.base.Strings;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C> {
+public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C, IndexResponse> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToCommandResult(org.elasticsearch.client.Response,
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#convertToCommandResult(org.elasticsearch.client.Response,
 	 *      com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
@@ -56,24 +53,29 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
-	 *      java.io.InputStream)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#completeResponse(com.github.nnest.sparrow.ElasticCommandResultData,
+	 *      com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
-	protected ElasticCommandResultData readResponse(C command, InputStream stream) throws ElasticExecutorException {
-		try {
-			IndexResponse response = new ObjectMapper().readValue(stream, IndexResponse.class);
-			response.setDocument(command.getDocument());
-			return response;
-		} catch (Exception e) {
-			throw new ElasticExecutorException("Fail to read data from response.", e);
-		}
+	protected IndexResponse completeResponse(IndexResponse response, C command) {
+		response.setDocument(command.getDocument());
+		return response;
 	}
 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#getResponseClass()
+	 */
+	@Override
+	protected Class<IndexResponse> getResponseClass() {
+		return IndexResponse.class;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
 	protected RestRequest convertToRestRequest(C command) throws ElasticExecutorException {
@@ -106,7 +108,7 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C> {
 
 		StringWriter documentJSONString = new StringWriter();
 		try {
-			this.createObjectMapper(descriptor).writeValue(documentJSONString, document);
+			this.createRequestObjectMapper(descriptor).writeValue(documentJSONString, document);
 		} catch (Exception e) {
 			throw new ElasticExecutorException(String.format("Fail to parse document[%1$s] to JSON.", documentType), e);
 		}

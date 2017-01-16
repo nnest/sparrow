@@ -3,20 +3,17 @@
  */
 package com.github.nnest.sparrow.rest.command.document;
 
-import java.io.InputStream;
-
 import org.apache.http.HttpStatus;
 import org.elasticsearch.client.Response;
 
 import com.github.nnest.sparrow.DefaultElasticCommandResult;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticCommandResult;
-import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.Exist;
-import com.github.nnest.sparrow.rest.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
+import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 
 /**
@@ -26,11 +23,11 @@ import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class RestCommandExist extends AbstractRestCommand<Exist> {
+public class RestCommandExist extends AbstractRestCommand<Exist, ExistResponse> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToCommandResult(org.elasticsearch.client.Response,
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#convertToCommandResult(org.elasticsearch.client.Response,
 	 *      com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
@@ -44,20 +41,17 @@ public class RestCommandExist extends AbstractRestCommand<Exist> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
-	 *      java.io.InputStream)
-	 * @deprecated
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#getResponseClass()
 	 */
 	@Override
-	@Deprecated
-	protected ElasticCommandResultData readResponse(Exist command, InputStream stream) throws ElasticExecutorException {
-		throw new UnsupportedOperationException("#readResponse is unnecessary here.");
+	protected Class<ExistResponse> getResponseClass() {
+		return ExistResponse.class;
 	}
 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
 	protected RestRequest convertToRestRequest(Exist command) throws ElasticExecutorException {

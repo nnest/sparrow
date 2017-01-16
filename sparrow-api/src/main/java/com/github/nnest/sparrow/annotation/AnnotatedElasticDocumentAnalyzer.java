@@ -27,8 +27,8 @@ import com.github.nnest.sparrow.ErrorCodes;
  * @version 0.0.1
  */
 public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAnalyzer {
-	private static PropertyDetective detective = new PropertyDetectiveChain(Arrays.asList(new IdProperrtyDetective(),
-			new IgnoredPropertyDetective(), new VersionPropertyDetective(), new NormalPropertyDetective()));
+	private final static PropertyDetective detective = new PropertyDetectiveChain(
+			Arrays.asList(new IdProperrtyDetective(), new VersionPropertyDetective(), new NormalPropertyDetective()));
 
 	private Map<Class<?>, ElasticDocumentDescriptor> descriptorMap = new ConcurrentHashMap<Class<?>, ElasticDocumentDescriptor>();
 
@@ -235,49 +235,6 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 			ElasticId id = field.getAnnotation(ElasticId.class);
 			if (id != null) {
 				descriptor.setIdField(field.getName());
-				return true;
-			} else {
-				return false;
-			}
-		}
-	}
-
-	/**
-	 * ignored property detective
-	 * 
-	 * @author brad.wu
-	 * @since 0.0.1
-	 * @version 0.0.1
-	 */
-	public static class IgnoredPropertyDetective extends AbstractPropertyDetective {
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Method,
-		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
-		 */
-		@Override
-		public boolean detect(Method method, AnnotatedElasticDocumentDescriptor descriptor) {
-			ElasticIgnored ignored = method.getAnnotation(ElasticIgnored.class);
-			if (ignored != null) {
-				descriptor.registerAsIgnored(this.getPropertyName(method, true).get());
-				return true;
-			} else {
-				return false;
-			}
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer.PropertyDetective#detect(java.lang.reflect.Field,
-		 *      com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentDescriptor)
-		 */
-		@Override
-		public boolean detect(Field field, AnnotatedElasticDocumentDescriptor descriptor) {
-			ElasticIgnored ignored = field.getAnnotation(ElasticIgnored.class);
-			if (ignored != null) {
-				descriptor.registerAsIgnored(field.getName());
 				return true;
 			} else {
 				return false;

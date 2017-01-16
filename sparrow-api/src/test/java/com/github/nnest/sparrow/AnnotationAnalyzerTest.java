@@ -13,7 +13,6 @@ import com.github.nnest.sparrow.annotation.AnnotatedElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.annotation.ElasticDocument;
 import com.github.nnest.sparrow.annotation.ElasticField;
 import com.github.nnest.sparrow.annotation.ElasticId;
-import com.github.nnest.sparrow.annotation.ElasticIgnored;
 
 /**
  * @author brad.wu
@@ -45,9 +44,6 @@ public class AnnotationAnalyzerTest {
 		private String testProp1 = null;
 
 		private String testProp2 = null;
-
-		@ElasticIgnored
-		private String testProp3 = null;
 
 		@ElasticField
 		private String testProp4 = null;
@@ -117,21 +113,6 @@ public class AnnotationAnalyzerTest {
 		 */
 		public String getTestProp2() {
 			return testProp2;
-		}
-
-		/**
-		 * @return the testProp3
-		 */
-		public String getTestProp3() {
-			return testProp3;
-		}
-
-		/**
-		 * @param testProp3
-		 *            the testProp3 to set
-		 */
-		public void setTestProp3(String testProp3) {
-			this.testProp3 = testProp3;
 		}
 	}
 }

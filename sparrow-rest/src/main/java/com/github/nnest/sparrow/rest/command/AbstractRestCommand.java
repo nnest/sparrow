@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.rest;
+package com.github.nnest.sparrow.rest.command;
 
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -21,9 +21,7 @@ import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.introspect.VisibilityChecker;
 import com.github.nnest.sparrow.DefaultElasticCommandResult;
 import com.github.nnest.sparrow.ElasticCommand;
 import com.github.nnest.sparrow.ElasticCommandException;
@@ -34,6 +32,7 @@ import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.ElasticDocumentIncorrectVersionException;
 import com.github.nnest.sparrow.command.document.ElasticDocumentNotFoundException;
+import com.github.nnest.sparrow.rest.RestCommand;
 import com.google.common.collect.Lists;
 
 /**
@@ -43,7 +42,8 @@ import com.google.common.collect.Lists;
  * @since 0.0.1
  * @version 0.0.1
  */
-public abstract class AbstractRestCommand<C extends ElasticCommand> implements RestCommand<C> {
+public abstract class AbstractRestCommand<C extends ElasticCommand, R extends ElasticCommandResultData>
+		implements RestCommand<C> {
 	private static Map<Class<?>, DocumentFieldValueVisitor> idVisitors = new ConcurrentHashMap<Class<?>, DocumentFieldValueVisitor>();
 	private static Map<Class<?>, DocumentFieldValueVisitor> versionVisitors = new ConcurrentHashMap<Class<?>, DocumentFieldValueVisitor>();
 
@@ -132,8 +132,46 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 	 * @throws ElasticExecutorException
 	 *             executor exception
 	 */
-	protected abstract ElasticCommandResultData readResponse(C command, InputStream stream)
-			throws ElasticExecutorException;
+	protected R readResponse(C command, InputStream stream) throws ElasticExecutorException {
+		try {
+			return this.completeResponse(
+					this.createResponseObjectMapper(this.getResponseClass()).readValue(stream, getResponseClass()),
+					command);
+		} catch (Exception e) {
+			throw new ElasticExecutorException("Fail to read data from response.", e);
+		}
+	}
+
+	/**
+	 * complete response, here return parameter directly.
+	 * 
+	 * @param response
+	 *            response
+	 * @param command
+	 *            command
+	 * @return response
+	 */
+	protected R completeResponse(R response, C command) {
+		return response;
+	}
+
+	/**
+	 * get response class
+	 * 
+	 * @return response class
+	 */
+	protected abstract Class<R> getResponseClass();
+
+	/**
+	 * create response object mapper
+	 * 
+	 * @param responseClass
+	 *            response class
+	 * @return object mapper
+	 */
+	protected ObjectMapper createResponseObjectMapper(Class<?> responseClass) {
+		return RestCommandUtil.getObjectMapper();
+	}
 
 	/**
 	 * convert command to rest request
@@ -293,10 +331,8 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 	 *            document descriptor
 	 * @return object mapper
 	 */
-	protected ObjectMapper createObjectMapper(ElasticDocumentDescriptor documentDescriptor) {
-		ObjectMapper mapper = new ObjectMapper();
-		return mapper
-				.setVisibility(new DocumentFieldVisibilityChecker(mapper.getVisibilityChecker(), documentDescriptor));
+	protected ObjectMapper createRequestObjectMapper(ElasticDocumentDescriptor documentDescriptor) {
+		return RestCommandUtil.getObjectMapper();
 	}
 
 	/**
@@ -568,157 +604,6 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 		 */
 		public void setHeaders(Header[] headers) {
 			this.headers = headers;
-		}
-	}
-
-	/**
-	 * document field visibility checker
-	 * 
-	 * @author brad.wu
-	 * @since 0.0.1
-	 * @version 0.0.1
-	 */
-	@SuppressWarnings("rawtypes")
-	public static class DocumentFieldVisibilityChecker extends VisibilityChecker.Std {
-		private static final long serialVersionUID = 6321985313833406329L;
-
-		private VisibilityChecker parentChecker = null;
-		private ElasticDocumentDescriptor documentDescriptor = null;
-
-		public DocumentFieldVisibilityChecker(VisibilityChecker parentChecker,
-				ElasticDocumentDescriptor documentDescriptor) {
-			super(Visibility.DEFAULT);
-			this.parentChecker = parentChecker;
-			this.documentDescriptor = documentDescriptor;
-		}
-
-		/**
-		 * @return the parentChecker
-		 */
-		public VisibilityChecker getParentChecker() {
-			return parentChecker;
-		}
-
-		/**
-		 * @return the documentDescriptor
-		 */
-		public ElasticDocumentDescriptor getDocumentDescriptor() {
-			return documentDescriptor;
-		}
-
-		/**
-		 * the visibility of given property name
-		 * 
-		 * @param name
-		 *            property name
-		 * @return true if visible
-		 */
-		protected boolean isPropertyVisible(String name) {
-			ElasticDocumentDescriptor descriptor = this.getDocumentDescriptor();
-			return descriptor.getIdField().equals(name) || descriptor.getFields().contains(name)
-					|| name.equals(descriptor.getVersionField());
-		}
-
-		/**
-		 * get property name by given method. method should be getter or setter
-		 * 
-		 * @param method
-		 *            method
-		 * @return property name
-		 */
-		protected String getPropertyName(Method method) {
-			String methodName = method.getName().substring(3);
-			return methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
-		}
-
-		/**
-		 * get property name by given method. method should be is-getter
-		 * 
-		 * @param method
-		 *            method
-		 * @return property name
-		 */
-		protected String getIsPropertyName(Method method) {
-			String methodName = method.getName().substring(2);
-			return methodName.substring(0, 1).toLowerCase() + methodName.substring(1);
-		}
-
-		/**
-		 * check the field is from document class or not
-		 * 
-		 * @param f
-		 *            field
-		 * @return true if field is from document class
-		 */
-		protected boolean isFieldFromDocument(Field f) {
-			return f.getType() == this.getDocumentDescriptor().getDocumentClass();
-		}
-
-		/**
-		 * check the method is from document class or not
-		 * 
-		 * @param m
-		 *            method
-		 * @return true if field is from document class
-		 */
-		protected boolean isMethodFromDocument(Method m) {
-			return m.getDeclaringClass() == this.getDocumentDescriptor().getDocumentClass();
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isFieldVisible(java.lang.reflect.Field)
-		 */
-		@Override
-		public boolean isFieldVisible(Field f) {
-			if (this.isFieldFromDocument(f)) {
-				return this.isPropertyVisible(f.getName()) && super.isFieldVisible(f);
-			} else {
-				return this.getParentChecker().isFieldVisible(f);
-			}
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isGetterVisible(java.lang.reflect.Method)
-		 */
-		@Override
-		public boolean isGetterVisible(Method m) {
-			if (this.isMethodFromDocument(m)) {
-				return this.isPropertyVisible(this.getPropertyName(m)) && super.isGetterVisible(m);
-			} else {
-				return this.getParentChecker().isGetterVisible(m);
-			}
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isIsGetterVisible(java.lang.reflect.Method)
-		 */
-		@Override
-		public boolean isIsGetterVisible(Method m) {
-			if (this.isMethodFromDocument(m)) {
-				return this.isPropertyVisible(this.getIsPropertyName(m)) && super.isIsGetterVisible(m);
-			} else {
-				return this.getParentChecker().isIsGetterVisible(m);
-			}
-		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isSetterVisible(java.lang.reflect.Method)
-		 */
-		@Override
-		public boolean isSetterVisible(Method m) {
-			if (this.isMethodFromDocument(m)) {
-				return this.isPropertyVisible(this.getPropertyName(m)) && super.isSetterVisible(m);
-			} else {
-				return this.getParentChecker().isSetterVisible(m);
-			}
 		}
 	}
 }

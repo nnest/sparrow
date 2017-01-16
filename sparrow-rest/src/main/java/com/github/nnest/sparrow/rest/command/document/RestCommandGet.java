@@ -14,12 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.nnest.sparrow.ElasticCommandKind;
-import com.github.nnest.sparrow.ElasticCommandResultData;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.Get;
-import com.github.nnest.sparrow.rest.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
+import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.SetQueryParam;
 import com.google.common.collect.Sets;
@@ -31,18 +30,18 @@ import com.google.common.collect.Sets;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class RestCommandGet extends AbstractRestCommand<Get> {
+public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
 	 *      java.io.InputStream)
 	 */
 	@Override
-	protected ElasticCommandResultData readResponse(Get command, InputStream stream) throws ElasticExecutorException {
+	protected GetResponse readResponse(Get command, InputStream stream) throws ElasticExecutorException {
 		try {
 			Class<?> documentType = command.getDocumentType();
-			ObjectMapper mapper = new ObjectMapper();
+			ObjectMapper mapper = this.createResponseObjectMapper(this.getResponseClass()).copy();
 			SimpleModule module = new SimpleModule();
 			module.addDeserializer(GetResponse.class, new GetResponseDeserializer(mapper, documentType));
 			mapper.registerModule(module);
@@ -55,7 +54,17 @@ public class RestCommandGet extends AbstractRestCommand<Get> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#getResponseClass()
+	 */
+	@Override
+	protected Class<GetResponse> getResponseClass() {
+		return GetResponse.class;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#convertToRestRequest(com.github.nnest.sparrow.ElasticCommand)
 	 */
 	@Override
 	protected RestRequest convertToRestRequest(Get command) throws ElasticExecutorException {
