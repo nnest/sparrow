@@ -123,7 +123,7 @@ public class UpdateResponse implements UpdateResultData {
 	 */
 	@Override
 	public boolean isSuccessful() {
-		return "noop".equals(this.getResult()) || "updated".equals(this.getResult());
+		return "noop,updated,created".indexOf(this.getResult()) != -1;
 	}
 
 	/**

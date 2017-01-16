@@ -41,6 +41,7 @@ import com.github.nnest.sparrow.command.document.IndexResultType;
 import com.github.nnest.sparrow.command.document.Update;
 import com.github.nnest.sparrow.command.document.UpdateResultData;
 import com.github.nnest.sparrow.command.indices.DropIndex;
+import com.github.nnest.sparrow.rest.command.document.UpdateResponse;
 import com.google.common.collect.Lists;
 
 /**
@@ -63,7 +64,7 @@ public class ElasticSearchConnectTest {
 	}
 
 	@Test
-	public void test001Index() throws ElasticCommandException, ElasticExecutorException {
+	public void test001Index1stUser() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
 		tt.setId("1");
@@ -83,7 +84,7 @@ public class ElasticSearchConnectTest {
 	}
 
 	@Test
-	public void test002IndexNoId() throws ElasticCommandException, ElasticExecutorException {
+	public void test002Index2ndUserNoId() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
 		tt.setUser("2nd User");
@@ -105,7 +106,7 @@ public class ElasticSearchConnectTest {
 	}
 
 	@Test
-	public void test003Create() throws ElasticCommandException, ElasticExecutorException {
+	public void test003Create3rdUser() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
 		tt.setId("3");
@@ -125,7 +126,7 @@ public class ElasticSearchConnectTest {
 	}
 
 	@Test
-	public void test004CreateNoId() throws ElasticCommandException, ElasticExecutorException {
+	public void test004Create4thUserNoId() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
 		tt.setUser("4th User");
@@ -145,7 +146,7 @@ public class ElasticSearchConnectTest {
 	}
 
 	@Test(expected = ElasticDocumentIncorrectVersionException.class)
-	public void test005CreateFail() throws ElasticCommandException, ElasticExecutorException {
+	public void test005Create3rdUserFail() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
 		tt.setId("3");
@@ -350,6 +351,47 @@ public class ElasticSearchConnectTest {
 		updateResult = result.getResultData();
 		assertTrue(updateResult.isSuccessful());
 		assertFalse(updateResult.isNoopChanged());
+	}
+
+	@Test
+	public void test016Update5thUser() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		TwitterTweet tt = new TwitterTweet();
+		tt.setId("5");
+		tt.setUser("5th User");
+		tt.setPostDate("2017-01-08T14:12:12");
+		tt.setMessage("Message from 5th user");
+
+		ElasticCommand cmd = new Update(tt).withAsUpsert(true);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		UpdateResponse updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertFalse(updateResult.isNoopChanged());
+		assertEquals("created", updateResult.getResult());
+
+		// get again for verification
+		cmd = new Get(TwitterTweet.class, "5");
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		GetResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(TwitterTweet.class == data.getDocument().getClass());
+		tt = data.getDocument();
+		assertEquals("5", tt.getId());
+		assertEquals("5th User", tt.getUser());
+		assertEquals("2017-01-08T14:12:12", tt.getPostDate());
+		assertEquals("Message from 5th user", tt.getMessage());
+
+		// update again, and detect noop changed
+		cmd = new Update(tt).withAsUpsert(true).withDetectNoopChanged(true);
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertTrue(updateResult.isNoopChanged());
+		assertEquals("noop", updateResult.getResult());
 	}
 
 	private ElasticClient createClient() {

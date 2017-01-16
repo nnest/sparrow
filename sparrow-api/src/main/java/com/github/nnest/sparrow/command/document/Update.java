@@ -10,7 +10,7 @@ import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 
 /**
  * update document by given data.<br>
- * {@linkplain #detectNoopChanged} default is {@code true}
+ * {@linkplain #detectNoopChanged} default is {@code false}
  * 
  * @author brad.wu
  * @since 0.0.1
@@ -18,6 +18,7 @@ import com.github.nnest.sparrow.ElasticDocumentDescriptor;
  */
 public class Update implements ElasticCommand {
 	private boolean detectNoopChanged = false;
+	private boolean asUpsert = false;
 	private Object document = null;
 	private ElasticDocumentDescriptor documentDescriptor = null;
 
@@ -51,6 +52,23 @@ public class Update implements ElasticCommand {
 	 */
 	public Update withDetectNoopChanged(boolean detectNoopChanged) {
 		this.detectNoopChanged = detectNoopChanged;
+		return this;
+	}
+
+	/**
+	 * @return the asUpsert
+	 */
+	public boolean isAsUpsert() {
+		return asUpsert;
+	}
+
+	/**
+	 * @param asUpsert
+	 *            the asUpsert to set
+	 * @return this
+	 */
+	public Update withAsUpsert(boolean asUpsert) {
+		this.asUpsert = asUpsert;
 		return this;
 	}
 

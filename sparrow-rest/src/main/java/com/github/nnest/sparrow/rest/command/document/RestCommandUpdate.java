@@ -90,10 +90,13 @@ public class RestCommandUpdate extends AbstractRestCommand<Update> {
 		private Object doc = null;
 		@JsonProperty("detect_noop")
 		private boolean detectNoop = false;
+		@JsonProperty("doc_as_upsert")
+		private boolean asUpsert = false;
 
 		public UpdateRequestObject(Update command) {
 			this.doc = command.getDocument();
 			this.detectNoop = command.isDetectNoopChanged();
+			this.asUpsert = command.isAsUpsert();
 		}
 
 		/**
@@ -108,6 +111,13 @@ public class RestCommandUpdate extends AbstractRestCommand<Update> {
 		 */
 		public boolean isDetectNoop() {
 			return detectNoop;
+		}
+
+		/**
+		 * @return the asUpsert
+		 */
+		public boolean isAsUpsert() {
+			return asUpsert;
 		}
 	}
 }
