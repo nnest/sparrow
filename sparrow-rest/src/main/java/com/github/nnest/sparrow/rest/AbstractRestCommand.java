@@ -644,13 +644,39 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 		}
 
 		/**
+		 * check the field is from document class or not
+		 * 
+		 * @param f
+		 *            field
+		 * @return true if field is from document class
+		 */
+		protected boolean isFieldFromDocument(Field f) {
+			return f.getType() == this.getDocumentDescriptor().getDocumentClass();
+		}
+
+		/**
+		 * check the method is from document class or not
+		 * 
+		 * @param m
+		 *            method
+		 * @return true if field is from document class
+		 */
+		protected boolean isMethodFromDocument(Method m) {
+			return m.getDeclaringClass() == this.getDocumentDescriptor().getDocumentClass();
+		}
+
+		/**
 		 * (non-Javadoc)
 		 * 
 		 * @see com.fasterxml.jackson.databind.introspect.VisibilityChecker.Std#isFieldVisible(java.lang.reflect.Field)
 		 */
 		@Override
 		public boolean isFieldVisible(Field f) {
-			return this.isPropertyVisible(f.getName()) && super.isFieldVisible(f);
+			if (this.isFieldFromDocument(f)) {
+				return this.isPropertyVisible(f.getName()) && super.isFieldVisible(f);
+			} else {
+				return this.getParentChecker().isFieldVisible(f);
+			}
 		}
 
 		/**
@@ -660,7 +686,11 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 		 */
 		@Override
 		public boolean isGetterVisible(Method m) {
-			return this.isPropertyVisible(this.getPropertyName(m)) && super.isGetterVisible(m);
+			if (this.isMethodFromDocument(m)) {
+				return this.isPropertyVisible(this.getPropertyName(m)) && super.isGetterVisible(m);
+			} else {
+				return this.getParentChecker().isGetterVisible(m);
+			}
 		}
 
 		/**
@@ -670,7 +700,11 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 		 */
 		@Override
 		public boolean isIsGetterVisible(Method m) {
-			return this.isPropertyVisible(this.getIsPropertyName(m)) && super.isIsGetterVisible(m);
+			if (this.isMethodFromDocument(m)) {
+				return this.isPropertyVisible(this.getIsPropertyName(m)) && super.isIsGetterVisible(m);
+			} else {
+				return this.getParentChecker().isIsGetterVisible(m);
+			}
 		}
 
 		/**
@@ -680,7 +714,11 @@ public abstract class AbstractRestCommand<C extends ElasticCommand> implements R
 		 */
 		@Override
 		public boolean isSetterVisible(Method m) {
-			return this.isPropertyVisible(this.getPropertyName(m)) && super.isSetterVisible(m);
+			if (this.isMethodFromDocument(m)) {
+				return this.isPropertyVisible(this.getPropertyName(m)) && super.isSetterVisible(m);
+			} else {
+				return this.getParentChecker().isSetterVisible(m);
+			}
 		}
 	}
 }

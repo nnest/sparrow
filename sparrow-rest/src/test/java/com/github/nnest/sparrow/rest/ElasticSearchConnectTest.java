@@ -39,8 +39,10 @@ import com.github.nnest.sparrow.command.document.Index;
 import com.github.nnest.sparrow.command.document.IndexResultData;
 import com.github.nnest.sparrow.command.document.IndexResultType;
 import com.github.nnest.sparrow.command.document.Update;
+import com.github.nnest.sparrow.command.document.UpdateByScript;
 import com.github.nnest.sparrow.command.document.UpdateResultData;
 import com.github.nnest.sparrow.command.indices.DropIndex;
+import com.github.nnest.sparrow.command.script.PainlessElasticScript;
 import com.github.nnest.sparrow.rest.command.document.UpdateResponse;
 import com.google.common.collect.Lists;
 
@@ -159,7 +161,7 @@ public class ElasticSearchConnectTest {
 	}
 
 	@Test
-	public void test006Update1stUser() throws ElasticCommandException, ElasticExecutorException {
+	public void test006IndexUpdate1stUser() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
 		tt.setId("1");
@@ -179,7 +181,7 @@ public class ElasticSearchConnectTest {
 	}
 
 	@Test
-	public void test007Update2ndUser() throws ElasticCommandException, ElasticExecutorException {
+	public void test007IndexUpdate2ndUser() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
 		tt.setId(idOf2ndUser);
@@ -392,6 +394,124 @@ public class ElasticSearchConnectTest {
 		assertTrue(updateResult.isSuccessful());
 		assertTrue(updateResult.isNoopChanged());
 		assertEquals("noop", updateResult.getResult());
+	}
+
+	@Test
+	public void test017UpdateByScript5thUser() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		PainlessElasticScript script = new PainlessElasticScript()
+				.withScript("ctx._source.postDate = \"2017-01-08T20:12:12\"");
+		ElasticCommand cmd = new UpdateByScript(TwitterTweet.class, "5").withScript(script);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		UpdateResponse updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertFalse(updateResult.isNoopChanged());
+		assertEquals("updated", updateResult.getResult());
+
+		// get again for verification
+		cmd = new Get(TwitterTweet.class, "5");
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		GetResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(TwitterTweet.class == data.getDocument().getClass());
+		TwitterTweet tt = data.getDocument();
+		assertEquals("5", tt.getId());
+		assertEquals("5th User", tt.getUser());
+		assertEquals("2017-01-08T20:12:12", tt.getPostDate());
+		assertEquals("Message from 5th user", tt.getMessage());
+	}
+
+	@Test
+	public void test018UpdateByScriptAndParamsMap5thUser() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		PainlessElasticScript script = new PainlessElasticScript().withScript("ctx._source.postDate = params.post")
+				.withParam("post", "2017-01-08T20:12:12");
+		ElasticCommand cmd = new UpdateByScript(TwitterTweet.class, "5").withScript(script);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		UpdateResponse updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertFalse(updateResult.isNoopChanged());
+		assertEquals("updated", updateResult.getResult());
+
+		// get again for verification
+		cmd = new Get(TwitterTweet.class, "5");
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		GetResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(TwitterTweet.class == data.getDocument().getClass());
+		TwitterTweet tt = data.getDocument();
+		assertEquals("5", tt.getId());
+		assertEquals("5th User", tt.getUser());
+		assertEquals("2017-01-08T20:12:12", tt.getPostDate());
+		assertEquals("Message from 5th user", tt.getMessage());
+	}
+
+	@Test
+	public void test019UpdateByScriptAndDocument6thUser() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		TwitterTweet tt = new TwitterTweet();
+		tt.setId("6");
+		tt.setUser("6th User");
+		tt.setPostDate("2017-01-08T14:12:12");
+		tt.setMessage("Message from 6th user");
+
+		// actually the script not run
+		PainlessElasticScript script = new PainlessElasticScript().withScript("ctx._source.postDate = params.post")
+				.withParam("post", "2017-01-08T20:12:12");
+		ElasticCommand cmd = new UpdateByScript(tt).withScript(script);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		UpdateResponse updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertFalse(updateResult.isNoopChanged());
+		assertEquals("created", updateResult.getResult());
+
+		// get again for verification
+		cmd = new Get(TwitterTweet.class, "6");
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		GetResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(TwitterTweet.class == data.getDocument().getClass());
+		tt = data.getDocument();
+		assertEquals("6", tt.getId());
+		assertEquals("6th User", tt.getUser());
+		assertEquals("2017-01-08T14:12:12", tt.getPostDate());
+		assertEquals("Message from 6th user", tt.getMessage());
+
+		// actually document is useless, since document already exists, script
+		// run
+		cmd = new UpdateByScript(tt).withScript(script).withAsUpsert(true);
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+		updateResult = result.getResultData();
+		assertTrue(updateResult.isSuccessful());
+		assertFalse(updateResult.isNoopChanged());
+		assertEquals("updated", updateResult.getResult());
+
+		// get again for verification
+		cmd = new Get(TwitterTweet.class, "6");
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertTrue(TwitterTweet.class == data.getDocument().getClass());
+		tt = data.getDocument();
+		assertEquals("6", tt.getId());
+		assertEquals("6th User", tt.getUser());
+		assertEquals("2017-01-08T20:12:12", tt.getPostDate());
+		assertEquals("Message from 6th user", tt.getMessage());
 	}
 
 	private ElasticClient createClient() {

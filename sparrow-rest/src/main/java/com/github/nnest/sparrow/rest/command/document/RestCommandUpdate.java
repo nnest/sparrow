@@ -8,6 +8,8 @@ import java.io.StringWriter;
 
 import org.apache.http.entity.StringEntity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nnest.sparrow.ElasticCommandKind;
@@ -88,9 +90,10 @@ public class RestCommandUpdate extends AbstractRestCommand<Update> {
 	public static class UpdateRequestObject {
 		@JsonProperty
 		private Object doc = null;
-		@JsonProperty("detect_noop")
+		@JsonProperty(value = "detect_noop")
 		private boolean detectNoop = false;
-		@JsonProperty("doc_as_upsert")
+		@JsonProperty(value = "doc_as_upsert", defaultValue = "false")
+		@JsonInclude(Include.NON_DEFAULT)
 		private boolean asUpsert = false;
 
 		public UpdateRequestObject(Update command) {
