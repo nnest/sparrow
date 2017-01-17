@@ -14,6 +14,7 @@ import com.github.nnest.sparrow.rest.command.document.RestCommandDelete;
 import com.github.nnest.sparrow.rest.command.document.RestCommandExist;
 import com.github.nnest.sparrow.rest.command.document.RestCommandGet;
 import com.github.nnest.sparrow.rest.command.document.RestCommandIndex;
+import com.github.nnest.sparrow.rest.command.document.RestCommandMultiGet;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdate;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdateByScript;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
@@ -36,6 +37,7 @@ public class RestCommandUtil {
 		commands.put(ElasticCommandKind.INDEX, new RestCommandIndex());
 		commands.put(ElasticCommandKind.CREATE, new RestCommandCreate());
 		commands.put(ElasticCommandKind.GET, new RestCommandGet());
+		commands.put(ElasticCommandKind.MULTI_GET, new RestCommandMultiGet());
 		commands.put(ElasticCommandKind.EXIST, new RestCommandExist());
 		commands.put(ElasticCommandKind.DELETE, new RestCommandDelete());
 		commands.put(ElasticCommandKind.UPDATE, new RestCommandUpdate());

@@ -26,12 +26,11 @@ public class Get implements ElasticCommand {
 	private Set<String> includes = null;
 	private Set<String> excludes = null;
 
-	public Get(Class<?> documentType, String id) {
-		assert documentType != null : "Document type cannot be null.";
-		assert Strings.nullToEmpty(id).trim().length() != 0 : "Id cannot be null.";
+	public Get() {
+	}
 
-		this.documentType = documentType;
-		this.id = id;
+	public Get(Class<?> documentType, String id) {
+		this.withDocumentType(documentType).withId(id);
 	}
 
 	/**
@@ -42,10 +41,38 @@ public class Get implements ElasticCommand {
 	}
 
 	/**
+	 * with document type
+	 * 
+	 * @param documentType
+	 *            document type
+	 * @return this
+	 */
+	public Get withDocumentType(Class<?> documentType) {
+		assert documentType != null : "Document type cannot be null.";
+
+		this.documentType = documentType;
+		return this;
+	}
+
+	/**
 	 * @return the id
 	 */
 	public String getId() {
 		return id;
+	}
+
+	/**
+	 * with id
+	 * 
+	 * @param id
+	 *            id
+	 * @return this
+	 */
+	public Get withId(String id) {
+		assert Strings.nullToEmpty(id).trim().length() != 0 : "Id cannot be null.";
+
+		this.id = id;
+		return this;
 	}
 
 	/**

@@ -38,6 +38,7 @@ import com.github.nnest.sparrow.command.document.GetResultData;
 import com.github.nnest.sparrow.command.document.Index;
 import com.github.nnest.sparrow.command.document.IndexResultData;
 import com.github.nnest.sparrow.command.document.IndexResultType;
+import com.github.nnest.sparrow.command.document.MultiGet;
 import com.github.nnest.sparrow.command.document.Update;
 import com.github.nnest.sparrow.command.document.UpdateByScript;
 import com.github.nnest.sparrow.command.document.UpdateResultData;
@@ -512,6 +513,15 @@ public class ElasticSearchConnectTest {
 		assertEquals("6th User", tt.getUser());
 		assertEquals("2017-01-08T20:12:12", tt.getPostDate());
 		assertEquals("Message from 6th user", tt.getMessage());
+	}
+
+	@Test
+	public void test020MultiGet() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new MultiGet().withCommand(new Get(TwitterTweet.class, "3"));
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
 	}
 
 	private ElasticClient createClient() {

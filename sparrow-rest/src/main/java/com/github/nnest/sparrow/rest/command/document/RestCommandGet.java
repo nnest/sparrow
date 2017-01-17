@@ -75,7 +75,7 @@ public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 				Sets.newHashSet(new SetQueryParam("_source_include", command.getIncludes()),
 						new SetQueryParam("_source_exclude", command.getExcludes())));
 		request.setEndpoint(endpoint);
-		// use PUT for id given
+		// use GET for id given
 		request.setMethod(ElasticRestMethod.GET.name());
 		return request;
 	}
