@@ -13,8 +13,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 /**
- * multiple get. contains a {@linkplain InnerCommand} set, each inner get is
- * same as {@linkplain Get}, but can carry ids not one id.
+ * multiple get. contains a get command set, each inner get is same as
+ * {@linkplain Get}, but can carry ids not one id.
  * 
  * @author brad.wu
  * @since 0.0.1
@@ -57,6 +57,27 @@ public class MultiGet implements ElasticCommand {
 	 */
 	public MultiGet withCommand(Get command) {
 		this.getInnerCommands().add(command);
+		return this;
+	}
+
+	/**
+	 * push get into command
+	 * 
+	 * @param documentType
+	 *            document type
+	 * @param ids
+	 *            ids
+	 * @return this
+	 */
+	public MultiGet withCommand(Class<?> documentType, String... ids) {
+		if (ids == null || ids.length == 0) {
+			// do nothing
+			return this;
+		}
+
+		for (String id : ids) {
+			this.withCommand(new Get(documentType, id));
+		}
 		return this;
 	}
 

@@ -44,6 +44,7 @@ import com.github.nnest.sparrow.command.document.UpdateByScript;
 import com.github.nnest.sparrow.command.document.UpdateResultData;
 import com.github.nnest.sparrow.command.indices.DropIndex;
 import com.github.nnest.sparrow.command.script.PainlessElasticScript;
+import com.github.nnest.sparrow.rest.command.document.MultiGetResponse;
 import com.github.nnest.sparrow.rest.command.document.UpdateResponse;
 import com.google.common.collect.Lists;
 
@@ -519,9 +520,15 @@ public class ElasticSearchConnectTest {
 	public void test020MultiGet() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 
-		ElasticCommand cmd = new MultiGet().withCommand(new Get(TwitterTweet.class, "3"));
+		ElasticCommand cmd = new MultiGet().withCommand(TwitterTweet.class, "3", "4", "5");
 		ElasticCommandResult result = client.execute(cmd);
 		assertTrue(result.getCommand() == cmd);
+
+		MultiGetResponse response = result.getResultData();
+		assertEquals(3, response.getInnerCommandCount());
+		assertEquals(2, response.getSuccessCount());
+		assertEquals(1, response.getFailCount());
+		assertTrue(response.isPartialSuccessful());
 	}
 
 	private ElasticClient createClient() {

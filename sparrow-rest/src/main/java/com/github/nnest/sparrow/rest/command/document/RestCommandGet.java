@@ -134,7 +134,7 @@ public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 			resp.setId(node.get("_id").asText());
 			resp.setVersion(node.get("_version").asText());
 			resp.setFound(node.get("found").asBoolean());
-			resp.setDocument(mapper.treeToValue(node.get("_source"), documentType));
+			resp.setJsonNode(mapper.treeToValue(node.get("_source"), documentType));
 
 			return resp;
 		}

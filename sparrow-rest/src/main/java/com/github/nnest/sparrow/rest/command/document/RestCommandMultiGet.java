@@ -3,6 +3,7 @@
  */
 package com.github.nnest.sparrow.rest.command.document;
 
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ import com.github.nnest.sparrow.command.document.MultiGet;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandUtil;
+import com.github.nnest.sparrow.rest.command.document.MultiGetResponse.InnerGetResponse;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -37,6 +39,37 @@ import com.google.common.collect.Lists;
  * @version 0.0.1
  */
 public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetResponse> {
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand#readResponse(com.github.nnest.sparrow.ElasticCommand,
+	 *      java.io.InputStream)
+	 */
+	@Override
+	protected MultiGetResponse readResponse(MultiGet command, InputStream stream) throws ElasticExecutorException {
+		try {
+			ObjectMapper mapper = this.createResponseObjectMapper(this.getResponseClass()).copy();
+			MultiGetResponse response = mapper.readValue(stream, MultiGetResponse.class);
+			List<InnerGetResponse> innerResponses = response.getInnerResponses();
+			if (innerResponses != null) {
+				for (int index = 0, count = innerResponses.size(); index < count; index++) {
+					InnerGetResponse innerResponse = innerResponses.get(index);
+					Get innerCommand = command.getInnerCommands().get(index);
+					innerResponse.setCommand(innerCommand);
+					if (innerResponse.isFound()) {
+						innerResponse.setJsonNode(
+								mapper.treeToValue(innerResponse.getJsonNode(), innerCommand.getDocumentType()));
+					}
+					// clear json node in inner response
+					innerResponse.setJsonNode(null);
+				}
+			}
+			return response;
+		} catch (Exception e) {
+			throw new ElasticExecutorException("Fail to read data from response.", e);
+		}
+	}
+
 	/**
 	 * (non-Javadoc)
 	 * 
