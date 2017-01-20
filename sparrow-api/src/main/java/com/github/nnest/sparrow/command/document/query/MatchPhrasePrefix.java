@@ -18,6 +18,16 @@ public class MatchPhrasePrefix extends MatchPhrase<MatchPhrasePrefix> {
 	}
 
 	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.MatchPhrase#getType()
+	 */
+	@Override
+	public MatchType getType() {
+		return MatchType.SINGLE_MATCH_PHRASE_PREFIX;
+	}
+
+	/**
 	 * @return the maxExpansions
 	 */
 	public int getMaxExpansions() {

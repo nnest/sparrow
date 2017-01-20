@@ -4,23 +4,24 @@
 package com.github.nnest.sparrow.command.document.query;
 
 /**
- * match phrase
+ * multiple match cross fields
  * 
  * @author brad.wu
  * @since 0.0.1
  * @version 0.0.1
  */
-public class MatchPhrase<T extends MatchPhrase<T>> extends AbstractSingleMatchText<T> {
-	public MatchPhrase(String exampleText) {
+public class MultiMatchCrossFields extends AbstractMultiMatchText<MultiMatchCrossFields> {
+	public MultiMatchCrossFields(String exampleText) {
 		super(exampleText);
 	}
 
 	/**
 	 * (non-Javadoc)
+	 * 
 	 * @see com.github.nnest.sparrow.command.document.query.MatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {
-		return MatchType.SINGLE_MATCH_PHRASE;
+		return MatchType.MULTI_CROSS_FIELDS;
 	}
 }
