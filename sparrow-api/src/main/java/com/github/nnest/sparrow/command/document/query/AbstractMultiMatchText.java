@@ -83,6 +83,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param tieBreaker
 	 *            the tieBreaker to set
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T withTieBreaker(BigDecimal tieBreaker) {

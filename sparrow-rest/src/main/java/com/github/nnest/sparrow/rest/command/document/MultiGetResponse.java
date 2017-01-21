@@ -183,6 +183,7 @@ public class MultiGetResponse implements MultiGetResultData {
 		 * set command.
 		 * 
 		 * @param command
+		 *            command
 		 */
 		@JsonIgnore
 		protected void setCommand(Get command) {

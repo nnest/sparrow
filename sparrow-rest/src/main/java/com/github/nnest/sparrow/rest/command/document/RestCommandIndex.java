@@ -19,7 +19,10 @@ import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 import com.google.common.base.Strings;
 
 /**
- * rest command {@linkplain ElasticCommandKind#INDEX}
+ * rest command {@linkplain ElasticCommandKind#INDEX}.<br>
+ * Note if create id value by elastic search itself, command set the generated
+ * id value to document automatically, <strong>BUT, in elastic search server,
+ * the id field is still null, which means, be careful about this.</strong>
  * 
  * @author brad.wu
  * @since 0.0.1

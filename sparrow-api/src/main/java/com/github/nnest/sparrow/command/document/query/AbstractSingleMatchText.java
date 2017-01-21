@@ -22,7 +22,7 @@ public abstract class AbstractSingleMatchText<T extends AbstractSingleMatchText<
 	/**
 	 * get field name
 	 * 
-	 * @return
+	 * @return field name
 	 */
 	public String getFieldName() {
 		return this.fieldName;

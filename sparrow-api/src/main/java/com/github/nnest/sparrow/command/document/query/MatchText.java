@@ -3,8 +3,6 @@
  */
 package com.github.nnest.sparrow.command.document.query;
 
-import java.math.BigDecimal;
-
 /**
  * match given example text and other parameters
  * 
@@ -12,34 +10,21 @@ import java.math.BigDecimal;
  * @since 0.0.1
  * @version 0.0.1
  */
-public interface MatchText extends Example {
-	/**
-	 * get analyzer name
-	 * 
-	 * @return analyzer name
-	 */
-	String getAnalyzerName();
-
-	/**
-	 * get boost
-	 * 
-	 * @return boost
-	 */
-	BigDecimal getBoost();
-
-	/**
-	 * get example text
-	 * 
-	 * @return example text
-	 */
-	String getExampleText();
-
+public interface MatchText<T extends MatchText<T>> extends FullTextQuery<T> {
 	/**
 	 * get slop
 	 * 
 	 * @return slop
 	 */
 	Integer getSlop();
+
+	/**
+	 * with slop
+	 * 
+	 * @param slop
+	 * @return
+	 */
+	T withSlop(Integer slop);
 
 	/**
 	 * get match type

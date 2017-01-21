@@ -57,8 +57,9 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 					Get innerCommand = command.getInnerCommands().get(index);
 					innerResponse.setCommand(innerCommand);
 					if (innerResponse.isFound()) {
-						innerResponse.setJsonNode(
+						innerResponse.setDocument(
 								mapper.treeToValue(innerResponse.getJsonNode(), innerCommand.getDocumentType()));
+						// TODO set id value when it is null, use value of "_id"
 					}
 					// clear json node in inner response
 					innerResponse.setJsonNode(null);
@@ -292,7 +293,7 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 		}
 
 		/**
-		 * set index, only is multiple indices
+		 * set index, only when multiple indices is true. otherwise do nothing
 		 * 
 		 * @param index
 		 *            the index to set
@@ -315,11 +316,12 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 		}
 
 		/**
-		 * set type, only is multiple types
+		 * set type, only when multiple types is true. otherwise do nothing
 		 * 
 		 * @param type
 		 *            the type to set
 		 * @param multipleTypes
+		 *            is multiple types or not
 		 * @return this
 		 */
 		public GetRequestObject withType(String type, boolean multipleTypes) {
@@ -339,6 +341,7 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 		/**
 		 * @param id
 		 *            the id to set
+		 * @return this
 		 */
 		public GetRequestObject withId(String id) {
 			this.id = id;

@@ -120,7 +120,7 @@ public class GetResponse implements GetResultData {
 	 * @param document
 	 *            the document to set
 	 */
-	public void setJsonNode(Object document) {
+	public void setDocument(Object document) {
 		this.document = document;
 	}
 }
