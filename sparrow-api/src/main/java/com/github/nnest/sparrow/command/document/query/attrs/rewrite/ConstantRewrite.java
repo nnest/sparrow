@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query.rewrite;
+package com.github.nnest.sparrow.command.document.query.attrs.rewrite;
 
 /**
  * constant rewrite
@@ -24,7 +24,7 @@ public enum ConstantRewrite implements Rewrite {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.rewrite.Rewrite#asString()
+	 * @see com.github.nnest.sparrow.command.document.query.attrs.rewrite.Rewrite#asString()
 	 */
 	@Override
 	public String asString() {

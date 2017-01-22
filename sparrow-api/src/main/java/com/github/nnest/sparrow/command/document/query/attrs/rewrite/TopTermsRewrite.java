@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query.rewrite;
+package com.github.nnest.sparrow.command.document.query.attrs.rewrite;
 
 /**
  * top terms rewrite
@@ -54,7 +54,7 @@ public class TopTermsRewrite implements Rewrite {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.rewrite.Rewrite#asString()
+	 * @see com.github.nnest.sparrow.command.document.query.attrs.rewrite.Rewrite#asString()
 	 */
 	@Override
 	public String asString() {
@@ -93,7 +93,7 @@ public class TopTermsRewrite implements Rewrite {
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.command.document.query.rewrite.TopTermsRewrite.TopTermsRewriteType#asString(java.lang.Integer)
+		 * @see com.github.nnest.sparrow.command.document.query.attrs.rewrite.TopTermsRewrite.TopTermsRewriteType#asString(java.lang.Integer)
 		 */
 		@Override
 		public String asString(Integer size) {

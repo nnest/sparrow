@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
 /**
  * match phrase
@@ -18,7 +18,7 @@ public class MatchPhrase<T extends MatchPhrase<T>> extends AbstractSingleMatchTe
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.AbstractMatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {

@@ -1,9 +1,11 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
 import java.math.BigDecimal;
+
+import com.github.nnest.sparrow.command.document.query.Example;
 
 /**
  * full text query

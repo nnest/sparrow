@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query.rewrite;
+package com.github.nnest.sparrow.command.document.query.attrs.rewrite;
 
 /**
  * Rewrite

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.attrs;
 
 /**
  * example text conjunction

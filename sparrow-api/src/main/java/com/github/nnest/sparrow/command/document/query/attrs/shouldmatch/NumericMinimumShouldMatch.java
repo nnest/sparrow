@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query.shouldmatch;
+package com.github.nnest.sparrow.command.document.query.attrs.shouldmatch;
 
 /**
  * numeric minimum should match, contains a value of integer
@@ -36,7 +36,7 @@ public class NumericMinimumShouldMatch implements ValuedMinimumShouldMatch {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.shouldmatch.MinimumShouldMatch#asString()
+	 * @see com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch#asString()
 	 */
 	@Override
 	public String asString() {

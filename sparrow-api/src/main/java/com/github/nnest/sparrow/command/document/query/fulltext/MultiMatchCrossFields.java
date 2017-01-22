@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
 /**
  * multiple match cross fields
@@ -18,7 +18,7 @@ public class MultiMatchCrossFields extends AbstractMultiMatchText<MultiMatchCros
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.AbstractMatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {

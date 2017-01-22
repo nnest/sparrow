@@ -1,13 +1,15 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
-import com.github.nnest.sparrow.command.document.query.rewrite.Rewrite;
-import com.github.nnest.sparrow.command.document.query.shouldmatch.MinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
+import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
+import com.github.nnest.sparrow.command.document.query.attrs.rewrite.Rewrite;
+import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
 import com.google.common.collect.Sets;
 
 /**

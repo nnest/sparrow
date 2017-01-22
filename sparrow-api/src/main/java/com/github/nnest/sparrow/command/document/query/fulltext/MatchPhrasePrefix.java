@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
 /**
  * match phrase prefix
@@ -20,7 +20,7 @@ public class MatchPhrasePrefix extends MatchPhrase<MatchPhrasePrefix> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.AbstractMatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {

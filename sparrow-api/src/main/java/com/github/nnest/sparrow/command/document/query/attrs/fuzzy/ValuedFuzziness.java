@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query.fuzzy;
+package com.github.nnest.sparrow.command.document.query.attrs.fuzzy;
 
 /**
  * valued fuzziness

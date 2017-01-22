@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
 import java.math.BigDecimal;
 
@@ -26,7 +26,7 @@ public abstract class AbstractFullTextQuery<T extends AbstractFullTextQuery<T>> 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.FullTextQuery#getExampleText()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.FullTextQuery#getExampleText()
 	 */
 	@Override
 	public String getExampleText() {
@@ -36,7 +36,7 @@ public abstract class AbstractFullTextQuery<T extends AbstractFullTextQuery<T>> 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.FullTextQuery#withExampleText(java.lang.String)
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.FullTextQuery#withExampleText(java.lang.String)
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
@@ -50,7 +50,7 @@ public abstract class AbstractFullTextQuery<T extends AbstractFullTextQuery<T>> 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.FullTextQuery#getBoost()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.FullTextQuery#getBoost()
 	 */
 	@Override
 	public BigDecimal getBoost() {
@@ -60,7 +60,7 @@ public abstract class AbstractFullTextQuery<T extends AbstractFullTextQuery<T>> 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.FullTextQuery#withBoost(java.math.BigDecimal)
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.FullTextQuery#withBoost(java.math.BigDecimal)
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -76,7 +76,7 @@ public abstract class AbstractFullTextQuery<T extends AbstractFullTextQuery<T>> 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.FullTextQuery#getAnalyzerName()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.FullTextQuery#getAnalyzerName()
 	 */
 	@Override
 	public String getAnalyzerName() {
@@ -86,7 +86,7 @@ public abstract class AbstractFullTextQuery<T extends AbstractFullTextQuery<T>> 
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.FullTextQuery#withAnalyzerName(java.lang.String)
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.FullTextQuery#withAnalyzerName(java.lang.String)
 	 */
 	@Override
 	@SuppressWarnings("unchecked")

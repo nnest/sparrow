@@ -1,9 +1,9 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
-import com.github.nnest.sparrow.command.document.query.fuzzy.Fuzziness;
+import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
 
 /**
  * multiple match most fields
@@ -22,7 +22,7 @@ public class MultiMatchMostFields extends AbstractMultiMatchText<MultiMatchMostF
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.AbstractMatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {

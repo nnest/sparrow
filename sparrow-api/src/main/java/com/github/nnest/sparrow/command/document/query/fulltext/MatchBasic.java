@@ -1,13 +1,15 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
 import java.math.BigDecimal;
 
-import com.github.nnest.sparrow.command.document.query.fuzzy.Fuzziness;
-import com.github.nnest.sparrow.command.document.query.rewrite.Rewrite;
-import com.github.nnest.sparrow.command.document.query.shouldmatch.MinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
+import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
+import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
+import com.github.nnest.sparrow.command.document.query.attrs.rewrite.Rewrite;
+import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
 
 /**
  * Match basic, in elastic search, the {@code match} api.
@@ -35,7 +37,7 @@ public class MatchBasic extends AbstractSingleMatchText<MatchBasic> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.AbstractMatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {

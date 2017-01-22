@@ -1,11 +1,12 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
 import java.math.BigDecimal;
 
-import com.github.nnest.sparrow.command.document.query.shouldmatch.MinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
+import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
 import com.google.common.base.Strings;
 
 /**

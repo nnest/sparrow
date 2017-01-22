@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query.shouldmatch;
+package com.github.nnest.sparrow.command.document.query.attrs.shouldmatch;
 
 /**
  * valued minimum should match

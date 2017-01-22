@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query.shouldmatch;
+package com.github.nnest.sparrow.command.document.query.attrs.shouldmatch;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -60,7 +60,7 @@ public class MultipleCombinationMinimumShouldMatch implements MinimumShouldMatch
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.shouldmatch.MinimumShouldMatch#asString()
+	 * @see com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch#asString()
 	 */
 	@Override
 	public String asString() {

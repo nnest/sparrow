@@ -1,8 +1,9 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.command.document.query;
+package com.github.nnest.sparrow.command.document.query.fulltext;
 
+import com.github.nnest.sparrow.command.document.query.Example;
 import com.google.common.base.Strings;
 
 /**
