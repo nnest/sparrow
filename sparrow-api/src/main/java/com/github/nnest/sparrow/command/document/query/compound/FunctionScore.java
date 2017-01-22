@@ -4,13 +4,17 @@
 package com.github.nnest.sparrow.command.document.query.compound;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.github.nnest.sparrow.command.document.query.Example;
 import com.github.nnest.sparrow.command.document.query.attrs.ScoreMode;
+import com.github.nnest.sparrow.command.document.query.attrs.score.NestedScoreFunction;
 import com.github.nnest.sparrow.command.document.query.attrs.score.ScoreFunction;
+import com.google.common.collect.Lists;
 
 /**
- * function score query
+ * function score query.<br>
+ * note the {@linkplain #function} and {@linkplain #functions} are exclusive.
  * 
  * @author brad.wu
  * @since 0.0.1
@@ -23,6 +27,7 @@ public class FunctionScore extends AbstractCompoundQuery<FunctionScore> {
 	private ScoreMode boostMode = null;
 	private BigDecimal maxBoost = null;
 	private ScoreFunction function = null;
+	private List<NestedScoreFunction> functions = null;
 
 	/**
 	 * @return the example
@@ -134,9 +139,40 @@ public class FunctionScore extends AbstractCompoundQuery<FunctionScore> {
 	 * @return this
 	 */
 	public FunctionScore withFunction(ScoreFunction function) {
-		assert function != null : "Functions cannot be null.";
+		assert function != null : "Function cannot be null.";
 
 		this.function = function;
+		return this;
+	}
+
+	/**
+	 * @return the functions
+	 */
+	public List<NestedScoreFunction> getFunctions() {
+		return functions;
+	}
+
+	/**
+	 * @param functions
+	 *            the functions to set
+	 * @return this
+	 */
+	public FunctionScore withFunctions(List<NestedScoreFunction> functions) {
+		assert functions != null && functions.size() > 0 : "Functions cannot be null or empty.";
+
+		this.functions = functions;
+		return this;
+	}
+
+	/**
+	 * @param functions
+	 *            the functions to set
+	 * @return this
+	 */
+	public FunctionScore withFunctions(NestedScoreFunction... functions) {
+		assert functions != null && functions.length > 0 : "Functions cannot be null or empty.";
+
+		this.functions = Lists.newArrayList(functions);
 		return this;
 	}
 }

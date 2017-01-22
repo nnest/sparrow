@@ -8,7 +8,8 @@ import java.math.BigDecimal;
 import com.github.nnest.sparrow.command.document.query.Example;
 
 /**
- * compound query
+ * compound query.<br>
+ * {@code IndicesQuery} is deprecated, not implemented.
  * 
  * @author brad.wu
  * @since 0.0.1

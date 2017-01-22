@@ -33,9 +33,7 @@ public class AbstractCompoundQuery<T extends AbstractCompoundQuery<T>> implement
 	@Override
 	@SuppressWarnings("unchecked")
 	public T withBoost(BigDecimal boost) {
-		assert boost != null : "Boost cannot be null.";
-		double v = boost.doubleValue();
-		assert v > 0 : "Boost must be positive.";
+		assert boost != null && boost.doubleValue() > 0 : "Boost cannot be null, and must be positive.";
 
 		this.boost = boost;
 		return (T) this;
