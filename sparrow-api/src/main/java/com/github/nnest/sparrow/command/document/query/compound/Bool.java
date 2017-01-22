@@ -10,7 +10,7 @@ import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.Minimum
 import com.google.common.collect.Lists;
 
 /**
- * Boolean query><br>
+ * Boolean query<br>
  * Named query is not supported.
  * 
  * @author brad.wu

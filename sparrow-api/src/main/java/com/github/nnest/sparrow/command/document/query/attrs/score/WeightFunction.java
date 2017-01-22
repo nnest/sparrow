@@ -29,6 +29,7 @@ public class WeightFunction implements ScoreFunction {
 	/**
 	 * @param value
 	 *            the value to set
+	 * @return this
 	 */
 	public WeightFunction withValue(BigDecimal value) {
 		assert value != null : "Value cannot be null.";
@@ -36,5 +37,4 @@ public class WeightFunction implements ScoreFunction {
 		this.value = value;
 		return this;
 	}
-
 }

@@ -36,6 +36,7 @@ public class DecayFunction implements ScoreFunction {
 	/**
 	 * @param type
 	 *            the type to set
+	 * @return this
 	 */
 	public DecayFunction with(DecayFunctionType type) {
 		assert type != null : "Type cannot be null.";
