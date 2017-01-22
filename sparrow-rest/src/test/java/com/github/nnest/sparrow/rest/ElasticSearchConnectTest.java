@@ -107,6 +107,16 @@ public class ElasticSearchConnectTest {
 		assertNotNull(rtt.getId());
 
 		idOf2ndUser = rtt.getId();
+
+		cmd = new Get(TwitterTweet.class, idOf2ndUser);
+		result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		GetResultData getResult = result.getResultData();
+		assertTrue(getResult.isSuccessful());
+		assertTrue(TwitterTweet.class == getResult.getDocument().getClass());
+		tt = getResult.getDocument();
+		assertEquals(idOf2ndUser, tt.getId());
 	}
 
 	@Test
@@ -129,7 +139,7 @@ public class ElasticSearchConnectTest {
 		assertTrue(rtt == tt);
 	}
 
-	@Test
+	@Test(expected = ElasticExecutorException.class)
 	public void test004Create4thUserNoId() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 		TwitterTweet tt = new TwitterTweet();
@@ -138,15 +148,7 @@ public class ElasticSearchConnectTest {
 		tt.setMessage("Message from 4th user");
 
 		ElasticCommand cmd = new Create(tt);
-		ElasticCommandResult result = client.execute(cmd);
-		assertTrue(result.getCommand() == cmd);
-
-		IndexResultData data = result.getResultData();
-		assertTrue(data.isSuccessful());
-		assertEquals(IndexResultType.CREATED, data.getResultType());
-		TwitterTweet rtt = data.getDocument();
-		assertTrue(rtt == tt);
-		assertNotNull(rtt.getId());
+		client.execute(cmd);
 	}
 
 	@Test(expected = ElasticDocumentIncorrectVersionException.class)
@@ -529,6 +531,8 @@ public class ElasticSearchConnectTest {
 		assertEquals(2, response.getSuccessCount());
 		assertEquals(1, response.getFailCount());
 		assertTrue(response.isPartialSuccessful());
+
+		assertEquals("3", ((TwitterTweet) response.getInnerResponses().get(0).getDocument()).getId());
 	}
 
 	private ElasticClient createClient() {

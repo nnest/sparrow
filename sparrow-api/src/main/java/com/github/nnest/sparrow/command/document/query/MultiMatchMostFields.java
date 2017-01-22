@@ -22,7 +22,7 @@ public class MultiMatchMostFields extends AbstractMultiMatchText<MultiMatchMostF
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.MatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.AbstractMatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {

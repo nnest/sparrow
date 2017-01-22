@@ -6,6 +6,7 @@ package com.github.nnest.sparrow.command.document.query;
 import java.math.BigDecimal;
 
 import com.github.nnest.sparrow.command.document.query.shouldmatch.MinimumShouldMatch;
+import com.google.common.base.Strings;
 
 /**
  * Common terms query
@@ -15,12 +16,37 @@ import com.github.nnest.sparrow.command.document.query.shouldmatch.MinimumShould
  * @version 0.0.1
  */
 public class CommonTerms extends AbstractFullTextQuery<CommonTerms> {
+	private String fieldName = null;
 	private BigDecimal cutoffFrequency = null;
-	private MinimumShouldMatch minimumShouldMatch = null;
 	private Boolean disableCoord = null;
+	private MinimumShouldMatch highMinimumShouldMatch = null;
+	private ExampleTextConjunction highConjunction = null;
+	private MinimumShouldMatch lowMinimumShouldMatch = null;
+	private ExampleTextConjunction lowConjunction = null;
 
 	public CommonTerms(String exampleText) {
 		super(exampleText);
+	}
+
+	/**
+	 * get field name
+	 * 
+	 * @return field name
+	 */
+	public String getFieldName() {
+		return this.fieldName;
+	}
+
+	/**
+	 * @param fieldName
+	 *            the fieldName to set
+	 * @return this;
+	 */
+	public CommonTerms withFieldName(String fieldName) {
+		assert Strings.nullToEmpty(fieldName).trim().length() != 0 : "Field name cannot be null or blank.";
+
+		this.fieldName = fieldName;
+		return this;
 	}
 
 	/**
@@ -45,21 +71,78 @@ public class CommonTerms extends AbstractFullTextQuery<CommonTerms> {
 	}
 
 	/**
-	 * @return the minimumShouldMatch
+	 * @return the lowMinimumShouldMatch
 	 */
-	public MinimumShouldMatch getMinimumShouldMatch() {
-		return minimumShouldMatch;
+	public MinimumShouldMatch getLowMinimumShouldMatch() {
+		return lowMinimumShouldMatch;
 	}
 
 	/**
-	 * @param minimumShouldMatch
-	 *            the miuimumShouldMatch to set
+	 * @param lowMinimumShouldMatch
+	 *            the lowMinimumShouldMatch to set
 	 * @return this
 	 */
-	public CommonTerms with(MinimumShouldMatch minimumShouldMatch) {
-		assert minimumShouldMatch != null : "Minimum should match cannot be null.";
+	public CommonTerms withLow(MinimumShouldMatch lowMinimumShouldMatch) {
+		assert lowMinimumShouldMatch != null : "Minimum should match cannot be null.";
 
-		this.minimumShouldMatch = minimumShouldMatch;
+		this.lowMinimumShouldMatch = lowMinimumShouldMatch;
+		return this;
+	}
+
+	/**
+	 * @return the lowConjunction
+	 */
+	public ExampleTextConjunction getLowConjunction() {
+		return lowConjunction;
+	}
+
+	/**
+	 * @param lowConjunction
+	 *            the lowConjunction to set
+	 * @return this
+	 */
+	public CommonTerms withLow(ExampleTextConjunction lowConjunction) {
+		assert lowConjunction != null : "Conjunction cannot be null.";
+
+		this.lowConjunction = lowConjunction;
+		return this;
+	}
+
+	/**
+	 * @return the highMinimumShouldMatch
+	 */
+	public MinimumShouldMatch getHighMinimumShouldMatch() {
+		return highMinimumShouldMatch;
+	}
+
+	/**
+	 * @param highMinimumShouldMatch
+	 *            the highMinimumShouldMatch to set
+	 * @return this
+	 */
+	public CommonTerms withHigh(MinimumShouldMatch highMinimumShouldMatch) {
+		assert highMinimumShouldMatch != null : "Minimum should match cannot be null.";
+
+		this.highMinimumShouldMatch = highMinimumShouldMatch;
+		return this;
+	}
+
+	/**
+	 * @return the highConjunction
+	 */
+	public ExampleTextConjunction getHighConjunction() {
+		return highConjunction;
+	}
+
+	/**
+	 * @param highConjunction
+	 *            the highConjunction to set
+	 * @return this
+	 */
+	public CommonTerms withHigh(ExampleTextConjunction highConjunction) {
+		assert highConjunction != null : "Conjunction cannot be null.";
+
+		this.highConjunction = highConjunction;
 		return this;
 	}
 

@@ -39,16 +39,18 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C, In
 	protected ElasticCommandResult convertToCommandResult(Response response, C command)
 			throws ElasticExecutorException {
 		ElasticCommandResult result = super.convertToCommandResult(response, command);
-		ElasticDocumentDescriptor descriptor = command.getDocumentDescriptor();
-		Object document = command.getDocument();
-		String idField = descriptor.getIdField();
-		String idValue = this.getIdValue(document, idField);
-
-		if (Strings.nullToEmpty(idValue).trim().length() == 0) {
-			IndexResponse indexResponse = (IndexResponse) result.getResultData();
-			String resultIdValue = indexResponse.getId();
-			this.setIdValue(document, idField, resultIdValue);
-		}
+		ElasticDocumentDescriptor documentDescriptor = command.getDocumentDescriptor();
+		this.setIdValueIfNull(command.getDocument(), documentDescriptor, new IdDetective() {
+			/**
+			 * (non-Javadoc)
+			 * 
+			 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand.IdDetective#findIdValue()
+			 */
+			@Override
+			public String findIdValue() {
+				return ((IndexResponse) result.getResultData()).getId();
+			}
+		});
 
 		return result;
 	}
@@ -97,6 +99,10 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C, In
 		}
 
 		if (Strings.nullToEmpty(idValue).trim().length() == 0) {
+			if (!this.isIdAutoCreateionAllowed()) {
+				throw new ElasticExecutorException(
+						String.format("Id is required for [%1$s]", command.getCommandKind()));
+			}
 			// no id identified
 			request.setEndpoint(RestCommandEndpointBuilder.buildEndpoint(descriptor, null, versionValue,
 					this.getEndpointCommandKind()));
@@ -126,5 +132,14 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C, In
 	 */
 	protected String getEndpointCommandKind() {
 		return null;
+	}
+
+	/**
+	 * is id auto creation allowed, default returns true
+	 * 
+	 * @return allow
+	 */
+	protected boolean isIdAutoCreateionAllowed() {
+		return true;
 	}
 }

@@ -10,8 +10,7 @@ package com.github.nnest.sparrow.command.document.query;
  * @since 0.0.1
  * @version 0.0.1
  */
-public abstract class AbstractMatchText<T extends AbstractMatchText<T>> extends AbstractFullTextQuery<T>
-		implements MatchText<T> {
+public abstract class AbstractMatchText<T extends AbstractMatchText<T>> extends AbstractFullTextQuery<T> {
 	private Integer slop = null;
 
 	public AbstractMatchText(String exampleText) {
@@ -26,11 +25,12 @@ public abstract class AbstractMatchText<T extends AbstractMatchText<T>> extends 
 	}
 
 	/**
-	 * (non-Javadoc)
+	 * with slop
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.MatchText#withSlop(java.lang.Integer)
+	 * @param slop
+	 *            slop
+	 * @return this
 	 */
-	@Override
 	@SuppressWarnings("unchecked")
 	public T withSlop(Integer slop) {
 		assert slop != null && slop > 0 : "Slop cannot be null, and must be positive.";
@@ -38,4 +38,11 @@ public abstract class AbstractMatchText<T extends AbstractMatchText<T>> extends 
 		this.slop = slop;
 		return (T) this;
 	}
+
+	/**
+	 * get match type
+	 * 
+	 * @return type
+	 */
+	public abstract MatchType getType();
 }

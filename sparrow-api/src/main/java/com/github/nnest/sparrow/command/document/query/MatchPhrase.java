@@ -17,7 +17,8 @@ public class MatchPhrase<T extends MatchPhrase<T>> extends AbstractSingleMatchTe
 
 	/**
 	 * (non-Javadoc)
-	 * @see com.github.nnest.sparrow.command.document.query.MatchText#getType()
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.AbstractMatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {

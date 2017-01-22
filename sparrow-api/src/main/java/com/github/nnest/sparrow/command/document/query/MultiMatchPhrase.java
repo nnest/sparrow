@@ -18,7 +18,7 @@ public class MultiMatchPhrase extends AbstractMultiMatchText<MultiMatchPhrase> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.MatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.AbstractMatchText#getType()
 	 */
 	@Override
 	public MatchType getType() {

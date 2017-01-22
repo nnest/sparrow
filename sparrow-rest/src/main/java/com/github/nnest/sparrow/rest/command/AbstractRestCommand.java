@@ -33,6 +33,7 @@ import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.ElasticDocumentIncorrectVersionException;
 import com.github.nnest.sparrow.command.document.ElasticDocumentNotFoundException;
 import com.github.nnest.sparrow.rest.RestCommand;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 /**
@@ -325,6 +326,29 @@ public abstract class AbstractRestCommand<C extends ElasticCommand, R extends El
 	}
 
 	/**
+	 * set id value to given document if detect id value is null
+	 * 
+	 * @param document
+	 *            document
+	 * @param documentDescriptor
+	 *            document descriptor
+	 * @param idDetective
+	 *            id detective
+	 * @throws ElasticExecutorException
+	 *             executor exception
+	 */
+	protected void setIdValueIfNull(Object document, ElasticDocumentDescriptor documentDescriptor,
+			IdDetective idDetective) throws ElasticExecutorException {
+		String idField = documentDescriptor.getIdField();
+		String idValue = this.getIdValue(document, idField);
+
+		if (Strings.nullToEmpty(idValue).trim().length() == 0) {
+			String resultIdValue = idDetective.findIdValue();
+			this.setIdValue(document, idField, resultIdValue);
+		}
+	}
+
+	/**
 	 * create {@linkplain ObjectMapper} according to given document descriptor
 	 * 
 	 * @param documentDescriptor
@@ -333,6 +357,22 @@ public abstract class AbstractRestCommand<C extends ElasticCommand, R extends El
 	 */
 	protected ObjectMapper createRequestObjectMapper(ElasticDocumentDescriptor documentDescriptor) {
 		return RestCommandUtil.getObjectMapper();
+	}
+
+	/**
+	 * id detective
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.1
+	 * @version 0.0.1
+	 */
+	public static interface IdDetective {
+		/**
+		 * find id value
+		 * 
+		 * @return id value
+		 */
+		String findIdValue();
 	}
 
 	/**

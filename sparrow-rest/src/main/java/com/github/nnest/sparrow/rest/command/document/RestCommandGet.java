@@ -40,12 +40,26 @@ public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 	@Override
 	protected GetResponse readResponse(Get command, InputStream stream) throws ElasticExecutorException {
 		try {
-			Class<?> documentType = command.getDocumentType();
+			ElasticDocumentDescriptor documentDescriptor = command.getDocumentDescriptor();
 			ObjectMapper mapper = this.createResponseObjectMapper(this.getResponseClass()).copy();
 			SimpleModule module = new SimpleModule();
-			module.addDeserializer(GetResponse.class, new GetResponseDeserializer(mapper, documentType));
+			module.addDeserializer(GetResponse.class, new GetResponseDeserializer(mapper, documentDescriptor));
 			mapper.registerModule(module);
-			return mapper.readValue(stream, GetResponse.class);
+			GetResponse response = mapper.readValue(stream, GetResponse.class);
+
+			// set id value when it is null, use value of "_id"
+			this.setIdValueIfNull(response.getDocument(), documentDescriptor, new IdDetective() {
+				/**
+				 * (non-Javadoc)
+				 * 
+				 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand.IdDetective#findIdValue()
+				 */
+				@Override
+				public String findIdValue() {
+					return response.getId();
+				}
+			});
+			return response;
 		} catch (Exception e) {
 			throw new ElasticExecutorException("Fail to read data from response.", e);
 		}
@@ -90,13 +104,13 @@ public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 	public static class GetResponseDeserializer extends StdDeserializer<GetResponse> {
 		private static final long serialVersionUID = 2100430478383947559L;
 		private ObjectMapper mapper = null;
-		private Class<?> documentType = null;
+		private ElasticDocumentDescriptor documentDescriptor = null;
 
-		public GetResponseDeserializer(ObjectMapper mapper, Class<?> documentType) {
+		public GetResponseDeserializer(ObjectMapper mapper, ElasticDocumentDescriptor documentDescriptor) {
 			this(null);
 
 			this.mapper = mapper;
-			this.documentType = documentType;
+			this.documentDescriptor = documentDescriptor;
 		}
 
 		private GetResponseDeserializer(Class<?> vc) {
@@ -111,10 +125,17 @@ public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 		}
 
 		/**
+		 * @return the documentDescriptor
+		 */
+		public ElasticDocumentDescriptor getDocumentDescriptor() {
+			return documentDescriptor;
+		}
+
+		/**
 		 * @return the documentType
 		 */
 		public Class<?> getDocumentType() {
-			return documentType;
+			return this.getDocumentDescriptor().getDocumentClass();
 		}
 
 		/**
@@ -134,9 +155,7 @@ public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 			resp.setId(node.get("_id").asText());
 			resp.setVersion(node.get("_version").asText());
 			resp.setFound(node.get("found").asBoolean());
-			resp.setDocument(mapper.treeToValue(node.get("_source"), documentType));
-
-			// TODO set id value when it is null, use value of "_id"
+			resp.setDocument(mapper.treeToValue(node.get("_source"), this.getDocumentType()));
 
 			return resp;
 		}

@@ -59,7 +59,19 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 					if (innerResponse.isFound()) {
 						innerResponse.setDocument(
 								mapper.treeToValue(innerResponse.getJsonNode(), innerCommand.getDocumentType()));
-						// TODO set id value when it is null, use value of "_id"
+						// set id value when it is null, use value of "_id"
+						this.setIdValueIfNull(innerResponse.getDocument(),
+								innerResponse.getCommand().getDocumentDescriptor(), new IdDetective() {
+									/**
+									 * (non-Javadoc)
+									 * 
+									 * @see com.github.nnest.sparrow.rest.command.AbstractRestCommand.IdDetective#findIdValue()
+									 */
+									@Override
+									public String findIdValue() {
+										return innerResponse.getId();
+									}
+								});
 					}
 					// clear json node in inner response
 					innerResponse.setJsonNode(null);

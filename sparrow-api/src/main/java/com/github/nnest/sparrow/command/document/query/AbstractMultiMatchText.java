@@ -48,7 +48,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param fieldNames
 	 *            the fieldNames to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T withFieldNames(Set<String> fieldNames) {
@@ -63,7 +63,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 * 
 	 * @param fieldNames
 	 *            field names
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T withFieldNames(String... fieldNames) {
@@ -105,7 +105,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param conjuction
 	 *            the conjuction to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T with(ExampleTextConjunction conjuction) {
@@ -125,7 +125,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param minimumShouldMatch
 	 *            the miuimumShouldMatch to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T with(MinimumShouldMatch minimumShouldMatch) {
@@ -145,7 +145,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param zeroTermsQuery
 	 *            the zeroTermsQuery to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T with(ZeroTermsQuery zeroTermsQuery) {
@@ -165,7 +165,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param cutoffFrequency
 	 *            the cutoffFrequency to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T withCutoffFrequency(BigDecimal cutoffFrequency) {
@@ -187,7 +187,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param lenient
 	 *            the lenient to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T withLenient(Boolean lenient) {
@@ -207,7 +207,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param prefixLength
 	 *            the prefixLength to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T withPrefixLength(Integer prefixLength) {
@@ -228,7 +228,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param maxExpansions
 	 *            the maxExpansions to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T withMaxExpansions(Integer maxExpansions) {
@@ -249,7 +249,7 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	/**
 	 * @param rewrite
 	 *            the rewrite to set
-	 * @return (T)this
+	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
 	public T with(Rewrite rewrite) {
