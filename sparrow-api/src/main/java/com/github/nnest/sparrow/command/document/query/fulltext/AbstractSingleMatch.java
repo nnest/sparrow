@@ -13,10 +13,10 @@ import com.google.common.base.Strings;
  * @since 0.0.1
  * @version 0.0.1
  */
-public abstract class AbstractSingleMatchText<T extends AbstractSingleMatchText<T>> extends AbstractMatchText<T> {
+public abstract class AbstractSingleMatch<T extends AbstractSingleMatch<T>> extends AbstractMatch<T> {
 	private String fieldName = Example.ALL_FIELDS;
 
-	public AbstractSingleMatchText(String exampleText) {
+	public AbstractSingleMatch(String exampleText) {
 		super(exampleText);
 	}
 

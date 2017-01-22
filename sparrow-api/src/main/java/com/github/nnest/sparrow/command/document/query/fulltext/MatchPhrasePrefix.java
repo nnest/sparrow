@@ -20,7 +20,7 @@ public class MatchPhrasePrefix extends MatchPhrase<MatchPhrasePrefix> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatch#getType()
 	 */
 	@Override
 	public MatchType getType() {

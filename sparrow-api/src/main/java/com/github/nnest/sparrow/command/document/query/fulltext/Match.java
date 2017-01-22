@@ -4,97 +4,44 @@
 package com.github.nnest.sparrow.command.document.query.fulltext;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
 import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
+import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.Rewrite;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
-import com.google.common.collect.Sets;
 
 /**
- * abstract multiple match text.<br>
- * according to elastic search document {@code 5.1}, some attributes are not
- * comfortable for some multiple match type. but after testing, seems no syntax
- * exception raised by elastic search server. so these attributes are kept here.
- * for how to use them, see official document please.
+ * Match basic, in elastic search, the {@code match} api.
  * 
  * @author brad.wu
  * @since 0.0.1
  * @version 0.0.1
  */
-public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>> extends AbstractMatchText<T> {
-	private Set<String> fieldNames = null;
-	private BigDecimal tieBreaker = null;
-
+public class Match extends AbstractSingleMatch<Match> {
 	private ExampleTextConjunction conjuction = null;
 	private MinimumShouldMatch minimumShouldMatch = null;
+	private Fuzziness fuzziness = null;
 	private ZeroTermsQuery zeroTermsQuery = null;
 	private BigDecimal cutoffFrequency = null;
 	private Boolean lenient = null;
 	private Integer prefixLength = null;
 	private Integer maxExpansions = null;
 	private Rewrite rewrite = null;
+	private Boolean transpositions = null;
 
-	public AbstractMultiMatchText(String exampleText) {
+	public Match(String exampleText) {
 		super(exampleText);
 	}
 
 	/**
-	 * @return the fieldNames
-	 */
-	public Set<String> getFieldNames() {
-		return fieldNames;
-	}
-
-	/**
-	 * @param fieldNames
-	 *            the fieldNames to set
-	 * @return this
-	 */
-	@SuppressWarnings("unchecked")
-	public T withFieldNames(Set<String> fieldNames) {
-		assert fieldNames != null && fieldNames.size() != 0 : "Field names cannot be null or empty.";
-
-		this.fieldNames = fieldNames;
-		return (T) this;
-	}
-
-	/**
-	 * with field names
+	 * (non-Javadoc)
 	 * 
-	 * @param fieldNames
-	 *            field names
-	 * @return this
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatch#getType()
 	 */
-	@SuppressWarnings("unchecked")
-	public T withFieldNames(String... fieldNames) {
-		assert fieldNames != null && fieldNames.length != 0 : "Field names cannot be null or empty.";
-
-		this.fieldNames = Sets.newHashSet(fieldNames);
-		return (T) this;
-	}
-
-	/**
-	 * @return the tieBreaker
-	 */
-	public BigDecimal getTieBreaker() {
-		return tieBreaker;
-	}
-
-	/**
-	 * @param tieBreaker
-	 *            the tieBreaker to set
-	 * @return this
-	 */
-	@SuppressWarnings("unchecked")
-	public T withTieBreaker(BigDecimal tieBreaker) {
-		assert tieBreaker != null : "Tie breaker cannot be null.";
-		double v = tieBreaker.doubleValue();
-		assert v >= 0 && v <= 1 : "Tie breaker must in range of [0, 1]";
-
-		this.tieBreaker = tieBreaker;
-		return (T) this;
+	@Override
+	public MatchType getType() {
+		return MatchType.SINGLE_MATCH;
 	}
 
 	/**
@@ -109,12 +56,11 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 *            the conjuction to set
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public T with(ExampleTextConjunction conjuction) {
+	public Match with(ExampleTextConjunction conjuction) {
 		assert conjuction != null : "Conjuction cannot be null.";
 
 		this.conjuction = conjuction;
-		return (T) this;
+		return this;
 	}
 
 	/**
@@ -129,12 +75,30 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 *            the miuimumShouldMatch to set
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public T with(MinimumShouldMatch minimumShouldMatch) {
+	public Match with(MinimumShouldMatch minimumShouldMatch) {
 		assert minimumShouldMatch != null : "Minimum should match cannot be null.";
 
 		this.minimumShouldMatch = minimumShouldMatch;
-		return (T) this;
+		return this;
+	}
+
+	/**
+	 * @return the fuzziness
+	 */
+	public Fuzziness getFuzziness() {
+		return fuzziness;
+	}
+
+	/**
+	 * @param fuzziness
+	 *            the fuzziness to set
+	 * @return this
+	 */
+	public Match with(Fuzziness fuzziness) {
+		assert fuzziness != null : "Fuzziness cannot be null.";
+
+		this.fuzziness = fuzziness;
+		return this;
 	}
 
 	/**
@@ -149,12 +113,11 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 *            the zeroTermsQuery to set
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public T with(ZeroTermsQuery zeroTermsQuery) {
+	public Match with(ZeroTermsQuery zeroTermsQuery) {
 		assert zeroTermsQuery != null : "Zero terms query cannot be null.";
 
 		this.zeroTermsQuery = zeroTermsQuery;
-		return (T) this;
+		return this;
 	}
 
 	/**
@@ -169,14 +132,13 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 *            the cutoffFrequency to set
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public T withCutoffFrequency(BigDecimal cutoffFrequency) {
+	public Match withCutoffFrequency(BigDecimal cutoffFrequency) {
 		assert cutoffFrequency != null : "Cutoff frequence cannot be null.";
 		double v = cutoffFrequency.doubleValue();
 		assert v >= 0 : "Cutoff frequence must in range [0, 1) or absolute if greater or equal to 1.0.";
 
 		this.cutoffFrequency = cutoffFrequency;
-		return (T) this;
+		return this;
 	}
 
 	/**
@@ -191,12 +153,11 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 *            the lenient to set
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public T withLenient(Boolean lenient) {
+	public Match withLenient(Boolean lenient) {
 		assert lenient != null : "Lenient cannot be null";
 
 		this.lenient = lenient;
-		return (T) this;
+		return this;
 	}
 
 	/**
@@ -211,13 +172,12 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 *            the prefixLength to set
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public T withPrefixLength(Integer prefixLength) {
+	public Match withPrefixLength(Integer prefixLength) {
 		assert prefixLength != null
 				&& prefixLength >= 0 : "Prefix length cannot be null, and must be zero or positive.";
 
 		this.prefixLength = prefixLength;
-		return (T) this;
+		return this;
 	}
 
 	/**
@@ -232,13 +192,12 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 *            the maxExpansions to set
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public T withMaxExpansions(Integer maxExpansions) {
+	public Match withMaxExpansions(Integer maxExpansions) {
 		assert maxExpansions != null
 				&& maxExpansions >= 0 : "Max expansions cannot be null, and must be zero or positive.";
 
 		this.maxExpansions = maxExpansions;
-		return (T) this;
+		return this;
 	}
 
 	/**
@@ -253,11 +212,29 @@ public abstract class AbstractMultiMatchText<T extends AbstractMultiMatchText<T>
 	 *            the rewrite to set
 	 * @return this
 	 */
-	@SuppressWarnings("unchecked")
-	public T with(Rewrite rewrite) {
+	public Match with(Rewrite rewrite) {
 		assert rewrite != null : "Rewrite cannot be null.";
 
 		this.rewrite = rewrite;
-		return (T) this;
+		return this;
+	}
+
+	/**
+	 * @return the transpositions
+	 */
+	public Boolean getTranspositions() {
+		return transpositions;
+	}
+
+	/**
+	 * @param transpositions
+	 *            the transpositions to set
+	 * @return this
+	 */
+	public Match withTranspositions(Boolean transpositions) {
+		assert transpositions != null : "Transpositions cannot be null.";
+
+		this.transpositions = transpositions;
+		return this;
 	}
 }

@@ -10,10 +10,10 @@ package com.github.nnest.sparrow.command.document.query.fulltext;
  * @since 0.0.1
  * @version 0.0.1
  */
-public abstract class AbstractMatchText<T extends AbstractMatchText<T>> extends AbstractFullTextQuery<T> {
+public abstract class AbstractMatch<T extends AbstractMatch<T>> extends AbstractFullTextQuery<T> {
 	private Integer slop = null;
 
-	public AbstractMatchText(String exampleText) {
+	public AbstractMatch(String exampleText) {
 		super(exampleText);
 	}
 

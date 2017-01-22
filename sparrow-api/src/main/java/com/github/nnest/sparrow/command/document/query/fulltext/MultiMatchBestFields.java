@@ -12,7 +12,7 @@ import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class MultiMatchBestFields extends AbstractMultiMatchText<MultiMatchBestFields> {
+public class MultiMatchBestFields extends AbstractMultiMatch<MultiMatchBestFields> {
 	private Fuzziness fuzziness = null;
 
 	public MultiMatchBestFields(String exampleText) {
@@ -22,7 +22,7 @@ public class MultiMatchBestFields extends AbstractMultiMatchText<MultiMatchBestF
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatchText#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatch#getType()
 	 */
 	@Override
 	public MatchType getType() {
