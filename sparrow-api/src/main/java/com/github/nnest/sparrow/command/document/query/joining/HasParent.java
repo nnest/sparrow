@@ -3,7 +3,9 @@
  */
 package com.github.nnest.sparrow.command.document.query.joining;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.google.common.base.Strings;
 
 /**
@@ -21,6 +23,16 @@ public class HasParent extends AbstractExampleJoiningQuery<HasParent> {
 	public HasParent(String type, Example example) {
 		super(example);
 		this.withType(type);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.HAS_PARENT;
 	}
 
 	/**

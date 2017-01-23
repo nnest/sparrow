@@ -9,6 +9,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.math.BigDecimal;
+
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
@@ -39,9 +41,11 @@ import com.github.nnest.sparrow.command.document.Index;
 import com.github.nnest.sparrow.command.document.IndexResultData;
 import com.github.nnest.sparrow.command.document.IndexResultType;
 import com.github.nnest.sparrow.command.document.MultiGet;
+import com.github.nnest.sparrow.command.document.Query;
 import com.github.nnest.sparrow.command.document.Update;
 import com.github.nnest.sparrow.command.document.UpdateByScript;
 import com.github.nnest.sparrow.command.document.UpdateResultData;
+import com.github.nnest.sparrow.command.document.query.fulltext.Match;
 import com.github.nnest.sparrow.command.indices.DropIndex;
 import com.github.nnest.sparrow.command.script.PainlessElasticScript;
 import com.github.nnest.sparrow.rest.command.document.MultiGetResponse;
@@ -533,6 +537,25 @@ public class ElasticSearchConnectTest {
 		assertTrue(response.isPartialSuccessful());
 
 		assertEquals("3", ((TwitterTweet) response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test021Match() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query(new Match("user").withCutoffFrequency(new BigDecimal("0.001")))
+				.withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
 	}
 
 	private ElasticClient createClient() {

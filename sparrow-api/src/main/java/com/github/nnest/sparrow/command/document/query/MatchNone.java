@@ -11,4 +11,13 @@ package com.github.nnest.sparrow.command.document.query;
  * @version 0.0.1
  */
 public class MatchNone implements Example {
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.MATCH_NONE;
+	}
 }

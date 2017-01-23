@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow.command.document.query.fulltext;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
 
 /**
@@ -22,11 +24,11 @@ public class MultiMatchMostFields extends AbstractMultiMatch<MultiMatchMostField
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatch#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
 	 */
 	@Override
-	public MatchType getType() {
-		return MatchType.MULTI_MOST_FIELDS;
+	public ExampleType getExampleType() {
+		return DefaultExampleType.MULTI_MOST_FIELDS;
 	}
 
 	/**

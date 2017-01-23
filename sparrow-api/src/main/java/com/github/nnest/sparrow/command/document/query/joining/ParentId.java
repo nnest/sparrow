@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow.command.document.query.joining;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.google.common.base.Strings;
 
 /**
@@ -19,6 +21,16 @@ public class ParentId extends AbstractJoiningQuery<ParentId> {
 
 	public ParentId(String type, String id) {
 		this.withType(type).withId(id);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.PARENT_ID;
 	}
 
 	/**

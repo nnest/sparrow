@@ -12,7 +12,7 @@ import java.math.BigDecimal;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class AbstractCompoundQuery<T extends AbstractCompoundQuery<T>> implements CompoundQuery<T> {
+public abstract class AbstractCompoundQuery<T extends AbstractCompoundQuery<T>> implements CompoundQuery<T> {
 	private BigDecimal boost = null;
 
 	/**

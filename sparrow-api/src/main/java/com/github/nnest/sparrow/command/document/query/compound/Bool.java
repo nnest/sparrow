@@ -5,7 +5,9 @@ package com.github.nnest.sparrow.command.document.query.compound;
 
 import java.util.List;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
 import com.google.common.collect.Lists;
 
@@ -23,6 +25,16 @@ public class Bool extends AbstractCompoundQuery<Bool> {
 	private List<Example> mustNot = null;
 	private List<Example> should = null;
 	private MinimumShouldMatch minimumShouldMatch = null;
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.BOOL;
+	}
 
 	/**
 	 * @return the must

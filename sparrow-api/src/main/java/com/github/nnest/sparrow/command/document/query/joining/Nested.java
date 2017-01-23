@@ -3,7 +3,9 @@
  */
 package com.github.nnest.sparrow.command.document.query.joining;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.ScoreMode;
 import com.google.common.base.Strings;
 
@@ -21,6 +23,16 @@ public class Nested extends AbstractExampleJoiningQuery<Nested> {
 	public Nested(String path, Example example) {
 		super(example);
 		this.withPath(path);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.NESTED;
 	}
 
 	/**

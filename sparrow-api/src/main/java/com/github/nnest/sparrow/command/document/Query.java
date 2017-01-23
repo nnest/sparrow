@@ -4,6 +4,7 @@
 package com.github.nnest.sparrow.command.document;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -13,14 +14,13 @@ import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.command.document.query.Example;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * query documents.<br>
  * use {@linkplain #scope} to describe the query scope.<br>
- * for {@linkplain #hintMapping}, key is "index/type". to describe how to
- * receive the data.
+ * for {@linkplain #hitTypes}, always add, never remove.
  * 
  * @author brad.wu
  * @since 0.0.1
@@ -30,9 +30,9 @@ public class Query implements ElasticCommand {
 	// scope
 	private Map<Class<?>, ElasticDocumentDescriptor> scope = null;
 	private Map<Class<?>, Object> typeIgnoredInScope = new HashMap<>();
-	// hints
-	private Map<String, Class<?>> hintMapping = null;
-	private Map<String, ElasticDocumentDescriptor> hintDocumentDescriptors = new HashMap<>();
+	// hits
+	private Set<Class<?>> hitTypes = new HashSet<>();
+	private Map<String, ElasticDocumentDescriptor> hitDocumentDescriptors = new HashMap<>();
 	// example
 	private Example example = null;
 
@@ -147,42 +147,40 @@ public class Query implements ElasticCommand {
 	}
 
 	/**
-	 * @return the hintMapping
+	 * @return the hitTypes
 	 */
-	public Map<String, Class<?>> getHintMapping() {
-		return hintMapping;
+	public Set<Class<?>> getHitTypes() {
+		return hitTypes;
 	}
 
 	/**
-	 * @param hintMapping
-	 *            the hintMapping to set
+	 * with hit document type, add
+	 * 
+	 * @param documentTypes
+	 *            document types
 	 * @return this
 	 */
-	public Query withHintMapping(Map<String, Class<?>> hintMapping) {
-		this.hintMapping = hintMapping;
+	public Query withHit(Set<Class<?>> documentTypes) {
+		assert documentTypes != null && documentTypes.size() != 0 : "Document types cannot be null.";
+
+		// put into hit mapping using qualified class name
+		for (Class<?> documentType : documentTypes) {
+			this.hitTypes.add(documentType);
+		}
 		return this;
 	}
 
 	/**
-	 * with hint mapping
+	 * with hit document type, add
 	 * 
-	 * @param index
-	 *            index name
-	 * @param type
-	 *            type name
-	 * @param documentType
+	 * @param documentTypes
 	 *            document type
 	 * @return this
 	 */
-	public Query withHintMapping(String index, String type, Class<?> documentType) {
-		assert Strings.nullToEmpty(index).trim().length() != 0 : "Index cannot be null or blank.";
-		assert Strings.nullToEmpty(type).trim().length() != 0 : "Type cannot be null or blank.";
+	public Query withHit(Class<?>... documentTypes) {
+		assert documentTypes != null && documentTypes.length != 0 : "Document types cannot be null.";
 
-		if (this.hintMapping == null) {
-			this.hintMapping = new HashMap<>();
-		}
-		this.hintMapping.put(index + "/" + type, documentType);
-		return this;
+		return this.withHit(Sets.newHashSet(documentTypes));
 	}
 
 	/**
@@ -202,11 +200,11 @@ public class Query implements ElasticCommand {
 	 */
 	@Override
 	public ElasticCommand analysis(ElasticDocumentAnalyzer documentAnalyzer) {
-		// analyze hints
-		for (Map.Entry<String, Class<?>> entry : this.getHintMapping().entrySet()) {
-			String key = entry.getKey();
-			Class<?> documentType = entry.getValue();
-			this.hintDocumentDescriptors.put(key, documentAnalyzer.analysis(documentType));
+		// analyze hits
+		for (Class<?> documentType : this.getHitTypes()) {
+			ElasticDocumentDescriptor descriptor = documentAnalyzer.analysis(documentType);
+			// change key from class name to "index/type"
+			this.hitDocumentDescriptors.put(descriptor.getIndex() + "/" + descriptor.getType(), descriptor);
 		}
 
 		// analyze scope

@@ -5,6 +5,8 @@ package com.github.nnest.sparrow.command.document.query.fulltext;
 
 import java.math.BigDecimal;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
 import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
 import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
@@ -37,11 +39,11 @@ public class Match extends AbstractSingleMatch<Match> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatch#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
 	 */
 	@Override
-	public MatchType getType() {
-		return MatchType.SINGLE_MATCH;
+	public ExampleType getExampleType() {
+		return DefaultExampleType.MATCH;
 	}
 
 	/**

@@ -13,4 +13,10 @@ import com.github.nnest.sparrow.ElasticCommandResultData;
  * @version 0.0.1
  */
 public interface QueryResultData extends ElasticCommandResultData {
+	/**
+	 * get result count
+	 * 
+	 * @return result count
+	 */
+	int getResultCount();
 }

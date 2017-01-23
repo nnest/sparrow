@@ -6,7 +6,9 @@ package com.github.nnest.sparrow.command.document.query.compound;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 
 /**
  * boosting query
@@ -19,6 +21,16 @@ public class Boosting extends AbstractCompoundQuery<Boosting> {
 	private List<Example> positive = null;
 	private List<Example> negative = null;
 	private BigDecimal negativeBoost = null;
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.BOOSTING;
+	}
 
 	/**
 	 * @return the positive

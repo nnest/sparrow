@@ -20,7 +20,7 @@ public class DropIndex implements ElasticCommand {
 
 	public DropIndex(String indexName) {
 		assert Strings.nullToEmpty(indexName).trim().length() != 0 : "Index name cannot be null or blank.";
-		
+
 		this.indexName = indexName;
 	}
 

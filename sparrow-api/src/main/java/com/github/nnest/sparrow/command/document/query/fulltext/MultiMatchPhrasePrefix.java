@@ -3,6 +3,9 @@
  */
 package com.github.nnest.sparrow.command.document.query.fulltext;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
+
 /**
  * multiple match phrase prefix
  * 
@@ -18,10 +21,10 @@ public class MultiMatchPhrasePrefix extends AbstractMultiMatch<MultiMatchPhraseP
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatch#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
 	 */
 	@Override
-	public MatchType getType() {
-		return MatchType.MULTI_PHRASE_PREFIX;
+	public ExampleType getExampleType() {
+		return DefaultExampleType.MULTI_PHRASE_PREFIX;
 	}
 }

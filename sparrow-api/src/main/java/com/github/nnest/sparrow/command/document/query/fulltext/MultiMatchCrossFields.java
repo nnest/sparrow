@@ -3,6 +3,9 @@
  */
 package com.github.nnest.sparrow.command.document.query.fulltext;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
+
 /**
  * multiple match cross fields
  * 
@@ -18,10 +21,10 @@ public class MultiMatchCrossFields extends AbstractMultiMatch<MultiMatchCrossFie
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatch#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
 	 */
 	@Override
-	public MatchType getType() {
-		return MatchType.MULTI_CROSS_FIELDS;
+	public ExampleType getExampleType() {
+		return DefaultExampleType.MULTI_CROSS_FIELDS;
 	}
 }

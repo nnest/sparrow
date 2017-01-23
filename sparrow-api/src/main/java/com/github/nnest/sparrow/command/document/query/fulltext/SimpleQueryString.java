@@ -5,6 +5,8 @@ package com.github.nnest.sparrow.command.document.query.fulltext;
 
 import java.util.Set;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
 import com.github.nnest.sparrow.command.document.query.attrs.ParseFeatureFlag;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
@@ -32,6 +34,16 @@ public class SimpleQueryString extends AbstractFullTextQuery<SimpleQueryString> 
 
 	public SimpleQueryString(String exampleText) {
 		super(exampleText);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.SIMPLE_QUERY_STRING;
 	}
 
 	/**

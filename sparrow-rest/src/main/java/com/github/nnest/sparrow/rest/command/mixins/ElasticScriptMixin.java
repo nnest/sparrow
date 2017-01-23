@@ -1,4 +1,4 @@
-package com.github.nnest.sparrow.rest.command;
+package com.github.nnest.sparrow.rest.command.mixins;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +14,7 @@ import com.github.nnest.sparrow.command.script.ElasticScript;
  * @since 0.0.1
  * @version 0.0.1
  */
-public interface ElasticScriptAnnotations extends ElasticScript {
+public interface ElasticScriptMixin extends ElasticScript {
 	/**
 	 * (non-Javadoc)
 	 * 

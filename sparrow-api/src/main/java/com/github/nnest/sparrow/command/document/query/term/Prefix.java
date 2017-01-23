@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow.command.document.query.term;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.Rewrite;
 import com.google.common.base.Strings;
 
@@ -19,6 +21,16 @@ public class Prefix extends AbstractTermLevelQuery<Prefix> {
 
 	public Prefix(String fieldName) {
 		super(fieldName);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.PREFIX;
 	}
 
 	/**

@@ -6,7 +6,9 @@ package com.github.nnest.sparrow.command.document.query.compound;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.google.common.collect.Lists;
 
 /**
@@ -26,6 +28,16 @@ public class DisMax extends AbstractCompoundQuery<DisMax> {
 
 	public DisMax(Example... examples) {
 		this.withExamples(examples);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.DIS_MAX;
 	}
 
 	/**

@@ -3,6 +3,9 @@
  */
 package com.github.nnest.sparrow.command.document.query.fulltext;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
+
 /**
  * match phrase prefix
  * 
@@ -20,11 +23,11 @@ public class MatchPhrasePrefix extends MatchPhrase<MatchPhrasePrefix> {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.document.query.fulltext.AbstractMatch#getType()
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
 	 */
 	@Override
-	public MatchType getType() {
-		return MatchType.SINGLE_MATCH_PHRASE_PREFIX;
+	public ExampleType getExampleType() {
+		return DefaultExampleType.MATCH_PHRASE_PREFIX;
 	}
 
 	/**

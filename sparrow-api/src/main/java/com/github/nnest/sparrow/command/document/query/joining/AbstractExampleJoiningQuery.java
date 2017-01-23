@@ -12,8 +12,8 @@ import com.github.nnest.sparrow.command.document.query.Example;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class AbstractExampleJoiningQuery<T extends AbstractExampleJoiningQuery<T>> extends AbstractJoiningQuery<T>
-		implements ExampleJoiningQuery<T> {
+public abstract class AbstractExampleJoiningQuery<T extends AbstractExampleJoiningQuery<T>>
+		extends AbstractJoiningQuery<T> implements ExampleJoiningQuery<T> {
 	private Example example = null;
 
 	public AbstractExampleJoiningQuery(Example example) {

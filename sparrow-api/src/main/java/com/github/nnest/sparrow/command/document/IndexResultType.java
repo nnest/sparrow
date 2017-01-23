@@ -13,6 +13,6 @@ package com.github.nnest.sparrow.command.document;
 public enum IndexResultType {
 	CREATED, //
 	UPDATED, //
-	
+
 	FAIL
 }

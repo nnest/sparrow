@@ -6,7 +6,9 @@ package com.github.nnest.sparrow.command.document.query.compound;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.ScoreMode;
 import com.github.nnest.sparrow.command.document.query.attrs.score.NestedScoreFunction;
 import com.github.nnest.sparrow.command.document.query.attrs.score.ScoreFunction;
@@ -28,6 +30,16 @@ public class FunctionScore extends AbstractCompoundQuery<FunctionScore> {
 	private BigDecimal maxBoost = null;
 	private ScoreFunction function = null;
 	private List<NestedScoreFunction> functions = null;
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.FUNCTION_SCORE;
+	}
 
 	/**
 	 * @return the example

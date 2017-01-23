@@ -38,11 +38,4 @@ public abstract class AbstractMatch<T extends AbstractMatch<T>> extends Abstract
 		this.slop = slop;
 		return (T) this;
 	}
-
-	/**
-	 * get match type
-	 * 
-	 * @return type
-	 */
-	public abstract MatchType getType();
 }

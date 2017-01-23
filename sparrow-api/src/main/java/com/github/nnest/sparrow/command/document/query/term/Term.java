@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow.command.document.query.term;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.google.common.base.Strings;
 
 /**
@@ -17,6 +19,16 @@ public class Term extends AbstractTermLevelQuery<Term> {
 
 	public Term(String fieldName) {
 		super(fieldName);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.TERM;
 	}
 
 	/**

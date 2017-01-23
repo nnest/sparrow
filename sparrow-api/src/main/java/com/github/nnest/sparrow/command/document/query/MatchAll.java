@@ -29,4 +29,14 @@ public class MatchAll implements Example {
 	public void setBoost(BigDecimal boost) {
 		this.boost = boost;
 	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.MATCH_ALL;
+	}
 }

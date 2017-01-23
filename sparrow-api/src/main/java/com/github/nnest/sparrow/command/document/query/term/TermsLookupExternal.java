@@ -5,6 +5,8 @@ package com.github.nnest.sparrow.command.document.query.term;
 
 import java.util.List;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -20,6 +22,16 @@ public class TermsLookupExternal extends AbstractTermLevelQuery<TermsLookupExter
 
 	public TermsLookupExternal(String fieldName) {
 		super(fieldName);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.TERM;
 	}
 
 	/**

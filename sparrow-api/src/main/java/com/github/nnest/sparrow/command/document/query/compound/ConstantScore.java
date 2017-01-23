@@ -3,7 +3,9 @@
  */
 package com.github.nnest.sparrow.command.document.query.compound;
 
+import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.ExampleType;
 
 /**
  * Constant score query
@@ -17,6 +19,16 @@ public class ConstantScore extends AbstractCompoundQuery<ConstantScore> {
 
 	public ConstantScore(Example example) {
 		this.with(example);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.Example#getExampleType()
+	 */
+	@Override
+	public ExampleType getExampleType() {
+		return DefaultExampleType.CONSTANT_SCORE;
 	}
 
 	/**

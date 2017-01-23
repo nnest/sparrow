@@ -17,4 +17,11 @@ package com.github.nnest.sparrow.command.document.query;
  */
 public interface Example {
 	String ALL_FIELDS = "_all";
+
+	/**
+	 * get example type
+	 * 
+	 * @return example type
+	 */
+	ExampleType getExampleType();
 }
