@@ -6,6 +6,7 @@ package com.github.nnest.sparrow.rest.command;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,6 +21,8 @@ import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseException;
 import org.elasticsearch.client.ResponseListener;
 import org.elasticsearch.client.RestClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.nnest.sparrow.DefaultElasticCommandResult;
@@ -45,8 +48,17 @@ import com.google.common.collect.Lists;
  */
 public abstract class AbstractRestCommand<C extends ElasticCommand, R extends ElasticCommandResultData>
 		implements RestCommand<C> {
+	private Logger logger = LoggerFactory.getLogger(getClass());
+
 	private static Map<Class<?>, DocumentFieldValueVisitor> idVisitors = new ConcurrentHashMap<Class<?>, DocumentFieldValueVisitor>();
 	private static Map<Class<?>, DocumentFieldValueVisitor> versionVisitors = new ConcurrentHashMap<Class<?>, DocumentFieldValueVisitor>();
+
+	/**
+	 * @return the logger
+	 */
+	protected Logger getLogger() {
+		return logger;
+	}
 
 	/**
 	 * (non-Javadoc)
@@ -60,6 +72,9 @@ public abstract class AbstractRestCommand<C extends ElasticCommand, R extends El
 		RestRequest request = this.convertToRestRequest(command);
 		Response response;
 		try {
+			if (this.getLogger().isDebugEnabled()) {
+				this.getLogger().debug(request.toString());
+			}
 			response = restClient.performRequest(request.getMethod(), request.getEndpoint(), request.getParams(),
 					request.getEntity(), request.getHeaders());
 		} catch (Exception e) {
@@ -198,6 +213,9 @@ public abstract class AbstractRestCommand<C extends ElasticCommand, R extends El
 		try {
 			RestRequest request = this.convertToRestRequest(command);
 			ResponseListener responseListener = this.getResponseListener(command, commandResultHandler);
+			if (this.getLogger().isDebugEnabled()) {
+				this.getLogger().debug(request.toString());
+			}
 			restClient.performRequestAsync(request.getMethod(), request.getEndpoint(), request.getParams(),
 					request.getEntity(), responseListener, request.getHeaders());
 		} catch (ElasticExecutorException e) {
@@ -644,6 +662,17 @@ public abstract class AbstractRestCommand<C extends ElasticCommand, R extends El
 		 */
 		public void setHeaders(Header[] headers) {
 			this.headers = headers;
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Object#toString()
+		 */
+		@Override
+		public String toString() {
+			return "RestRequest [method=" + method + ", endpoint=" + endpoint + ", params=" + params + ", entity="
+					+ entity + ", headers=" + Arrays.toString(headers) + "]";
 		}
 	}
 }

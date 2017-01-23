@@ -20,6 +20,7 @@ public enum ElasticCommandKind {
 	DELETE, // delete document by given id
 	UPDATE, // update document by given data
 	UPDATE_BY_SCRIPT, // update document by given script
+	QUERY, // query
 
 	// indices command
 	DROP_INDEX, // delete index

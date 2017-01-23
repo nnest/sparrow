@@ -3,15 +3,15 @@
  */
 package com.github.nnest.sparrow.rest.command;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 /**
@@ -32,42 +32,7 @@ public final class RestCommandEndpointBuilder {
 	 * @return endpoint
 	 */
 	public static String buildEndpoint(ElasticDocumentDescriptor documentDescriptor, String idValue) {
-		return buildEndpoint(documentDescriptor, idValue, null, (String) null);
-	}
-
-	/**
-	 * build endpoint by given parameters
-	 * 
-	 * @param documentDescriptor
-	 *            document descriptor
-	 * @param idValue
-	 *            id
-	 * @param versionValue
-	 *            version
-	 * @return endpoint
-	 */
-	public static String buildEndpoint(ElasticDocumentDescriptor documentDescriptor, String idValue,
-			String versionValue) {
-		return buildEndpoint(documentDescriptor, idValue, versionValue, (String) null);
-	}
-
-	/**
-	 * build endpoint by given parameters
-	 * 
-	 * @param documentDescriptor
-	 *            document descriptor
-	 * @param idValue
-	 *            id value
-	 * @param versionValue
-	 *            version value
-	 * @param endpointCommand
-	 *            command kind
-	 * @return endpoint
-	 */
-	public static String buildEndpoint(ElasticDocumentDescriptor documentDescriptor, String idValue,
-			String versionValue, String endpointCommand) {
-		return buildEndpoint(documentDescriptor, idValue, endpointCommand,
-				Sets.newHashSet(new SimpleQueryParam("version", versionValue)));
+		return buildEndpoint(documentDescriptor, idValue, null);
 	}
 
 	/**
@@ -81,46 +46,102 @@ public final class RestCommandEndpointBuilder {
 	 *            id value
 	 * @param endpointCommand
 	 *            endpoint command
-	 * @param queryParams
-	 *            query parameters
 	 * @return endpoint
 	 */
 	public static String buildEndpoint(ElasticDocumentDescriptor documentDescriptor, String idValue,
-			String endpointCommand, Set<QueryParam> queryParams) {
+			String endpointCommand) {
+		return buildEndpoint(documentDescriptor.getIndex(), documentDescriptor.getType(), idValue, endpointCommand);
+	}
+
+	/**
+	 * build endpoint by given parameters.
+	 * 
+	 * @param index
+	 *            index name
+	 * @param type
+	 *            type name
+	 * @param idValue
+	 *            id value
+	 * @param endpointCommand
+	 *            endpoint command
+	 * @return endpoint
+	 */
+	public static String buildEndpoint(String index, String type, String idValue, String endpointCommand) {
+		return buildEndpoint(Sets.newHashSet(index), Sets.newHashSet(type), idValue, endpointCommand);
+	}
+
+	/**
+	 * build endpoint by given parameters
+	 * 
+	 * @param indices
+	 *            index names
+	 * @param types
+	 *            type names
+	 * @param idValue
+	 *            id value
+	 * @param endpointCommand
+	 *            endpoint command
+	 * @return endpoint
+	 */
+	public static String buildEndpoint(Set<String> indices, Set<String> types, String idValue, String endpointCommand) {
 		List<String> parts = new LinkedList<String>();
-		parts.add(documentDescriptor.getIndex());
-		parts.add(documentDescriptor.getType());
+		if (indices != null && indices.size() > 0) {
+			Joiner joiner = Joiner.on(",").skipNulls();
+			String indicesString = joiner.join(indices);
+			if (Strings.nullToEmpty(indicesString).trim().length() != 0) {
+				parts.add(indicesString);
+				if (types != null && types.size() > 0) {
+					String typesString = joiner.join(types);
+					if (Strings.nullToEmpty(typesString).trim().length() != 0) {
+						parts.add(typesString);
+					}
+				}
+			}
+		}
 		if (idValue != null) {
 			parts.add(idValue);
 		}
 		parts.add(endpointCommand);
-		String loc = Joiner.on('/').skipNulls().join(parts);
-
-		return Joiner.on("?").skipNulls().join(loc, generateQueryParams(queryParams));
+		return Joiner.on('/').skipNulls().join(parts);
 	}
 
 	/**
-	 * generate query parameters string
+	 * transform query parameters to string map
 	 * 
-	 * @param queryParams
-	 *            query parameters
-	 * @return query string
+	 * @param params
+	 *            parameters
+	 * @return map
 	 */
-	public static String generateQueryParams(Set<QueryParam> queryParams) {
-		if (queryParams == null || queryParams.size() == 0) {
+	@SuppressWarnings("rawtypes")
+	public static Map<String, String> transformQueryParameters(Set<QueryParam> params) {
+		if (params == null || params.size() == 0) {
 			return null;
 		} else {
-			return Joiner.on("&").skipNulls().join(Iterables.transform(queryParams, new Function<QueryParam, String>() {
-				/**
-				 * (non-Javadoc)
-				 * 
-				 * @see com.google.common.base.Function#apply(java.lang.Object)
-				 */
-				@Override
-				public String apply(QueryParam input) {
-					return input == null ? null : input.getQueryParamString();
-				}
-			}));
+			Map<String, String> map = new HashMap<>();
+			for (QueryParam param : params) {
+				map.put(param.getKey(), param.getValueAsString());
+			}
+			return map;
+		}
+	}
+
+	/**
+	 * transform query parameters to string map
+	 * 
+	 * @param params
+	 *            parameters
+	 * @return map
+	 */
+	@SuppressWarnings("rawtypes")
+	public static Map<String, String> transformQueryParameters(QueryParam... params) {
+		if (params == null || params.length == 0) {
+			return null;
+		} else {
+			Map<String, String> map = new HashMap<>();
+			for (QueryParam param : params) {
+				map.put(param.getKey(), param.getValueAsString());
+			}
+			return map;
 		}
 	}
 
@@ -131,14 +152,22 @@ public final class RestCommandEndpointBuilder {
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	public static interface QueryParam {
+	public static interface QueryParam<V> {
 		/**
-		 * get query parameter string, return null when the parameter can be
-		 * ignored
+		 * get value as string
 		 * 
-		 * @return query string
+		 * @param value
+		 *            value
+		 * @return string value
 		 */
-		String getQueryParamString();
+		String getValueAsString();
+
+		/**
+		 * get key of param
+		 * 
+		 * @return key
+		 */
+		String getKey();
 	}
 
 	/**
@@ -148,7 +177,7 @@ public final class RestCommandEndpointBuilder {
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	public static abstract class AbstractQueryParam<V> implements QueryParam {
+	public static abstract class AbstractQueryParam<V> implements QueryParam<V> {
 		private String key = null;
 		private V value = null;
 
@@ -160,8 +189,11 @@ public final class RestCommandEndpointBuilder {
 		}
 
 		/**
-		 * @return the key
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.QueryParam#getKey()
 		 */
+		@Override
 		public String getKey() {
 			return key;
 		}
@@ -188,31 +220,6 @@ public final class RestCommandEndpointBuilder {
 		protected void setValue(V value) {
 			this.value = value;
 		}
-
-		/**
-		 * (non-Javadoc)
-		 * 
-		 * @see com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.QueryParam#getQueryParamString()
-		 */
-		@Override
-		public String getQueryParamString() {
-			String strValue = this.valueToString(this.getValue());
-			if (Strings.nullToEmpty(strValue).length() == 0) {
-				// no value or it is empty when cast value to string
-				return null;
-			} else {
-				return key + "=" + strValue;
-			}
-		}
-
-		/**
-		 * value to string
-		 * 
-		 * @param value
-		 *            value
-		 * @return string
-		 */
-		protected abstract String valueToString(V value);
 	}
 
 	/**
@@ -230,11 +237,35 @@ public final class RestCommandEndpointBuilder {
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.AbstractQueryParam#valueToString(java.lang.Object)
+		 * @see com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.QueryParam#getValueAsString()
 		 */
 		@Override
-		protected String valueToString(String value) {
-			return value;
+		public String getValueAsString() {
+			return this.getValue();
+		}
+	}
+
+	/**
+	 * version query parameter
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.1
+	 * @version 0.0.1
+	 */
+	public static class VersionQueryParam extends SimpleQueryParam {
+		public VersionQueryParam(String value) {
+			super("version", value);
+		}
+
+		/**
+		 * with version
+		 * 
+		 * @param value
+		 *            value
+		 * @return new VersionQueryParam
+		 */
+		public static VersionQueryParam withVersion(String value) {
+			return new VersionQueryParam(value);
 		}
 	}
 
@@ -253,14 +284,15 @@ public final class RestCommandEndpointBuilder {
 		/**
 		 * (non-Javadoc)
 		 * 
-		 * @see com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.AbstractQueryParam#valueToString(java.lang.Object)
+		 * @see com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.QueryParam#getValueAsString()
 		 */
 		@Override
-		protected String valueToString(Set<String> value) {
-			if (value == null || value.size() == 0) {
+		public String getValueAsString() {
+			Set<String> values = this.getValue();
+			if (values == null || values.size() == 0) {
 				return null;
 			} else {
-				return Joiner.on(",").skipNulls().join(value);
+				return Joiner.on(",").skipNulls().join(values);
 			}
 		}
 	}

@@ -17,6 +17,7 @@ import com.github.nnest.sparrow.command.document.Update;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
+import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.VersionQueryParam;
 import com.google.common.base.Strings;
 
 /**
@@ -56,9 +57,11 @@ public class RestCommandUpdate extends AbstractRestCommand<Update, UpdateRespons
 		String versionValue = null;
 		if (Strings.nullToEmpty(versionField).length() > 0) {
 			versionValue = this.getVersionValue(document, versionField);
+			request.setParams(
+					RestCommandEndpointBuilder.transformQueryParameters(VersionQueryParam.withVersion(versionValue)));
 		}
 
-		request.setEndpoint(RestCommandEndpointBuilder.buildEndpoint(descriptor, idValue, versionValue, "_update"));
+		request.setEndpoint(RestCommandEndpointBuilder.buildEndpoint(descriptor, idValue, "_update"));
 		request.setMethod(ElasticRestMethod.POST.name());
 
 		StringWriter documentJSONString = new StringWriter();

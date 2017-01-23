@@ -16,6 +16,7 @@ import com.github.nnest.sparrow.command.document.Index;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
+import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.VersionQueryParam;
 import com.google.common.base.Strings;
 
 /**
@@ -96,6 +97,8 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C, In
 		String versionValue = null;
 		if (Strings.nullToEmpty(versionField).length() > 0) {
 			versionValue = this.getVersionValue(document, versionField);
+			request.setParams(
+					RestCommandEndpointBuilder.transformQueryParameters(VersionQueryParam.withVersion(versionValue)));
 		}
 
 		if (Strings.nullToEmpty(idValue).trim().length() == 0) {
@@ -104,13 +107,13 @@ public class RestCommandIndex<C extends Index> extends AbstractRestCommand<C, In
 						String.format("Id is required for [%1$s]", command.getCommandKind()));
 			}
 			// no id identified
-			request.setEndpoint(RestCommandEndpointBuilder.buildEndpoint(descriptor, null, versionValue,
-					this.getEndpointCommandKind()));
+			request.setEndpoint(
+					RestCommandEndpointBuilder.buildEndpoint(descriptor, null, this.getEndpointCommandKind()));
 			// use POST for auto id creation
 			request.setMethod(ElasticRestMethod.POST.name());
 		} else {
-			request.setEndpoint(RestCommandEndpointBuilder.buildEndpoint(descriptor, idValue, versionValue,
-					this.getEndpointCommandKind()));
+			request.setEndpoint(
+					RestCommandEndpointBuilder.buildEndpoint(descriptor, idValue, this.getEndpointCommandKind()));
 			// use PUT for id given
 			request.setMethod(ElasticRestMethod.PUT.name());
 		}

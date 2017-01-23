@@ -21,7 +21,6 @@ import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.SetQueryParam;
-import com.google.common.collect.Sets;
 
 /**
  * rest command get, {@linkplain ElasticCommandKind#GET}
@@ -85,10 +84,11 @@ public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 		ElasticDocumentDescriptor descriptor = command.getDocumentDescriptor();
 
 		RestRequest request = new RestRequest();
-		String endpoint = RestCommandEndpointBuilder.buildEndpoint(descriptor, command.getId(), null,
-				Sets.newHashSet(new SetQueryParam("_source_include", command.getIncludes()),
-						new SetQueryParam("_source_exclude", command.getExcludes())));
+		String endpoint = RestCommandEndpointBuilder.buildEndpoint(descriptor, command.getId());
 		request.setEndpoint(endpoint);
+		request.setParams(RestCommandEndpointBuilder.transformQueryParameters(
+				new SetQueryParam("_source_include", command.getIncludes()),
+				new SetQueryParam("_source_exclude", command.getExcludes())));
 		// use GET for id given
 		request.setMethod(ElasticRestMethod.GET.name());
 		return request;

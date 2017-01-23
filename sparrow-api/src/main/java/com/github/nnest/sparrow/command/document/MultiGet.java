@@ -43,9 +43,13 @@ public class MultiGet implements ElasticCommand {
 	/**
 	 * @param innerCommands
 	 *            the innerCommands to set
+	 * @return this
 	 */
-	public void setInnerCommands(List<Get> innerCommands) {
+	public MultiGet withInnerCommands(List<Get> innerCommands) {
+		assert innerCommands != null && innerCommands.size() > 0 : "Inner commands cannot be null or empty.";
+
 		this.innerCommands = innerCommands;
+		return this;
 	}
 
 	/**
