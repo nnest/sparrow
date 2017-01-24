@@ -11,7 +11,7 @@ import com.github.nnest.sparrow.command.document.query.Example;
  * @since 0.0.1
  * @version 0.0.1
  */
-public interface QueryExampleWrapper<T extends Example> {
+public interface QueryExampleWrapper {
 	/**
 	 * wrap example
 	 * 
@@ -19,5 +19,14 @@ public interface QueryExampleWrapper<T extends Example> {
 	 *            original example
 	 * @return wrapped example
 	 */
-	Example wrap(T example);
+	Example wrap(Example example);
+
+	/**
+	 * check given example is accepted by this
+	 * 
+	 * @param example
+	 *            example
+	 * @return acceptable
+	 */
+	boolean accept(Example example);
 }

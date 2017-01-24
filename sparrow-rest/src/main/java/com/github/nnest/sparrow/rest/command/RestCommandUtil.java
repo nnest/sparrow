@@ -131,7 +131,6 @@ public class RestCommandUtil {
 	 *            original example
 	 * @return wrapped example
 	 */
-	@SuppressWarnings("unchecked")
 	public static Example wrapExample(Example example) {
 		return getExampleWrapper().wrap(example);
 	}

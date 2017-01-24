@@ -3,8 +3,6 @@
  */
 package com.github.nnest.sparrow.rest.command.mixins.wrapper;
 
-import java.util.Optional;
-
 import com.github.nnest.sparrow.command.document.query.Example;
 
 /**
@@ -15,8 +13,8 @@ import com.github.nnest.sparrow.command.document.query.Example;
  * @since 0.0.1
  * @version 0.0.1
  */
-@SuppressWarnings("rawtypes")
-public abstract class AbstractChainQueryExampleWrapper<T extends Example> implements ChainQueryExampleWrapper<T> {
+public abstract class AbstractChainQueryExampleWrapper extends AbstractQueryExampleWrapper
+		implements ChainQueryExampleWrapper {
 	private ChainQueryExampleWrapper next = null;
 
 	public AbstractChainQueryExampleWrapper() {
@@ -29,26 +27,23 @@ public abstract class AbstractChainQueryExampleWrapper<T extends Example> implem
 	}
 
 	/**
-	 * call {@linkplain #doWrap(Example)} for try to wrap example by itself. is
-	 * the returned {@linkplain Optional} is present, return wrapped example
-	 * directly. otherwise call next to wrap example if next exists. if cannot
-	 * wrap, return example itself.
+	 * if {@linkplain #accept(Example)} returns true, call
+	 * {@linkplain #doWrap(Example)} and return.<br>
+	 * if {@linkplain #accept(Example)} returns false, check there is next
+	 * wrapper existing.<br>
+	 * if existing, call {@linkplain #wrap(Example)} of next wrapper, otherwise
+	 * return given example directly.
 	 * 
 	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.QueryExampleWrapper#wrap(com.github.nnest.sparrow.command.document.query.Example)
 	 */
-	@SuppressWarnings({ "unchecked" })
 	@Override
-	public Example wrap(T example) {
-		Optional<Example> wrapped = this.doWrap(example);
-		if (wrapped.isPresent()) {
-			return wrapped.get();
+	public Example wrap(Example example) {
+		if (this.accept(example)) {
+			return this.doWrap(example);
+		} else if (this.hasNext()) {
+			return this.getNext().wrap(example);
 		} else {
-			QueryExampleWrapper next = this.getNext();
-			if (next != null) {
-				return next.wrap(example);
-			} else {
-				return example;
-			}
+			return example;
 		}
 	}
 
@@ -59,7 +54,7 @@ public abstract class AbstractChainQueryExampleWrapper<T extends Example> implem
 	 *            example
 	 * @return wrapped example or empty
 	 */
-	protected abstract Optional<Example> doWrap(T example);
+	// protected abstract Optional<Example> doWrap(T example);
 
 	/**
 	 * (non-Javadoc)
@@ -79,6 +74,15 @@ public abstract class AbstractChainQueryExampleWrapper<T extends Example> implem
 	@Override
 	public void setNext(ChainQueryExampleWrapper nextWrapper) {
 		this.next = nextWrapper;
+	}
+
+	/**
+	 * has next wrapper
+	 * 
+	 * @return has
+	 */
+	protected boolean hasNext() {
+		return this.getNext() != null;
 	}
 
 	/**

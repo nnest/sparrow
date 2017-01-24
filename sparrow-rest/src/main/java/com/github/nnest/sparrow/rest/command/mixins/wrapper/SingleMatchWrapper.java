@@ -1,7 +1,5 @@
 package com.github.nnest.sparrow.rest.command.mixins.wrapper;
 
-import java.util.Optional;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.nnest.sparrow.command.document.query.Example;
 import com.github.nnest.sparrow.command.document.query.ExampleType;
@@ -15,7 +13,7 @@ import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMa
  * @version 0.0.1
  */
 @SuppressWarnings("rawtypes")
-public class SingleMatchWrapper extends AbstractChainQueryExampleWrapper<AbstractSingleMatch> {
+public class SingleMatchWrapper extends AbstractChainQueryExampleWrapper {
 	public SingleMatchWrapper() {
 		super();
 	}
@@ -27,11 +25,21 @@ public class SingleMatchWrapper extends AbstractChainQueryExampleWrapper<Abstrac
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.AbstractChainQueryExampleWrapper#doWrap(com.github.nnest.sparrow.command.document.query.Example)
+	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.QueryExampleWrapper#accept(com.github.nnest.sparrow.command.document.query.Example)
 	 */
 	@Override
-	protected Optional<Example> doWrap(AbstractSingleMatch example) {
-		return Optional.of(new WrappedSingleMatch(example));
+	public boolean accept(Example example) {
+		return example instanceof AbstractSingleMatch;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.AbstractQueryExampleWrapper#doWrap(com.github.nnest.sparrow.command.document.query.Example)
+	 */
+	@Override
+	protected Example doWrap(Example example) {
+		return new WrappedSingleMatch((AbstractSingleMatch) example);
 	}
 
 	/**

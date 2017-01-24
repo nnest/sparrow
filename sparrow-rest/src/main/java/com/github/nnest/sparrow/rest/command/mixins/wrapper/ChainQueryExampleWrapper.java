@@ -3,8 +3,6 @@
  */
 package com.github.nnest.sparrow.rest.command.mixins.wrapper;
 
-import com.github.nnest.sparrow.command.document.query.Example;
-
 /**
  * chained query example wrapper
  * 
@@ -12,8 +10,7 @@ import com.github.nnest.sparrow.command.document.query.Example;
  * @since 0.0.1
  * @version 0.0.1
  */
-@SuppressWarnings("rawtypes")
-public interface ChainQueryExampleWrapper<T extends Example> extends QueryExampleWrapper<T> {
+public interface ChainQueryExampleWrapper extends QueryExampleWrapper {
 	/**
 	 * next query example wrapper
 	 * 
