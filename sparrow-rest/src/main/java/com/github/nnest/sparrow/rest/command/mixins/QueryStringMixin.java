@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow.rest.command.mixins;
 
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -12,30 +14,29 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
-import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
+import com.github.nnest.sparrow.command.document.query.attrs.ParseFeatureFlag;
 import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.Rewrite;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
-import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMatch;
-import com.github.nnest.sparrow.command.document.query.fulltext.Match;
+import com.github.nnest.sparrow.command.document.query.fulltext.QueryString;
+import com.github.nnest.sparrow.command.document.query.fulltext.SimpleQueryString;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.ExampleTextConjunctionSerializer;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.FuzzinessSerializer;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.MinimumShouldMatchSerializer;
+import com.github.nnest.sparrow.rest.command.mixins.serialize.ParseFeatureFlagsSerializer;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.RewriteSerializer;
-import com.github.nnest.sparrow.rest.command.mixins.serialize.ZeroTermsQuerySerializer;
 
 /**
- * single match mixin. all methods signature are same as them in
- * {@linkplain AbstractSingleMatch}
+ * query string mixin, see {@linkplain QueryString} and
+ * {@linkplain SimpleQueryString}
  * 
  * @author brad.wu
  * @since 0.0.1
  * @version 0.0.1
- * @see Match
  */
 @JsonInclude(Include.NON_NULL)
 @JsonNaming(SnakeCaseStrategy.class)
-public interface AbstractSingleMatchMixin {
+public interface QueryStringMixin {
 	/**
 	 * get analyzer name
 	 * 
@@ -49,7 +50,7 @@ public interface AbstractSingleMatchMixin {
 	 * 
 	 * @return conjunction
 	 */
-	@JsonProperty("operator")
+	@JsonProperty("default_operator")
 	@JsonSerialize(using = ExampleTextConjunctionSerializer.class)
 	ExampleTextConjunction getConjunction();
 
@@ -70,12 +71,20 @@ public interface AbstractSingleMatchMixin {
 	ExampleType getExampleType();
 
 	/**
-	 * get field name
+	 * get field names
 	 * 
 	 * @return
 	 */
-	@JsonIgnore
-	String getFieldName();
+	@JsonProperty("fields")
+	Set<String> getFieldNames();
+
+	/**
+	 * get flags
+	 * 
+	 * @return flags
+	 */
+	@JsonSerialize(using = ParseFeatureFlagsSerializer.class)
+	Set<ParseFeatureFlag> getFlags();
 
 	/**
 	 * get fuzziness
@@ -101,20 +110,4 @@ public interface AbstractSingleMatchMixin {
 	@JsonProperty("fuzzy_rewrite")
 	@JsonSerialize(using = RewriteSerializer.class)
 	Rewrite getRewrite();
-
-	/**
-	 * get transpositions
-	 * 
-	 * @return transpositions
-	 */
-	@JsonProperty("fuzzy_transpositions")
-	Boolean getTranspositions();
-
-	/**
-	 * get zero terms query
-	 * 
-	 * @return zero terms query
-	 */
-	@JsonSerialize(using = ZeroTermsQuerySerializer.class)
-	ZeroTermsQuery getZeroTermsQuery();
 }

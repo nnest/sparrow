@@ -27,7 +27,7 @@ public abstract class AbstractMultiMatch<T extends AbstractMultiMatch<T>> extend
 	private Set<String> fieldNames = null;
 	private BigDecimal tieBreaker = null;
 
-	private ExampleTextConjunction conjuction = null;
+	private ExampleTextConjunction conjunction = null;
 	private MinimumShouldMatch minimumShouldMatch = null;
 	private ZeroTermsQuery zeroTermsQuery = null;
 	private BigDecimal cutoffFrequency = null;
@@ -98,22 +98,22 @@ public abstract class AbstractMultiMatch<T extends AbstractMultiMatch<T>> extend
 	}
 
 	/**
-	 * @return the conjuction
+	 * @return the conjunction
 	 */
-	public ExampleTextConjunction getConjuction() {
-		return conjuction;
+	public ExampleTextConjunction getConjunction() {
+		return conjunction;
 	}
 
 	/**
-	 * @param conjuction
-	 *            the conjuction to set
+	 * @param conjunction
+	 *            the Conjunction to set
 	 * @return this
 	 */
 	@SuppressWarnings("unchecked")
-	public T with(ExampleTextConjunction conjuction) {
-		assert conjuction != null : "Conjuction cannot be null.";
+	public T with(ExampleTextConjunction conjunction) {
+		assert conjunction != null : "Conjunction cannot be null.";
 
-		this.conjuction = conjuction;
+		this.conjunction = conjunction;
 		return (T) this;
 	}
 

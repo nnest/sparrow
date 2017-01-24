@@ -229,7 +229,7 @@ public class QueryString extends AbstractFullTextQuery<QueryString> {
 	 * @return this
 	 */
 	public QueryString withPhraseSlop(Integer phraseSlop) {
-		assert phraseSlop != null && phraseSlop > 0 : "Phrase slop cannot be null, and must be positive.";
+		assert phraseSlop != null && phraseSlop >= 0 : "Phrase slop cannot be null, and must be zero or positive.";
 
 		this.phraseSlop = phraseSlop;
 		return this;

@@ -26,7 +26,7 @@ public enum DefaultExampleType implements ExampleType {
 	MULTI_CROSS_FIELDS("MULTI_MATCH"), //
 	MULTI_PHRASE("MULTI_MATCH"), //
 	MULTI_PHRASE_PREFIX("MULTI_MATCH"), //
-	COMMON_TERMS, //
+	COMMON_TERMS("COMMON"), //
 	QUERY_STRING, //
 	SIMPLE_QUERY_STRING, //
 

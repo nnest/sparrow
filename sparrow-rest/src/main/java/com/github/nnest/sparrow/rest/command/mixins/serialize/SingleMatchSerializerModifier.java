@@ -30,31 +30,45 @@ public class SingleMatchSerializerModifier extends BeanSerializerModifier {
 	@Override
 	public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDesc,
 			List<BeanPropertyWriter> beanProperties) {
-		if (WrappedSingleMatch.class.isAssignableFrom(beanDesc.getBeanClass())) {
-			for (int index = 0, count = beanProperties.size(); index < count; index++) {
-				BeanPropertyWriter property = beanProperties.get(index);
-				if ("match".equals(property.getName())) {
-					beanProperties.set(index, new BeanPropertyWriter(property) {
-						private static final long serialVersionUID = -3919261800446858573L;
+		this.withWrappedSingleMatch(beanDesc, beanProperties);
+		return super.changeProperties(config, beanDesc, beanProperties);
+	}
 
-						/**
-						 * (non-Javadoc)
-						 * 
-						 * @see com.fasterxml.jackson.databind.ser.BeanPropertyWriter#serializeAsField(java.lang.Object,
-						 *      com.fasterxml.jackson.core.JsonGenerator,
-						 *      com.fasterxml.jackson.databind.SerializerProvider)
-						 */
-						@Override
-						public void serializeAsField(Object bean, JsonGenerator gen, SerializerProvider prov)
-								throws Exception {
-							WrappedSingleMatch match = (WrappedSingleMatch) bean;
-							gen.writeFieldName(match.getMatch().getFieldName());
-							gen.writeObject(match.getMatch());
-						}
-					});
-				}
+	/**
+	 * with wrapped single match
+	 * 
+	 * @param beanDesc
+	 *            bean description
+	 * @param beanProperties
+	 *            bean properties
+	 */
+	protected void withWrappedSingleMatch(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+		if (!WrappedSingleMatch.class.isAssignableFrom(beanDesc.getBeanClass())) {
+			return;
+		}
+
+		for (int index = 0, count = beanProperties.size(); index < count; index++) {
+			BeanPropertyWriter property = beanProperties.get(index);
+			if ("match".equals(property.getName())) {
+				beanProperties.set(index, new BeanPropertyWriter(property) {
+					private static final long serialVersionUID = -3919261800446858573L;
+
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.fasterxml.jackson.databind.ser.BeanPropertyWriter#serializeAsField(java.lang.Object,
+					 *      com.fasterxml.jackson.core.JsonGenerator,
+					 *      com.fasterxml.jackson.databind.SerializerProvider)
+					 */
+					@Override
+					public void serializeAsField(Object bean, JsonGenerator gen, SerializerProvider prov)
+							throws Exception {
+						WrappedSingleMatch match = (WrappedSingleMatch) bean;
+						gen.writeFieldName(match.getMatch().getFieldName());
+						gen.writeObject(match.getMatch());
+					}
+				});
 			}
 		}
-		return super.changeProperties(config, beanDesc, beanProperties);
 	}
 }

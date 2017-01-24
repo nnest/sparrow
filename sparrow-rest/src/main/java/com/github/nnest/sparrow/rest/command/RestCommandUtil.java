@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.command.document.query.Example;
 import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMatch;
+import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
+import com.github.nnest.sparrow.command.document.query.fulltext.QueryString;
+import com.github.nnest.sparrow.command.document.query.fulltext.SimpleQueryString;
 import com.github.nnest.sparrow.command.script.ElasticScript;
 import com.github.nnest.sparrow.rest.RestCommand;
 import com.github.nnest.sparrow.rest.command.document.RestCommandCreate;
@@ -23,8 +26,12 @@ import com.github.nnest.sparrow.rest.command.document.RestCommandUpdate;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdateByScript;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
 import com.github.nnest.sparrow.rest.command.mixins.AbstractSingleMatchMixin;
+import com.github.nnest.sparrow.rest.command.mixins.CommonTermsMixin;
 import com.github.nnest.sparrow.rest.command.mixins.ElasticScriptMixin;
+import com.github.nnest.sparrow.rest.command.mixins.QueryStringMixin;
+import com.github.nnest.sparrow.rest.command.mixins.serialize.CommonTermsSerializerModifier;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.SingleMatchSerializerModifier;
+import com.github.nnest.sparrow.rest.command.mixins.wrapper.CommonTermsWrapper;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.QueryExampleWrapper;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.SingleMatchWrapper;
 import com.google.common.collect.Maps;
@@ -58,11 +65,15 @@ public class RestCommandUtil {
 		commands.put(ElasticCommandKind.DROP_INDEX, new RestCommandDropIndex());
 
 		// object mapper settings
-		objectMapper.addMixIn(ElasticScript.class, ElasticScriptMixin.class);
-		objectMapper.addMixIn(AbstractSingleMatch.class, AbstractSingleMatchMixin.class);
-		objectMapper.registerModule(new SimpleModule().setSerializerModifier(new SingleMatchSerializerModifier()));
+		objectMapper.addMixIn(ElasticScript.class, ElasticScriptMixin.class) //
+				.addMixIn(AbstractSingleMatch.class, AbstractSingleMatchMixin.class) //
+				.addMixIn(CommonTerms.class, CommonTermsMixin.class) //
+				.addMixIn(QueryString.class, QueryStringMixin.class) //
+				.addMixIn(SimpleQueryString.class, QueryStringMixin.class) //
+				.registerModule(new SimpleModule().setSerializerModifier(new SingleMatchSerializerModifier())) //
+				.registerModule(new SimpleModule().setSerializerModifier(new CommonTermsSerializerModifier()));
 
-		exampleWrapper = new SingleMatchWrapper();
+		exampleWrapper = new CommonTermsWrapper(new SingleMatchWrapper());
 	}
 
 	/**

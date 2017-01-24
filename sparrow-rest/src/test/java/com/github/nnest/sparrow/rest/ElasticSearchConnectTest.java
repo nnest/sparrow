@@ -46,6 +46,7 @@ import com.github.nnest.sparrow.command.document.Update;
 import com.github.nnest.sparrow.command.document.UpdateByScript;
 import com.github.nnest.sparrow.command.document.UpdateResultData;
 import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
+import com.github.nnest.sparrow.command.document.query.attrs.ParseFeatureFlag;
 import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
 import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.ConstantRewrite;
@@ -53,9 +54,12 @@ import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.Combina
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MultipleCombinationMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.NumericMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.PercentageMinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.command.document.query.fulltext.Match;
 import com.github.nnest.sparrow.command.document.query.fulltext.MatchPhrase;
 import com.github.nnest.sparrow.command.document.query.fulltext.MatchPhrasePrefix;
+import com.github.nnest.sparrow.command.document.query.fulltext.QueryString;
+import com.github.nnest.sparrow.command.document.query.fulltext.SimpleQueryString;
 import com.github.nnest.sparrow.command.indices.DropIndex;
 import com.github.nnest.sparrow.command.script.PainlessElasticScript;
 import com.github.nnest.sparrow.rest.command.document.MultiGetResponse;
@@ -623,6 +627,109 @@ public class ElasticSearchConnectTest {
 						.withFieldName("message") //
 						.withSlop(1) //
 						.withMaxExpansions(50) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test024CommonTerms() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new CommonTerms("user") //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withCutoffFrequency(new BigDecimal("0.001")) //
+						.withDisableCoord(Boolean.TRUE) //
+						.withFieldName("message") //
+						.withHigh(ExampleTextConjunction.OR) //
+						.withHigh(NumericMinimumShouldMatch.valueOf(1)) //
+						.withLow(ExampleTextConjunction.OR) //
+						.withLow(PercentageMinimumShouldMatch.valueOf(1)) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test025QueryString() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new QueryString("user") //
+						.with(ExampleTextConjunction.OR)//
+						.with(Fuzziness.AUTO) //
+						.with(NumericMinimumShouldMatch.valueOf(1)) //
+						.with(ConstantRewrite.CONSTANT_SCORE_BOOLEAN) //
+						.withAllFields(Boolean.FALSE) //
+						.withAllowLeadingWildcard(Boolean.TRUE) //
+						.withAnalyzerName("standard") //
+						.withAnalyzeWildcard(Boolean.TRUE) //
+						.withAutoGeneratePhraseQueries(Boolean.TRUE) //
+						.withBoost(new BigDecimal("1.2")) //
+						.withEnablePositionIncrement(Boolean.TRUE) //
+						.withFieldNames("message") //
+						.withFuzzyMaxExpansions(50) //
+						.withFuzzyPrefixLength(1) //
+						.withLenient(Boolean.TRUE) //
+						// this not supported since elastic search issue
+						// .withMaxDeterminizedStates(10000) //
+						.withPhraseSlop(0) //
+						.withQuoteFieldSuffix(".*") //
+						.withSplitOnWhitespace(Boolean.FALSE) //
+						.withTimeZone("-08:00") //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test026SimpleQueryString() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new SimpleQueryString("user") //
+						.with(ExampleTextConjunction.OR)//
+						.with(NumericMinimumShouldMatch.valueOf(1)) //
+						.withAllFields(Boolean.FALSE) //
+						.withAnalyzerName("standard") //
+						.withAnalyzeWildcard(Boolean.TRUE) //
+						.withBoost(new BigDecimal("1.2")) //
+						.withFieldNames("message") //
+						.withFlags(ParseFeatureFlag.AND, ParseFeatureFlag.OR, ParseFeatureFlag.PREFIX) //
+						.withLenient(Boolean.TRUE) //
+						.withQuoteFieldSuffix(".*") //
 		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
 
 		ElasticCommandResult result = client.execute(cmd);
