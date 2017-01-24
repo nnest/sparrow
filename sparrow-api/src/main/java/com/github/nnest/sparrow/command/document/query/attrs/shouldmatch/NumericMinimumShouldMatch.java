@@ -42,4 +42,15 @@ public class NumericMinimumShouldMatch implements ValuedMinimumShouldMatch {
 	public String asString() {
 		return value.toString();
 	}
+
+	/**
+	 * create numeric minimum should match by given value
+	 * 
+	 * @param value
+	 *            value
+	 * @return minimum should match
+	 */
+	public static NumericMinimumShouldMatch valueOf(Integer value) {
+		return new NumericMinimumShouldMatch(value);
+	}
 }

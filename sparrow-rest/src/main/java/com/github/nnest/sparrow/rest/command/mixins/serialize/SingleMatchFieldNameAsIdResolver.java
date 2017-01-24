@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.rest.command.mixins;
+package com.github.nnest.sparrow.rest.command.mixins.serialize;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;

@@ -33,4 +33,25 @@ public class ValuedFuzziness implements Fuzziness {
 
 		this.digits = digits;
 	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness#asString()
+	 */
+	@Override
+	public String asString() {
+		return String.valueOf(this.getDigits());
+	}
+
+	/**
+	 * create fuzziness by given digits
+	 * 
+	 * @param digits
+	 *            digits
+	 * @return fuzziness
+	 */
+	public static ValuedFuzziness valueOf(int digits) {
+		return new ValuedFuzziness(digits);
+	}
 }

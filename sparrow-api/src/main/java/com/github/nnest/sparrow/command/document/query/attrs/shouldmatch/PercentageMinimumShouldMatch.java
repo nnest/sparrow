@@ -43,4 +43,15 @@ public class PercentageMinimumShouldMatch implements ValuedMinimumShouldMatch {
 	public String asString() {
 		return value.toString() + "%";
 	}
+
+	/**
+	 * create percentage minimum should match by given value
+	 * 
+	 * @param value
+	 *            value
+	 * @return minimum should match
+	 */
+	public static PercentageMinimumShouldMatch valueOf(Integer value) {
+		return new PercentageMinimumShouldMatch(value);
+	}
 }

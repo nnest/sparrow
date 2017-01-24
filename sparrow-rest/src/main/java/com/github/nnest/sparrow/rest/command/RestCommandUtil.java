@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.command.document.query.Example;
-import com.github.nnest.sparrow.command.document.query.fulltext.Match;
+import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMatch;
 import com.github.nnest.sparrow.command.script.ElasticScript;
 import com.github.nnest.sparrow.rest.RestCommand;
 import com.github.nnest.sparrow.rest.command.document.RestCommandCreate;
@@ -25,10 +25,10 @@ import com.github.nnest.sparrow.rest.command.document.RestCommandUpdate;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdateByScript;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
 import com.github.nnest.sparrow.rest.command.mixins.ElasticScriptMixin;
-import com.github.nnest.sparrow.rest.command.mixins.MatchMixin;
+import com.github.nnest.sparrow.rest.command.mixins.AbstractSingleMatchMixin;
 import com.github.nnest.sparrow.rest.command.mixins.QueryExampleWrapper;
-import com.github.nnest.sparrow.rest.command.mixins.SingleMatchSerializerModifier;
 import com.github.nnest.sparrow.rest.command.mixins.SingleMatchWrapper;
+import com.github.nnest.sparrow.rest.command.mixins.serialize.SingleMatchSerializerModifier;
 import com.google.common.collect.Maps;
 
 /**
@@ -61,7 +61,7 @@ public class RestCommandUtil {
 
 		// object mapper settings
 		objectMapper.addMixIn(ElasticScript.class, ElasticScriptMixin.class);
-		objectMapper.addMixIn(Match.class, MatchMixin.class);
+		objectMapper.addMixIn(AbstractSingleMatch.class, AbstractSingleMatchMixin.class);
 		objectMapper.registerModule(new SimpleModule().setSerializerModifier(new SingleMatchSerializerModifier()));
 
 		exampleWrappers.add(new SingleMatchWrapper());

@@ -45,7 +45,17 @@ import com.github.nnest.sparrow.command.document.Query;
 import com.github.nnest.sparrow.command.document.Update;
 import com.github.nnest.sparrow.command.document.UpdateByScript;
 import com.github.nnest.sparrow.command.document.UpdateResultData;
+import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
+import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
+import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
+import com.github.nnest.sparrow.command.document.query.attrs.rewrite.ConstantRewrite;
+import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.CombinationMinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MultipleCombinationMinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.NumericMinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.PercentageMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.fulltext.Match;
+import com.github.nnest.sparrow.command.document.query.fulltext.MatchPhrase;
+import com.github.nnest.sparrow.command.document.query.fulltext.MatchPhrasePrefix;
 import com.github.nnest.sparrow.command.indices.DropIndex;
 import com.github.nnest.sparrow.command.script.PainlessElasticScript;
 import com.github.nnest.sparrow.rest.command.document.MultiGetResponse;
@@ -543,8 +553,78 @@ public class ElasticSearchConnectTest {
 	public void test021Match() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 
-		ElasticCommand cmd = new Query(new Match("user").withCutoffFrequency(new BigDecimal("0.001")))
-				.withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+		ElasticCommand cmd = new Query( //
+				new Match("user") //
+						.with(ExampleTextConjunction.OR) //
+						.with(Fuzziness.AUTO) //
+						.with(new MultipleCombinationMinimumShouldMatch(
+								new CombinationMinimumShouldMatch(1, PercentageMinimumShouldMatch.valueOf(1)),
+								new CombinationMinimumShouldMatch(2, NumericMinimumShouldMatch.valueOf(2)))) //
+						.with(ConstantRewrite.CONSTANT_SCORE) //
+						.with(ZeroTermsQuery.ALL) //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withCutoffFrequency(new BigDecimal("0.001")) //
+						.withFieldName("message") //
+						.withLenient(Boolean.TRUE) //
+						.withMaxExpansions(50) //
+						.withPrefixLength(2) //
+						.withSlop(1) //
+						.withTranspositions(Boolean.TRUE) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Test
+	public void test022MatchPhrase() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MatchPhrase("user") //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withFieldName("message") //
+						.withSlop(1) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test023MatchPhrasePrefix() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MatchPhrasePrefix("user") //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withFieldName("message") //
+						.withSlop(1) //
+						.withMaxExpansions(50) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
 		ElasticCommandResult result = client.execute(cmd);
 		assertTrue(result.getCommand() == cmd);
 

@@ -24,7 +24,7 @@ import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 import com.github.nnest.sparrow.rest.command.RestCommandUtil;
-import com.github.nnest.sparrow.rest.command.mixins.ExampleTypeAsIdResolver;
+import com.github.nnest.sparrow.rest.command.mixins.serialize.ExampleTypeAsIdResolver;
 
 /**
  * rest command query, {@linkplain ElasticCommandKind#QUERY}
