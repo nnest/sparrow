@@ -14,7 +14,6 @@ import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
-import com.github.nnest.sparrow.rest.command.mixins.serialize.CommonTermsSerializerModifier;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.ExampleTextConjunctionSerializer;
 
 /**

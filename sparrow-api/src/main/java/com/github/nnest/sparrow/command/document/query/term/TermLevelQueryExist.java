@@ -13,8 +13,8 @@ import com.github.nnest.sparrow.command.document.query.ExampleType;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class Exist extends AbstractTermLevelQuery<Exist> {
-	public Exist(String fieldName) {
+public class TermLevelQueryExist extends AbstractTermLevelQuery<TermLevelQueryExist> {
+	public TermLevelQueryExist(String fieldName) {
 		super(fieldName);
 	}
 

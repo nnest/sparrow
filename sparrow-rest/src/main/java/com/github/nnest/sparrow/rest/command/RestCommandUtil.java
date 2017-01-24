@@ -14,6 +14,10 @@ import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMa
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.command.document.query.fulltext.QueryString;
 import com.github.nnest.sparrow.command.document.query.fulltext.SimpleQueryString;
+import com.github.nnest.sparrow.command.document.query.term.AbstractTermLevelQuery;
+import com.github.nnest.sparrow.command.document.query.term.TermLevelQueryExist;
+import com.github.nnest.sparrow.command.document.query.term.Terms;
+import com.github.nnest.sparrow.command.document.query.term.TermsLookupExternal;
 import com.github.nnest.sparrow.command.script.ElasticScript;
 import com.github.nnest.sparrow.rest.RestCommand;
 import com.github.nnest.sparrow.rest.command.document.RestCommandCreate;
@@ -26,16 +30,19 @@ import com.github.nnest.sparrow.rest.command.document.RestCommandQuery;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdate;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdateByScript;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
-import com.github.nnest.sparrow.rest.command.mixins.AbstractMultiMatchMixin;
-import com.github.nnest.sparrow.rest.command.mixins.AbstractSingleMatchMixin;
 import com.github.nnest.sparrow.rest.command.mixins.CommonTermsMixin;
 import com.github.nnest.sparrow.rest.command.mixins.ElasticScriptMixin;
+import com.github.nnest.sparrow.rest.command.mixins.MultiMatchMixin;
+import com.github.nnest.sparrow.rest.command.mixins.QueryExistMixin;
 import com.github.nnest.sparrow.rest.command.mixins.QueryStringMixin;
-import com.github.nnest.sparrow.rest.command.mixins.serialize.CommonTermsSerializerModifier;
-import com.github.nnest.sparrow.rest.command.mixins.serialize.SingleMatchSerializerModifier;
+import com.github.nnest.sparrow.rest.command.mixins.SingleMatchMixin;
+import com.github.nnest.sparrow.rest.command.mixins.TermLevelQueryMixin;
+import com.github.nnest.sparrow.rest.command.mixins.TermsMixin;
+import com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.CommonTermsWrapper;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.QueryExampleWrapper;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.SingleMatchWrapper;
+import com.github.nnest.sparrow.rest.command.mixins.wrapper.TermLevelQueryWrapper;
 import com.google.common.collect.Maps;
 
 /**
@@ -68,15 +75,31 @@ public class RestCommandUtil {
 
 		// object mapper settings
 		objectMapper.addMixIn(ElasticScript.class, ElasticScriptMixin.class) //
-				.addMixIn(AbstractSingleMatch.class, AbstractSingleMatchMixin.class) //
+				.addMixIn(AbstractSingleMatch.class, SingleMatchMixin.class) //
 				.addMixIn(CommonTerms.class, CommonTermsMixin.class) //
 				.addMixIn(QueryString.class, QueryStringMixin.class) //
 				.addMixIn(SimpleQueryString.class, QueryStringMixin.class) //
-				.addMixIn(AbstractMultiMatch.class, AbstractMultiMatchMixin.class) //
-				.registerModule(new SimpleModule().setSerializerModifier(new SingleMatchSerializerModifier())) //
-				.registerModule(new SimpleModule().setSerializerModifier(new CommonTermsSerializerModifier()));
+				.addMixIn(AbstractMultiMatch.class, MultiMatchMixin.class) //
+				.addMixIn(AbstractTermLevelQuery.class, TermLevelQueryMixin.class) //
+				.addMixIn(Terms.class, TermsMixin.class) //
+				.addMixIn(TermsLookupExternal.class, TermsMixin.class) //
+				.addMixIn(TermLevelQueryExist.class, QueryExistMixin.class) //
+				.registerModule(new SimpleModule() {
+					private static final long serialVersionUID = -6766348162611371496L;
 
-		exampleWrapper = new CommonTermsWrapper(new SingleMatchWrapper());
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.fasterxml.jackson.databind.module.SimpleModule#setupModule(com.fasterxml.jackson.databind.Module.SetupContext)
+					 */
+					@Override
+					public void setupModule(SetupContext context) {
+						super.setupModule(context);
+						context.addBeanSerializerModifier(new QuerySerializerModifier());
+					}
+				});
+
+		exampleWrapper = new TermLevelQueryWrapper(new CommonTermsWrapper(new SingleMatchWrapper()));
 	}
 
 	/**

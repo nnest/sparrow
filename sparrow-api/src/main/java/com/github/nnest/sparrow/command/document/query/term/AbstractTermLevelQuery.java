@@ -39,7 +39,7 @@ public abstract class AbstractTermLevelQuery<T extends AbstractTermLevelQuery<T>
 	 */
 	@SuppressWarnings("unchecked")
 	public T withFieldName(String fieldName) {
-		assert Strings.nullToEmpty(fieldName).trim().length() == 0 : "Field name cannot be null or blank.";
+		assert Strings.nullToEmpty(fieldName).trim().length() != 0 : "Field name cannot be null or blank.";
 
 		this.fieldName = fieldName;
 		return (T) this;

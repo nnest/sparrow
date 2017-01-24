@@ -31,7 +31,7 @@ public class TermsLookupExternal extends AbstractTermLevelQuery<TermsLookupExter
 	 */
 	@Override
 	public ExampleType getExampleType() {
-		return DefaultExampleType.TERM;
+		return DefaultExampleType.TERMS;
 	}
 
 	/**
@@ -74,11 +74,13 @@ public class TermsLookupExternal extends AbstractTermLevelQuery<TermsLookupExter
 	 */
 	public static class ExternalDocumentTerm {
 		private String id = null;
-		private Class<?> documentType = null;
+		private String index = null;
+		private String type = null;
 		private String path = null;
 
-		public ExternalDocumentTerm(Class<?> documentType, String id, String path) {
-			this.withDocumentType(documentType) //
+		public ExternalDocumentTerm(String index, String type, String id, String path) {
+			this.withIndex(index) //
+					.withType(type) //
 					.withId(id) //
 					.withPath(path);
 		}
@@ -105,21 +107,40 @@ public class TermsLookupExternal extends AbstractTermLevelQuery<TermsLookupExter
 		}
 
 		/**
-		 * @return the documentType
+		 * @return the index
 		 */
-		public Class<?> getDocumentType() {
-			return documentType;
+		public String getIndex() {
+			return index;
 		}
 
 		/**
-		 * @param documentType
-		 *            the documentType to set
+		 * @param index
+		 *            the index to set
 		 * @return this
 		 */
-		protected ExternalDocumentTerm withDocumentType(Class<?> documentType) {
-			assert documentType != null : "Document type cannot be null.";
+		public ExternalDocumentTerm withIndex(String index) {
+			assert Strings.nullToEmpty(index).trim().length() != 0 : "Index name cannot be null or blank.";
 
-			this.documentType = documentType;
+			this.index = index;
+			return this;
+		}
+
+		/**
+		 * @return the type
+		 */
+		public String getType() {
+			return type;
+		}
+
+		/**
+		 * @param type
+		 *            the type to set
+		 * @return this
+		 */
+		public ExternalDocumentTerm withType(String type) {
+			assert Strings.nullToEmpty(type).trim().length() != 0 : "Type name cannot be null or blank.";
+
+			this.type = type;
 			return this;
 		}
 

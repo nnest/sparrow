@@ -6,7 +6,6 @@ package com.github.nnest.sparrow.rest.command.mixins.wrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.nnest.sparrow.command.document.query.Example;
 import com.github.nnest.sparrow.command.document.query.ExampleType;
-import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMatch;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 
 /**
@@ -46,7 +45,7 @@ public class CommonTermsWrapper extends AbstractChainQueryExampleWrapper {
 	}
 
 	/**
-	 * wrapped single match, only for {@linkplain AbstractSingleMatch}
+	 * wrapped common terms, only for {@linkplain CommonTerms}
 	 * 
 	 * @author brad.wu
 	 * @since 0.0.1
@@ -60,7 +59,7 @@ public class CommonTermsWrapper extends AbstractChainQueryExampleWrapper {
 		}
 
 		/**
-		 * @return the match
+		 * @return the terms
 		 */
 		public CommonTerms getTerms() {
 			return terms;

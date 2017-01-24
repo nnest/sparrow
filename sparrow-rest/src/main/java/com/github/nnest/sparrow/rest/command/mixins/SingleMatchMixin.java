@@ -3,8 +3,7 @@
  */
 package com.github.nnest.sparrow.rest.command.mixins;
 
-import java.util.Set;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,24 +16,26 @@ import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
 import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.Rewrite;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
-import com.github.nnest.sparrow.command.document.query.fulltext.AbstractMultiMatch;
+import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMatch;
+import com.github.nnest.sparrow.command.document.query.fulltext.Match;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.ExampleTextConjunctionSerializer;
-import com.github.nnest.sparrow.rest.command.mixins.serialize.ExampleTypeSeralizer;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.FuzzinessSerializer;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.MinimumShouldMatchSerializer;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.RewriteSerializer;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.ZeroTermsQuerySerializer;
 
 /**
- * best fields match mixin, see {@linkplain AbstractMultiMatch}
+ * single match mixin. all methods signature are same as them in
+ * {@linkplain AbstractSingleMatch}
  * 
  * @author brad.wu
  * @since 0.0.1
  * @version 0.0.1
+ * @see Match
  */
 @JsonInclude(Include.NON_NULL)
 @JsonNaming(SnakeCaseStrategy.class)
-public interface AbstractMultiMatchMixin {
+public interface SingleMatchMixin {
 	/**
 	 * get analyzer name
 	 * 
@@ -65,17 +66,16 @@ public interface AbstractMultiMatchMixin {
 	 * 
 	 * @return
 	 */
-	@JsonProperty("type")
-	@JsonSerialize(using = ExampleTypeSeralizer.class)
+	@JsonIgnore
 	ExampleType getExampleType();
 
 	/**
-	 * get field names
+	 * get field name
 	 * 
 	 * @return
 	 */
-	@JsonProperty("fields")
-	Set<String> getFieldNames();
+	@JsonIgnore
+	String getFieldName();
 
 	/**
 	 * get fuzziness
@@ -101,6 +101,14 @@ public interface AbstractMultiMatchMixin {
 	@JsonProperty("fuzzy_rewrite")
 	@JsonSerialize(using = RewriteSerializer.class)
 	Rewrite getRewrite();
+
+	/**
+	 * get transpositions
+	 * 
+	 * @return transpositions
+	 */
+	@JsonProperty("fuzzy_transpositions")
+	Boolean getTranspositions();
 
 	/**
 	 * get zero terms query
