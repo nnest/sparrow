@@ -49,7 +49,10 @@ import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunct
 import com.github.nnest.sparrow.command.document.query.attrs.ParseFeatureFlag;
 import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
 import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
+import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.ValuedFuzziness;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.ConstantRewrite;
+import com.github.nnest.sparrow.command.document.query.attrs.rewrite.TopTermsRewrite;
+import com.github.nnest.sparrow.command.document.query.attrs.rewrite.TopTermsRewrite.DefaultTopTermsRewriteType;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.CombinationMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MultipleCombinationMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.NumericMinimumShouldMatch;
@@ -58,6 +61,11 @@ import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.command.document.query.fulltext.Match;
 import com.github.nnest.sparrow.command.document.query.fulltext.MatchPhrase;
 import com.github.nnest.sparrow.command.document.query.fulltext.MatchPhrasePrefix;
+import com.github.nnest.sparrow.command.document.query.fulltext.MultiMatchBestFields;
+import com.github.nnest.sparrow.command.document.query.fulltext.MultiMatchCrossFields;
+import com.github.nnest.sparrow.command.document.query.fulltext.MultiMatchMostFields;
+import com.github.nnest.sparrow.command.document.query.fulltext.MultiMatchPhrase;
+import com.github.nnest.sparrow.command.document.query.fulltext.MultiMatchPhrasePrefix;
 import com.github.nnest.sparrow.command.document.query.fulltext.QueryString;
 import com.github.nnest.sparrow.command.document.query.fulltext.SimpleQueryString;
 import com.github.nnest.sparrow.command.indices.DropIndex;
@@ -730,6 +738,178 @@ public class ElasticSearchConnectTest {
 						.withFlags(ParseFeatureFlag.AND, ParseFeatureFlag.OR, ParseFeatureFlag.PREFIX) //
 						.withLenient(Boolean.TRUE) //
 						.withQuoteFieldSuffix(".*") //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test027BestFields() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MultiMatchBestFields("user") //
+						.with(ExampleTextConjunction.OR)//
+						.with(ValuedFuzziness.valueOf(1)) //
+						.with(NumericMinimumShouldMatch.valueOf(1)) //
+						.with(ConstantRewrite.SCORING_BOOLEAN) //
+						.with(ZeroTermsQuery.NONE) //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withCutoffFrequency(new BigDecimal("0.001")) //
+						.withFieldNames("message") //
+						.withLenient(Boolean.TRUE) //
+						.withMaxExpansions(50) //
+						.withPrefixLength(1) //
+						.withSlop(1) //
+						.withTieBreaker(new BigDecimal("0.3")) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test028MostFields() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MultiMatchMostFields("user") //
+						.with(ExampleTextConjunction.OR)//
+						.with(ValuedFuzziness.valueOf(1)) //
+						.with(NumericMinimumShouldMatch.valueOf(1)) //
+						.with(ConstantRewrite.SCORING_BOOLEAN) //
+						.with(ZeroTermsQuery.NONE) //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withCutoffFrequency(new BigDecimal("0.001")) //
+						.withFieldNames("message") //
+						.withLenient(Boolean.TRUE) //
+						.withMaxExpansions(50) //
+						.withPrefixLength(1) //
+						.withSlop(1) //
+						.withTieBreaker(new BigDecimal("0.3")) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test029CrossFields() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MultiMatchCrossFields("user") //
+						.with(ExampleTextConjunction.OR)//
+						.with(NumericMinimumShouldMatch.valueOf(1)) //
+						.with(new TopTermsRewrite(DefaultTopTermsRewriteType.BLENDED_FREQUENCY, 10)) //
+						.with(ZeroTermsQuery.NONE) //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withCutoffFrequency(new BigDecimal("0.001")) //
+						.withFieldNames("message") //
+						.withLenient(Boolean.TRUE) //
+						.withMaxExpansions(50) //
+						.withPrefixLength(1) //
+						.withSlop(1) //
+						.withTieBreaker(new BigDecimal("0.3")) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test030MultiPhrase() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MultiMatchPhrase("user") //
+						.with(ExampleTextConjunction.OR)//
+						.with(NumericMinimumShouldMatch.valueOf(1)) //
+						.with(new TopTermsRewrite(DefaultTopTermsRewriteType.BOOST, 10)) //
+						.with(ZeroTermsQuery.NONE) //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withCutoffFrequency(new BigDecimal("0.001")) //
+						.withFieldNames("message") //
+						.withLenient(Boolean.TRUE) //
+						.withMaxExpansions(50) //
+						.withPrefixLength(1) //
+						.withSlop(1) //
+						.withTieBreaker(new BigDecimal("0.3")) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test031MultiPhrasePrefix() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MultiMatchPhrasePrefix("user") //
+						.with(ExampleTextConjunction.OR)//
+						.with(NumericMinimumShouldMatch.valueOf(1)) //
+						.with(new TopTermsRewrite(DefaultTopTermsRewriteType.DEFAULT, 10)) //
+						.with(ZeroTermsQuery.NONE) //
+						.withAnalyzerName("standard") //
+						.withBoost(new BigDecimal("1.2")) //
+						.withCutoffFrequency(new BigDecimal("0.001")) //
+						.withFieldNames("message") //
+						.withLenient(Boolean.TRUE) //
+						.withMaxExpansions(50) //
+						.withPrefixLength(1) //
+						.withSlop(1) //
+						.withTieBreaker(new BigDecimal("0.3")) //
 		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
 
 		ElasticCommandResult result = client.execute(cmd);

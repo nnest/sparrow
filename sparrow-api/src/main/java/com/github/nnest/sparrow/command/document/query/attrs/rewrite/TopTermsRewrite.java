@@ -73,20 +73,20 @@ public class TopTermsRewrite implements Rewrite {
 	}
 
 	/**
-	 * constant top terms rewrite type
+	 * default valued rewrite type
 	 * 
 	 * @author brad.wu
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	public enum ConstantTopTermsRewriteType implements TopTermsRewriteType {
+	public enum DefaultTopTermsRewriteType implements TopTermsRewriteType {
 		DEFAULT("top_terms"), //
 		BOOST("top_terms_boost"), //
-		BLENDED_FREQUENCY("blended_freqs");
+		BLENDED_FREQUENCY("top_terms_blended_freqs");
 
 		private String name = null;
 
-		private ConstantTopTermsRewriteType(String name) {
+		private DefaultTopTermsRewriteType(String name) {
 			this.name = name;
 		}
 

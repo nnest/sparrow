@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.fulltext.AbstractMultiMatch;
 import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMatch;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.command.document.query.fulltext.QueryString;
@@ -25,6 +26,7 @@ import com.github.nnest.sparrow.rest.command.document.RestCommandQuery;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdate;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdateByScript;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
+import com.github.nnest.sparrow.rest.command.mixins.AbstractMultiMatchMixin;
 import com.github.nnest.sparrow.rest.command.mixins.AbstractSingleMatchMixin;
 import com.github.nnest.sparrow.rest.command.mixins.CommonTermsMixin;
 import com.github.nnest.sparrow.rest.command.mixins.ElasticScriptMixin;
@@ -70,6 +72,7 @@ public class RestCommandUtil {
 				.addMixIn(CommonTerms.class, CommonTermsMixin.class) //
 				.addMixIn(QueryString.class, QueryStringMixin.class) //
 				.addMixIn(SimpleQueryString.class, QueryStringMixin.class) //
+				.addMixIn(AbstractMultiMatch.class, AbstractMultiMatchMixin.class) //
 				.registerModule(new SimpleModule().setSerializerModifier(new SingleMatchSerializerModifier())) //
 				.registerModule(new SimpleModule().setSerializerModifier(new CommonTermsSerializerModifier()));
 
