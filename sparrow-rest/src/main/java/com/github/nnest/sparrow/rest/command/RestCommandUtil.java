@@ -3,8 +3,6 @@
  */
 package com.github.nnest.sparrow.rest.command;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,11 +22,11 @@ import com.github.nnest.sparrow.rest.command.document.RestCommandQuery;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdate;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdateByScript;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
-import com.github.nnest.sparrow.rest.command.mixins.ElasticScriptMixin;
 import com.github.nnest.sparrow.rest.command.mixins.AbstractSingleMatchMixin;
-import com.github.nnest.sparrow.rest.command.mixins.QueryExampleWrapper;
-import com.github.nnest.sparrow.rest.command.mixins.SingleMatchWrapper;
+import com.github.nnest.sparrow.rest.command.mixins.ElasticScriptMixin;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.SingleMatchSerializerModifier;
+import com.github.nnest.sparrow.rest.command.mixins.wrapper.QueryExampleWrapper;
+import com.github.nnest.sparrow.rest.command.mixins.wrapper.SingleMatchWrapper;
 import com.google.common.collect.Maps;
 
 /**
@@ -42,7 +40,7 @@ import com.google.common.collect.Maps;
 public class RestCommandUtil {
 	private static Map<ElasticCommandKind, RestCommand> commands = Maps.newHashMap();
 	private static ObjectMapper objectMapper = new ObjectMapper();
-	private static List<QueryExampleWrapper> exampleWrappers = new ArrayList<>();
+	private static QueryExampleWrapper exampleWrapper = null;
 
 	static {
 		// document
@@ -64,7 +62,7 @@ public class RestCommandUtil {
 		objectMapper.addMixIn(AbstractSingleMatch.class, AbstractSingleMatchMixin.class);
 		objectMapper.registerModule(new SimpleModule().setSerializerModifier(new SingleMatchSerializerModifier()));
 
-		exampleWrappers.add(new SingleMatchWrapper());
+		exampleWrapper = new SingleMatchWrapper();
 	}
 
 	/**
@@ -103,10 +101,18 @@ public class RestCommandUtil {
 	}
 
 	/**
-	 * @return the exampleWrappers
+	 * @return the exampleWrapper
 	 */
-	public static List<QueryExampleWrapper> getExampleWrappers() {
-		return exampleWrappers;
+	public static QueryExampleWrapper getExampleWrapper() {
+		return exampleWrapper;
+	}
+
+	/**
+	 * @param exampleWrapper
+	 *            the exampleWrapper to set
+	 */
+	public static void setExampleWrapper(QueryExampleWrapper exampleWrapper) {
+		RestCommandUtil.exampleWrapper = exampleWrapper;
 	}
 
 	/**
@@ -127,11 +133,6 @@ public class RestCommandUtil {
 	 */
 	@SuppressWarnings("unchecked")
 	public static Example wrapExample(Example example) {
-		for (QueryExampleWrapper wrapper : getExampleWrappers()) {
-			if (wrapper.accept(example)) {
-				return wrapper.wrap(example);
-			}
-		}
-		return example;
+		return getExampleWrapper().wrap(example);
 	}
 }

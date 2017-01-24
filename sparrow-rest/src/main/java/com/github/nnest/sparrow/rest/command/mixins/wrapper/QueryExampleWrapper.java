@@ -1,4 +1,4 @@
-package com.github.nnest.sparrow.rest.command.mixins;
+package com.github.nnest.sparrow.rest.command.mixins.wrapper;
 
 import com.github.nnest.sparrow.command.document.query.Example;
 
@@ -12,15 +12,6 @@ import com.github.nnest.sparrow.command.document.query.Example;
  * @version 0.0.1
  */
 public interface QueryExampleWrapper<T extends Example> {
-	/**
-	 * accept example or not
-	 * 
-	 * @param example
-	 *            example
-	 * @return example
-	 */
-	boolean accept(T example);
-
 	/**
 	 * wrap example
 	 * 
