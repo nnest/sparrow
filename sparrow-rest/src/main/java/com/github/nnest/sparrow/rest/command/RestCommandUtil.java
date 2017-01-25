@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.compound.AbstractCompoundQuery;
 import com.github.nnest.sparrow.command.document.query.fulltext.AbstractMultiMatch;
 import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMatch;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
@@ -31,6 +32,7 @@ import com.github.nnest.sparrow.rest.command.document.RestCommandUpdate;
 import com.github.nnest.sparrow.rest.command.document.RestCommandUpdateByScript;
 import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
 import com.github.nnest.sparrow.rest.command.mixins.CommonTermsMixin;
+import com.github.nnest.sparrow.rest.command.mixins.CompoundQueryMixin;
 import com.github.nnest.sparrow.rest.command.mixins.ElasticScriptMixin;
 import com.github.nnest.sparrow.rest.command.mixins.MultiMatchMixin;
 import com.github.nnest.sparrow.rest.command.mixins.QueryExistMixin;
@@ -84,6 +86,7 @@ public class RestCommandUtil {
 				.addMixIn(Terms.class, TermsMixin.class) //
 				.addMixIn(TermsLookupExternal.class, TermsMixin.class) //
 				.addMixIn(TermLevelQueryExist.class, QueryExistMixin.class) //
+				.addMixIn(AbstractCompoundQuery.class, CompoundQueryMixin.class) //
 				.registerModule(new SimpleModule() {
 					private static final long serialVersionUID = -6766348162611371496L;
 
@@ -99,7 +102,10 @@ public class RestCommandUtil {
 					}
 				});
 
-		exampleWrapper = new TermLevelQueryWrapper(new CommonTermsWrapper(new SingleMatchWrapper()));
+		exampleWrapper = new TermLevelQueryWrapper() //
+				.next(new CommonTermsWrapper()) //
+				.next(new SingleMatchWrapper()) //
+				.first();
 	}
 
 	/**

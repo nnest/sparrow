@@ -16,6 +16,7 @@ import com.github.nnest.sparrow.command.document.query.Example;
 public abstract class AbstractChainQueryExampleWrapper extends AbstractQueryExampleWrapper
 		implements ChainQueryExampleWrapper {
 	private ChainQueryExampleWrapper next = null;
+	private ChainQueryExampleWrapper previous = null;
 
 	public AbstractChainQueryExampleWrapper() {
 	}
@@ -23,7 +24,7 @@ public abstract class AbstractChainQueryExampleWrapper extends AbstractQueryExam
 	public AbstractChainQueryExampleWrapper(ChainQueryExampleWrapper nextWrapper) {
 		assert nextWrapper != null : "Next wrapper cannot be null.";
 
-		this.setNext(nextWrapper);
+		this.next(nextWrapper);
 	}
 
 	/**
@@ -69,11 +70,59 @@ public abstract class AbstractChainQueryExampleWrapper extends AbstractQueryExam
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper#setNext(com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper)
+	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper#next(com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper)
 	 */
 	@Override
-	public void setNext(ChainQueryExampleWrapper nextWrapper) {
+	public ChainQueryExampleWrapper next(ChainQueryExampleWrapper nextWrapper) {
 		this.next = nextWrapper;
+		if (nextWrapper.getPrevious() != this) {
+			nextWrapper.previous(this);
+		}
+		return this.next;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper#getPrevious()
+	 */
+	@Override
+	public ChainQueryExampleWrapper getPrevious() {
+		return this.previous;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper#previous(com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper)
+	 */
+	@Override
+	public ChainQueryExampleWrapper previous(ChainQueryExampleWrapper previousWrapper) {
+		this.previous = previousWrapper;
+		if (previousWrapper.getNext() != this) {
+			previousWrapper.next(this);
+		}
+		return this.previous;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper#first()
+	 */
+	@Override
+	public ChainQueryExampleWrapper first() {
+		return this.previous != null ? previous.first() : this;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper#last()
+	 */
+	@Override
+	public ChainQueryExampleWrapper last() {
+		return this.next != null ? next.last() : this;
 	}
 
 	/**
@@ -86,6 +135,15 @@ public abstract class AbstractChainQueryExampleWrapper extends AbstractQueryExam
 	}
 
 	/**
+	 * has previous wrapper
+	 * 
+	 * @return has
+	 */
+	protected boolean hasPrevious() {
+		return this.getPrevious() != null;
+	}
+
+	/**
 	 * (non-Javadoc)
 	 * 
 	 * @see com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper#twist(com.github.nnest.sparrow.rest.command.mixins.wrapper.ChainQueryExampleWrapper)
@@ -94,14 +152,8 @@ public abstract class AbstractChainQueryExampleWrapper extends AbstractQueryExam
 	public void twist(ChainQueryExampleWrapper wrapper) {
 		ChainQueryExampleWrapper originalNextWrapper = this.getNext();
 		// let new as new next wrapper
-		this.setNext(wrapper);
+		this.next(wrapper);
 		// find the end of new next wrapper
-		ChainQueryExampleWrapper endOfNewWrapper = wrapper;
-		ChainQueryExampleWrapper nextOfNewWrapper = wrapper.getNext();
-		while (nextOfNewWrapper != null) {
-			endOfNewWrapper = nextOfNewWrapper;
-			nextOfNewWrapper = nextOfNewWrapper.getNext();
-		}
-		endOfNewWrapper.setNext(originalNextWrapper);
+		wrapper.last().next(originalNextWrapper);
 	}
 }

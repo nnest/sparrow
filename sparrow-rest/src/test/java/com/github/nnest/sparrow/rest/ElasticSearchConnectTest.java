@@ -58,6 +58,7 @@ import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.Combina
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MultipleCombinationMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.NumericMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.PercentageMinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.compound.ConstantScore;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.command.document.query.fulltext.Match;
 import com.github.nnest.sparrow.command.document.query.fulltext.MatchPhrase;
@@ -1109,6 +1110,30 @@ public class ElasticSearchConnectTest {
 						.withBoost(new BigDecimal("1.2")) //
 						.with(ConstantRewrite.CONSTANT_SCORE) //
 						.withExampleText("2.*") //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test040ConstantScore() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new ConstantScore( //
+						new Term("message") //
+								.withExampleText("user") //
+				).withBoost(new BigDecimal("1.2")) //
 		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
 
 		ElasticCommandResult result = client.execute(cmd);

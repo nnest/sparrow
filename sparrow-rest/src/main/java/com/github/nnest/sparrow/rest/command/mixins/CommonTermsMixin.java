@@ -29,7 +29,7 @@ public interface CommonTermsMixin {
 	/**
 	 * get analyzer name
 	 * 
-	 * @return
+	 * @return analyzer name
 	 */
 	@JsonProperty("analyzer")
 	String getAnalyzerName();
@@ -37,7 +37,7 @@ public interface CommonTermsMixin {
 	/**
 	 * get example text
 	 * 
-	 * @return
+	 * @return example text
 	 */
 	@JsonProperty("query")
 	String getExampleText();
@@ -45,7 +45,7 @@ public interface CommonTermsMixin {
 	/**
 	 * get example type
 	 * 
-	 * @return
+	 * @return example type
 	 */
 	@JsonIgnore
 	ExampleType getExampleType();
@@ -53,7 +53,7 @@ public interface CommonTermsMixin {
 	/**
 	 * get field name
 	 * 
-	 * @return
+	 * @return field name
 	 */
 	@JsonIgnore
 	String getFieldName();

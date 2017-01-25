@@ -22,8 +22,40 @@ public interface ChainQueryExampleWrapper extends QueryExampleWrapper {
 	 * set next wrapper
 	 * 
 	 * @param nextWrapper
+	 *            next wrapper
+	 * @return the next wrapper
 	 */
-	void setNext(ChainQueryExampleWrapper nextWrapper);
+	ChainQueryExampleWrapper next(ChainQueryExampleWrapper nextWrapper);
+
+	/**
+	 * get previous wrapper
+	 * 
+	 * @return
+	 */
+	ChainQueryExampleWrapper getPrevious();
+
+	/**
+	 * set previous wrapper
+	 * 
+	 * @param previousWrapper
+	 *            previous wrapper
+	 * @return the previous wrapper
+	 */
+	ChainQueryExampleWrapper previous(ChainQueryExampleWrapper previousWrapper);
+
+	/**
+	 * get first wrapper of this chain
+	 * 
+	 * @return first
+	 */
+	ChainQueryExampleWrapper first();
+
+	/**
+	 * get last wrapper of this chain
+	 * 
+	 * @return last
+	 */
+	ChainQueryExampleWrapper last();
 
 	/**
 	 * twist a new wrapper into current chain. the new wrapper should be the new
