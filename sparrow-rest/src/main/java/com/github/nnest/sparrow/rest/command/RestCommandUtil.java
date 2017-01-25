@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.MatchAll;
+import com.github.nnest.sparrow.command.document.query.MatchNone;
 import com.github.nnest.sparrow.command.document.query.attrs.score.ScoreFunction;
 import com.github.nnest.sparrow.command.document.query.compound.AbstractCompoundQuery;
 import com.github.nnest.sparrow.command.document.query.fulltext.AbstractMultiMatch;
@@ -16,6 +18,7 @@ import com.github.nnest.sparrow.command.document.query.fulltext.AbstractSingleMa
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.command.document.query.fulltext.QueryString;
 import com.github.nnest.sparrow.command.document.query.fulltext.SimpleQueryString;
+import com.github.nnest.sparrow.command.document.query.joining.AbstractJoiningQuery;
 import com.github.nnest.sparrow.command.document.query.term.AbstractTermLevelQuery;
 import com.github.nnest.sparrow.command.document.query.term.TermLevelQueryExist;
 import com.github.nnest.sparrow.command.document.query.term.Terms;
@@ -35,6 +38,8 @@ import com.github.nnest.sparrow.rest.command.indices.RestCommandDropIndex;
 import com.github.nnest.sparrow.rest.command.mixins.CommonTermsMixin;
 import com.github.nnest.sparrow.rest.command.mixins.CompoundQueryMixin;
 import com.github.nnest.sparrow.rest.command.mixins.ElasticScriptMixin;
+import com.github.nnest.sparrow.rest.command.mixins.JoiningQueryMixin;
+import com.github.nnest.sparrow.rest.command.mixins.MatchAllAndNoneMixin;
 import com.github.nnest.sparrow.rest.command.mixins.MultiMatchMixin;
 import com.github.nnest.sparrow.rest.command.mixins.QueryExistMixin;
 import com.github.nnest.sparrow.rest.command.mixins.QueryStringMixin;
@@ -90,6 +95,9 @@ public class RestCommandUtil {
 				.addMixIn(TermLevelQueryExist.class, QueryExistMixin.class) //
 				.addMixIn(AbstractCompoundQuery.class, CompoundQueryMixin.class) //
 				.addMixIn(ScoreFunction.class, ScoreFunctionMixin.class) //
+				.addMixIn(MatchAll.class, MatchAllAndNoneMixin.class) //
+				.addMixIn(MatchNone.class, MatchAllAndNoneMixin.class) //
+				.addMixIn(AbstractJoiningQuery.class, JoiningQueryMixin.class) //
 				.registerModule(new SimpleModule() {
 					private static final long serialVersionUID = -6766348162611371496L;
 

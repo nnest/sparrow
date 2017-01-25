@@ -30,6 +30,14 @@ import com.github.nnest.sparrow.rest.command.mixins.serialize.ScoreModifierSeria
 @JsonNaming(SnakeCaseStrategy.class)
 public interface ScoreFunctionMixin {
 	/**
+	 * get decay field name, from {@linkplain DecayFunction}
+	 * 
+	 * @return field name
+	 */
+	@JsonIgnore
+	String getFieldName();
+
+	/**
 	 * get field names, from {@linkplain FieldValueFactorFunction}
 	 * 
 	 * @return field names
@@ -52,12 +60,4 @@ public interface ScoreFunctionMixin {
 	 */
 	@JsonIgnore
 	DecayFunctionType getType();
-
-	/**
-	 * get decay field name, from {@linkplain DecayFunction}
-	 * 
-	 * @return field name
-	 */
-	@JsonIgnore
-	String getFieldName();
 }

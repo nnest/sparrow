@@ -55,14 +55,6 @@ public interface TermsMixin {
 	String getFieldName();
 
 	/**
-	 * get external document terms
-	 * 
-	 * @return
-	 */
-	@JsonIgnore
-	List<ExternalDocumentTerm> getTerms();
-
-	/**
 	 * get rewrite
 	 * 
 	 * @return rewrite
@@ -70,4 +62,12 @@ public interface TermsMixin {
 	@JsonProperty("rewrite")
 	@JsonSerialize(using = RewriteSerializer.class)
 	Rewrite getRewrite();
+
+	/**
+	 * get external document terms
+	 * 
+	 * @return
+	 */
+	@JsonIgnore
+	List<ExternalDocumentTerm> getTerms();
 }

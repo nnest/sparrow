@@ -28,6 +28,7 @@ import com.github.nnest.sparrow.command.document.query.compound.ConstantScore;
 import com.github.nnest.sparrow.command.document.query.compound.DisMax;
 import com.github.nnest.sparrow.command.document.query.compound.FunctionScore;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
+import com.github.nnest.sparrow.command.document.query.joining.AbstractExampleJoiningQuery;
 import com.github.nnest.sparrow.command.document.query.term.Range;
 import com.github.nnest.sparrow.command.document.query.term.Terms;
 import com.github.nnest.sparrow.command.document.query.term.TermsLookupExternal;
@@ -79,6 +80,9 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 		// function score
 		this.withFunctionScore(beanDesc, beanProperties);
 		this.withNestedScoreFunction(beanDesc, beanProperties);
+
+		// joining query
+		this.withExampleJoiningQuery(beanDesc, beanProperties);
 
 		return super.changeProperties(config, beanDesc, beanProperties);
 	}
@@ -600,6 +604,30 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 	}
 
 	/**
+	 * with example joining query
+	 * 
+	 * @param beanDesc
+	 *            bean description
+	 * @param beanProperties
+	 *            bean properties
+	 */
+	protected void withExampleJoiningQuery(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+		this.withNestedExampleThings(beanDesc, beanProperties,
+				Lists.newArrayList(new NestedExampleThing(AbstractExampleJoiningQuery.class, "example", "query",
+						new NestedExampleVisitor() {
+							/**
+							 * (non-Javadoc)
+							 * 
+							 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+							 */
+							@SuppressWarnings("rawtypes")
+							public Object get(Object bean) {
+								return ((AbstractExampleJoiningQuery) bean).getExample();
+							}
+						})));
+	}
+
+	/**
 	 * with nested example things
 	 * 
 	 * @param beanDesc
@@ -726,8 +754,12 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 		@SuppressWarnings("rawtypes")
 		@Override
 		public void serializeAsField(Object bean, JsonGenerator gen, SerializerProvider prov) throws Exception {
-			gen.writeFieldName(this.getFieldName());
 			Object nestedExample = this.getNestedExample(bean);
+			if (nestedExample == null) {
+				return;
+			}
+
+			gen.writeFieldName(this.getFieldName());
 			if (nestedExample instanceof Example) {
 				// a single example
 				this.writeExample(gen, (Example) nestedExample);
@@ -737,6 +769,13 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 				Iterator nestedExamples = ((Iterable) nestedExample).iterator();
 				while (nestedExamples.hasNext()) {
 					this.writeExample(gen, (Example) nestedExamples.next());
+				}
+				gen.writeEndArray();
+			} else if (nestedExample.getClass().isArray()) {
+				gen.writeStartArray();
+				Object[] examples = (Object[]) nestedExample;
+				for (Object example : examples) {
+					this.writeExample(gen, (Example) example);
 				}
 				gen.writeEndArray();
 			}

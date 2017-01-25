@@ -45,6 +45,8 @@ import com.github.nnest.sparrow.command.document.Query;
 import com.github.nnest.sparrow.command.document.Update;
 import com.github.nnest.sparrow.command.document.UpdateByScript;
 import com.github.nnest.sparrow.command.document.UpdateResultData;
+import com.github.nnest.sparrow.command.document.query.MatchAll;
+import com.github.nnest.sparrow.command.document.query.MatchNone;
 import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
 import com.github.nnest.sparrow.command.document.query.attrs.ParseFeatureFlag;
 import com.github.nnest.sparrow.command.document.query.attrs.RegexpFlag;
@@ -78,6 +80,10 @@ import com.github.nnest.sparrow.command.document.query.fulltext.MultiMatchPhrase
 import com.github.nnest.sparrow.command.document.query.fulltext.MultiMatchPhrasePrefix;
 import com.github.nnest.sparrow.command.document.query.fulltext.QueryString;
 import com.github.nnest.sparrow.command.document.query.fulltext.SimpleQueryString;
+import com.github.nnest.sparrow.command.document.query.joining.HasChild;
+import com.github.nnest.sparrow.command.document.query.joining.HasParent;
+import com.github.nnest.sparrow.command.document.query.joining.Nested;
+import com.github.nnest.sparrow.command.document.query.joining.ParentId;
 import com.github.nnest.sparrow.command.document.query.term.Prefix;
 import com.github.nnest.sparrow.command.document.query.term.Range;
 import com.github.nnest.sparrow.command.document.query.term.Regexp;
@@ -1280,6 +1286,124 @@ public class ElasticSearchConnectTest {
 		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
 
 		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test(expected = ElasticCommandException.class)
+	public void test045Nested() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new Nested("obj1",
+						new Bool() //
+								.withMust(new Match("blue").withFieldName("obj1.name"), //
+										new Range("obj1.count").withMin("5")) //
+				) //
+						.with(ScoreMode.MAX) //
+						.withIgnoreUnmapped(Boolean.TRUE) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test(expected = ElasticCommandException.class)
+	public void test046HasParent() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new HasParent("tweet", new Term("tag").withExampleText("sth") //
+				).withIgnoreUnmapped(Boolean.TRUE) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test(expected = ElasticCommandException.class)
+	public void test047HasChild() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new HasChild("tweet", new Term("tag").withExampleText("sth") //
+				).withIgnoreUnmapped(Boolean.TRUE) //
+						.with(ScoreMode.MIN) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test(expected = ElasticCommandException.class)
+	public void test048ParentId() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new ParentId("tweet", "1") //
+						.withIgnoreUnmapped(Boolean.TRUE) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test049MatchAllAndNone() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MatchAll() //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		cmd = new Query( //
+				new MatchNone() //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		result = client.execute(cmd);
 		assertTrue(result.getCommand() == cmd);
 
 		// MultiGetResponse response = result.getResultData();

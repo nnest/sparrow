@@ -56,6 +56,23 @@ public interface TermLevelQueryMixin {
 	String getFieldName();
 
 	/**
+	 * get regexp flags, from {@linkplain Regexp}
+	 * 
+	 * @return regexp flags
+	 */
+	@JsonSerialize(using = RegexpFlagsSerializer.class)
+	Set<RegexpFlag> getFlags();
+
+	/**
+	 * get rewrite
+	 * 
+	 * @return rewrite
+	 */
+	@JsonProperty("rewrite")
+	@JsonSerialize(using = RewriteSerializer.class)
+	Rewrite getRewrite();
+
+	/**
 	 * is max include, from {@linkplain Range}
 	 * 
 	 * @return max include
@@ -70,21 +87,4 @@ public interface TermLevelQueryMixin {
 	 */
 	@JsonIgnore
 	boolean isMinInclude();
-
-	/**
-	 * get rewrite
-	 * 
-	 * @return rewrite
-	 */
-	@JsonProperty("rewrite")
-	@JsonSerialize(using = RewriteSerializer.class)
-	Rewrite getRewrite();
-
-	/**
-	 * get regexp flags, from {@linkplain Regexp}
-	 * 
-	 * @return regexp flags
-	 */
-	@JsonSerialize(using = RegexpFlagsSerializer.class)
-	Set<RegexpFlag> getFlags();
 }

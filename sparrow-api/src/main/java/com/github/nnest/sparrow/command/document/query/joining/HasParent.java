@@ -17,12 +17,12 @@ import com.google.common.base.Strings;
  * @version 0.0.1
  */
 public class HasParent extends AbstractExampleJoiningQuery<HasParent> {
-	private String type = null;
+	private String parentType = null;
 	private Boolean score = null;
 
-	public HasParent(String type, Example example) {
+	public HasParent(String parentType, Example example) {
 		super(example);
-		this.withType(type);
+		this.withParentType(parentType);
 	}
 
 	/**
@@ -38,19 +38,19 @@ public class HasParent extends AbstractExampleJoiningQuery<HasParent> {
 	/**
 	 * @return the type
 	 */
-	public String getType() {
-		return type;
+	public String getParentType() {
+		return parentType;
 	}
 
 	/**
-	 * @param type
+	 * @param parentType
 	 *            the type to set
 	 * @return this
 	 */
-	public HasParent withType(String type) {
-		assert Strings.nullToEmpty(type).trim().length() != 0 : "Type cannot be null or empty.";
+	public HasParent withParentType(String parentType) {
+		assert Strings.nullToEmpty(parentType).trim().length() != 0 : "Parent type cannot be null or empty.";
 
-		this.type = type;
+		this.parentType = parentType;
 		return this;
 	}
 

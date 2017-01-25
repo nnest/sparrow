@@ -11,15 +11,13 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.github.nnest.sparrow.command.document.query.attrs.ScoreMode;
-import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
-import com.github.nnest.sparrow.command.document.query.compound.AbstractCompoundQuery;
-import com.github.nnest.sparrow.command.document.query.compound.Bool;
-import com.github.nnest.sparrow.command.document.query.compound.FunctionScore;
-import com.github.nnest.sparrow.rest.command.mixins.serialize.MinimumShouldMatchSerializer;
+import com.github.nnest.sparrow.command.document.query.joining.AbstractJoiningQuery;
+import com.github.nnest.sparrow.command.document.query.joining.HasChild;
+import com.github.nnest.sparrow.command.document.query.joining.Nested;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.ScoreModeSerilaizer;
 
 /**
- * compound query mixin, see {@linkplain AbstractCompoundQuery}
+ * Joining query mixin, see {@linkplain AbstractJoiningQuery}
  * 
  * @author brad.wu
  * @since 0.0.1
@@ -27,15 +25,7 @@ import com.github.nnest.sparrow.rest.command.mixins.serialize.ScoreModeSerilaize
  */
 @JsonInclude(Include.NON_NULL)
 @JsonNaming(SnakeCaseStrategy.class)
-public interface CompoundQueryMixin {
-	/**
-	 * get boost mode, from {@linkplain FunctionScore}
-	 * 
-	 * @return boost mode
-	 */
-	@JsonSerialize(using = ScoreModeSerilaizer.class)
-	ScoreMode getBoostMode();
-
+public interface JoiningQueryMixin {
 	/**
 	 * get example type
 	 * 
@@ -45,17 +35,9 @@ public interface CompoundQueryMixin {
 	ExampleType getExampleType();
 
 	/**
-	 * get minimum should match. from {@linkplain Bool}
+	 * get score mode, from {@linkplain HasChild} and {@linkplain Nested}
 	 * 
-	 * @return minimum should match
-	 */
-	@JsonSerialize(using = MinimumShouldMatchSerializer.class)
-	MinimumShouldMatch getMinimumShouldMatch();
-
-	/**
-	 * get score mode, from {@linkplain FunctionScore}
-	 * 
-	 * @return score mode
+	 * @return
 	 */
 	@JsonSerialize(using = ScoreModeSerilaizer.class)
 	ScoreMode getScoreMode();
