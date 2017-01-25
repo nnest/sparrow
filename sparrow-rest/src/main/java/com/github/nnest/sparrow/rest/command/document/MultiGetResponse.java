@@ -5,9 +5,11 @@ package com.github.nnest.sparrow.rest.command.document;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.nnest.sparrow.command.document.Get;
 import com.github.nnest.sparrow.command.document.MultiGetResultData;
 import com.google.common.base.Predicate;
@@ -80,8 +82,13 @@ public class MultiGetResponse implements MultiGetResultData {
 	 * @param innerResponses
 	 *            the innerResponses to set
 	 */
-
+	@JsonDeserialize(contentAs = InnerGetResponseReceiver.class)
 	public void setInnerResponses(List<InnerGetResponse> innerResponses) {
+		// reset counting
+		count = 0;
+		successCount = 0;
+		failCount = 0;
+		
 		this.innerResponses = innerResponses;
 		if (this.innerResponses != null && this.innerResponses.size() > 0) {
 			Iterables.all(innerResponses, new Predicate<GetResponse>() {
@@ -114,8 +121,71 @@ public class MultiGetResponse implements MultiGetResultData {
 	 * @version 0.0.1
 	 */
 	public static class InnerGetResponse extends GetResponse {
-		private JsonNode jsonNode = null;
 		private Get command = null;
+
+		/**
+		 * set command.
+		 * 
+		 * @param command
+		 *            command
+		 */
+		public void setCommand(Get command) {
+			this.command = command;
+		}
+
+		/**
+		 * @return the command
+		 */
+		public Get getCommand() {
+			return command;
+		}
+	}
+
+	/**
+	 * inner get response receiver
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.1
+	 * @version 0.0.1
+	 */
+	public static class InnerGetResponseReceiver extends InnerGetResponse {
+		private InnerGetResponse get = new InnerGetResponse();
+		private JsonNode jsonNode = null;
+
+		/**
+		 * unwrap and get real {@linkplain GetResponse}
+		 * 
+		 * @return real response
+		 */
+		public InnerGetResponse unwrap() {
+			return this.get;
+		}
+
+		/**
+		 * @return the jsonNode
+		 */
+		public JsonNode getJsonNode() {
+			return jsonNode;
+		}
+
+		/**
+		 * @param jsonNode
+		 *            the jsonNode to set
+		 */
+		@JsonProperty("_source")
+		public void setJsonNode(JsonNode jsonNode) {
+			this.jsonNode = jsonNode;
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#getIndex()
+		 */
+		@Override
+		public String getIndex() {
+			return get.getIndex();
+		}
 
 		/**
 		 * (non-Javadoc)
@@ -125,7 +195,17 @@ public class MultiGetResponse implements MultiGetResultData {
 		@Override
 		@JsonProperty("_index")
 		public void setIndex(String index) {
-			super.setIndex(index);
+			get.setIndex(index);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#getType()
+		 */
+		@Override
+		public String getType() {
+			return get.getType();
 		}
 
 		/**
@@ -136,7 +216,17 @@ public class MultiGetResponse implements MultiGetResultData {
 		@Override
 		@JsonProperty("_type")
 		public void setType(String type) {
-			super.setType(type);
+			get.setType(type);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#getId()
+		 */
+		@Override
+		public String getId() {
+			return get.getId();
 		}
 
 		/**
@@ -147,7 +237,17 @@ public class MultiGetResponse implements MultiGetResultData {
 		@Override
 		@JsonProperty("_id")
 		public void setId(String id) {
-			super.setId(id);
+			get.setId(id);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#getVersion()
+		 */
+		@Override
+		public String getVersion() {
+			return get.getVersion();
 		}
 
 		/**
@@ -158,43 +258,90 @@ public class MultiGetResponse implements MultiGetResultData {
 		@Override
 		@JsonProperty("_version")
 		public void setVersion(String version) {
-			super.setVersion(version);
+			get.setVersion(version);
 		}
 
 		/**
-		 * @param jsonNode
-		 *            the jsonNode to set
-		 */
-		@JsonProperty("_source")
-		protected void setJsonNode(JsonNode jsonNode) {
-			this.jsonNode = jsonNode;
-		}
-
-		/**
-		 * get json node
+		 * (non-Javadoc)
 		 * 
-		 * @return json node
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#isFound()
 		 */
-		protected JsonNode getJsonNode() {
-			return this.jsonNode;
+		@Override
+		public boolean isFound() {
+			return get.isFound();
 		}
 
 		/**
-		 * set command.
+		 * (non-Javadoc)
 		 * 
-		 * @param command
-		 *            command
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#setFound(boolean)
 		 */
-		@JsonIgnore
-		protected void setCommand(Get command) {
-			this.command = command;
+		@Override
+		public void setFound(boolean found) {
+			get.setFound(found);
 		}
 
 		/**
-		 * @return the command
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#isSuccessful()
 		 */
+		@Override
+		public boolean isSuccessful() {
+			return get.isSuccessful();
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#getDocument()
+		 */
+		@Override
+		public <T> T getDocument() {
+			return get.getDocument();
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.GetResponse#setDocument(java.lang.Object)
+		 */
+		@Override
+		public void setDocument(Object document) {
+			get.setDocument(document);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.MultiGetResponse.InnerGetResponse#setCommand(com.github.nnest.sparrow.command.document.Get)
+		 */
+		@Override
+		public void setCommand(Get command) {
+			get.setCommand(command);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.MultiGetResponse.InnerGetResponse#getCommand()
+		 */
+		@Override
 		public Get getCommand() {
-			return command;
+			return get.getCommand();
+		}
+
+		/**
+		 * transform document
+		 * 
+		 * @param mapper
+		 *            mapper
+		 * @param documentType
+		 *            document type
+		 * @throws JsonProcessingException
+		 */
+		public void transformDocument(ObjectMapper mapper, Class<?> documentType) throws JsonProcessingException {
+			this.setDocument(mapper.treeToValue(this.getJsonNode(), documentType));
 		}
 	}
 }

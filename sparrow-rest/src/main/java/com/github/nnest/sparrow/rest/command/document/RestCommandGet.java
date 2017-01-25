@@ -36,7 +36,9 @@ public class RestCommandGet extends AbstractRestCommand<Get, GetResponse> {
 			ObjectMapper mapper = this.createResponseObjectMapper(GetResponseReceiver.class);
 			GetResponseReceiver response = (GetResponseReceiver) this
 					.completeResponse(mapper.readValue(stream, GetResponseReceiver.class), command);
-			response.transformDocument(mapper, documentDescriptor.getDocumentClass());
+			if (response.isFound()) {
+				response.transformDocument(mapper, documentDescriptor.getDocumentClass());
+			}
 			// set id value when it is null, use value of "_id"
 			this.setIdValueIfNull(response.getDocument(), documentDescriptor, new IdDetective() {
 				/**

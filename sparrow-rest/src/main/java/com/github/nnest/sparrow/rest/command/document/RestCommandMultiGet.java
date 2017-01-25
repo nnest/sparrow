@@ -25,6 +25,7 @@ import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandUtil;
 import com.github.nnest.sparrow.rest.command.document.MultiGetResponse.InnerGetResponse;
+import com.github.nnest.sparrow.rest.command.document.MultiGetResponse.InnerGetResponseReceiver;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
@@ -48,17 +49,16 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 	@Override
 	protected MultiGetResponse readResponse(MultiGet command, InputStream stream) throws ElasticExecutorException {
 		try {
-			ObjectMapper mapper = this.createResponseObjectMapper(this.getResponseClass()).copy();
+			ObjectMapper mapper = this.createResponseObjectMapper(this.getResponseClass());
 			MultiGetResponse response = mapper.readValue(stream, MultiGetResponse.class);
 			List<InnerGetResponse> innerResponses = response.getInnerResponses();
 			if (innerResponses != null) {
 				for (int index = 0, count = innerResponses.size(); index < count; index++) {
-					InnerGetResponse innerResponse = innerResponses.get(index);
+					InnerGetResponseReceiver innerResponse = (InnerGetResponseReceiver) innerResponses.get(index);
 					Get innerCommand = command.getInnerCommands().get(index);
 					innerResponse.setCommand(innerCommand);
 					if (innerResponse.isFound()) {
-						innerResponse.setDocument(
-								mapper.treeToValue(innerResponse.getJsonNode(), innerCommand.getDocumentType()));
+						innerResponse.transformDocument(mapper, innerCommand.getDocumentType());
 						// set id value when it is null, use value of "_id"
 						this.setIdValueIfNull(innerResponse.getDocument(),
 								innerResponse.getCommand().getDocumentDescriptor(), new IdDetective() {
@@ -73,9 +73,20 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 									}
 								});
 					}
-					// clear json node in inner response
-					innerResponse.setJsonNode(null);
 				}
+				// unwrap and discard json node objects in receiver
+				response.setInnerResponses(
+						Lists.transform(innerResponses, new Function<InnerGetResponse, InnerGetResponse>() {
+							/**
+							 * (non-Javadoc)
+							 * 
+							 * @see com.google.common.base.Function#apply(java.lang.Object)
+							 */
+							@Override
+							public InnerGetResponse apply(InnerGetResponse input) {
+								return ((InnerGetResponseReceiver) input).unwrap();
+							}
+						}));
 			}
 			return response;
 		} catch (Exception e) {
