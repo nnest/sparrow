@@ -9,6 +9,7 @@ import java.util.List;
 import com.github.nnest.sparrow.command.document.query.DefaultExampleType;
 import com.github.nnest.sparrow.command.document.query.Example;
 import com.github.nnest.sparrow.command.document.query.ExampleType;
+import com.google.common.collect.Lists;
 
 /**
  * boosting query
@@ -52,6 +53,18 @@ public class Boosting extends AbstractCompoundQuery<Boosting> {
 	}
 
 	/**
+	 * @param positive
+	 *            the positive to set
+	 * @return this
+	 */
+	public Boosting withPositive(Example... positive) {
+		assert positive != null && positive.length > 0 : "Positive examples cannot be null or empty.";
+
+		this.positive = Lists.newArrayList(positive);
+		return this;
+	}
+
+	/**
 	 * @return the negative
 	 */
 	public List<Example> getNegative() {
@@ -67,6 +80,20 @@ public class Boosting extends AbstractCompoundQuery<Boosting> {
 		assert negative != null && negative.size() > 0 : "Negative examples cannot be null or empty.";
 
 		this.negative = negative;
+		return this;
+	}
+
+	/**
+	 * with negative
+	 * 
+	 * @param negative
+	 *            negtaive
+	 * @return this
+	 */
+	public Boosting withNegative(Example... negative) {
+		assert negative != null && negative.length > 0 : "Negative examples cannot be null or empty.";
+
+		this.negative = Lists.newArrayList(negative);
 		return this;
 	}
 

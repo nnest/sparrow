@@ -37,4 +37,15 @@ public class RandomScoreFunction implements ScoreFunction {
 		this.seed = seed;
 		return this;
 	}
+
+	/**
+	 * value of
+	 * 
+	 * @param seed
+	 *            seed
+	 * @return random score function
+	 */
+	public static RandomScoreFunction valueOf(Long seed) {
+		return new RandomScoreFunction(seed);
+	}
 }

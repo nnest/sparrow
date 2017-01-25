@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow.rest.command.mixins.serialize;
 
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -12,8 +14,19 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.query.attrs.score.DecayFunction;
+import com.github.nnest.sparrow.command.document.query.attrs.score.FieldValueFactorFunction;
+import com.github.nnest.sparrow.command.document.query.attrs.score.NestedScoreFunction;
+import com.github.nnest.sparrow.command.document.query.attrs.score.RandomScoreFunction;
+import com.github.nnest.sparrow.command.document.query.attrs.score.ScoreFunction;
+import com.github.nnest.sparrow.command.document.query.attrs.score.ScriptScoreFunction;
+import com.github.nnest.sparrow.command.document.query.attrs.score.WeightFunction;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.compound.Bool;
+import com.github.nnest.sparrow.command.document.query.compound.Boosting;
 import com.github.nnest.sparrow.command.document.query.compound.ConstantScore;
+import com.github.nnest.sparrow.command.document.query.compound.DisMax;
+import com.github.nnest.sparrow.command.document.query.compound.FunctionScore;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.command.document.query.term.Range;
 import com.github.nnest.sparrow.command.document.query.term.Terms;
@@ -23,7 +36,10 @@ import com.github.nnest.sparrow.rest.command.RestCommandUtil;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.CommonTermsWrapper.WrappedCommonTerms;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.SingleMatchWrapper.WrappedSingleMatch;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.TermLevelQueryWrapper.WrappedTermLevelQuery;
+import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 
 /**
  * query serialzier modifier
@@ -59,7 +75,10 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 		this.withTermsLookupExternal(beanDesc, beanProperties);
 
 		// compound query
-		this.withConstantScore(beanDesc, beanProperties);
+		this.withCompoundQuery(beanDesc, beanProperties);
+		// function score
+		this.withFunctionScore(beanDesc, beanProperties);
+		this.withNestedScoreFunction(beanDesc, beanProperties);
 
 		return super.changeProperties(config, beanDesc, beanProperties);
 	}
@@ -367,27 +386,318 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 	}
 
 	/**
-	 * with constant score
+	 * with compound query
 	 * 
 	 * @param beanDesc
 	 *            bean description
 	 * @param beanProperties
 	 *            bean properties
 	 */
-	protected void withConstantScore(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
-		if (!ConstantScore.class.isAssignableFrom(beanDesc.getBeanClass())) {
+	protected void withCompoundQuery(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+		// constant score
+		this.withNestedExampleThings(beanDesc, beanProperties, Lists.newArrayList( //
+				new NestedExampleThing(ConstantScore.class, "example", "filter", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((ConstantScore) bean).getExample();
+					}
+				}), new NestedExampleThing(Boosting.class, "negative", "negative", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((Boosting) bean).getNegative();
+					}
+				}), new NestedExampleThing(Boosting.class, "positive", "positive", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((Boosting) bean).getPositive();
+					}
+				}), new NestedExampleThing(Bool.class, "must", "must", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((Bool) bean).getMust();
+					}
+				}), new NestedExampleThing(Bool.class, "must_not", "must_not", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((Bool) bean).getMustNot();
+					}
+				}), new NestedExampleThing(Bool.class, "should", "should", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((Bool) bean).getShould();
+					}
+				}), new NestedExampleThing(Bool.class, "filter", "filter", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((Bool) bean).getFilter();
+					}
+				}), new NestedExampleThing(DisMax.class, "examples", "queries", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((DisMax) bean).getExamples();
+					}
+				}), new NestedExampleThing(FunctionScore.class, "example", "query", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((FunctionScore) bean).getExample();
+					}
+				}) //
+		));
+	}
+
+	/**
+	 * with function score
+	 * 
+	 * @param beanDesc
+	 *            bean description
+	 * @param beanProperties
+	 *            bean properties
+	 */
+	protected void withFunctionScore(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+		if (!FunctionScore.class.isAssignableFrom(beanDesc.getBeanClass())) {
 			return;
 		}
 
 		for (int index = 0, count = beanProperties.size(); index < count; index++) {
 			BeanPropertyWriter property = beanProperties.get(index);
-			if ("example".equals(property.getName())) {
-				beanProperties.set(index,
-						new DefaultNestedExampleBeanPropertyWriter(property, "filter", new NestedExampleVisitor() {
-							public Example get(Object bean) {
-								return ((ConstantScore) bean).getExample();
+			if ("function".equals(property.getName())) {
+				beanProperties.set(index, //
+						new BeanPropertyWriter(property) {
+							private static final long serialVersionUID = 5278959579760436028L;
+
+							/**
+							 * (non-Javadoc)
+							 * 
+							 * @see com.fasterxml.jackson.databind.ser.BeanPropertyWriter#serializeAsField(java.lang.Object,
+							 *      com.fasterxml.jackson.core.JsonGenerator,
+							 *      com.fasterxml.jackson.databind.SerializerProvider)
+							 */
+							@Override
+							public void serializeAsField(Object bean, JsonGenerator gen, SerializerProvider prov)
+									throws Exception {
+								writeScoreFunctionAsField(((FunctionScore) bean).getFunction(), gen, prov);
 							}
-						}));
+						});
+			}
+		}
+	}
+
+	/**
+	 * with compound query
+	 * 
+	 * @param beanDesc
+	 *            bean description
+	 * @param beanProperties
+	 *            bean properties
+	 */
+	protected void withNestedScoreFunction(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+		new NestedExampleThing(NestedScoreFunction.class, "examples", "filter", new NestedExampleVisitor() {
+			/**
+			 * (non-Javadoc)
+			 * 
+			 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+			 */
+			public Object get(Object bean) {
+				return ((NestedScoreFunction) bean).getExamples();
+			}
+		}).withThing(beanDesc, beanProperties);
+
+		if (!NestedScoreFunction.class.isAssignableFrom(beanDesc.getBeanClass())) {
+			return;
+		}
+
+		for (int index = 0, count = beanProperties.size(); index < count; index++) {
+			BeanPropertyWriter property = beanProperties.get(index);
+			if ("functions".equals(property.getName())) {
+				beanProperties.set(index, //
+						new BeanPropertyWriter(property) {
+							private static final long serialVersionUID = 686705320310582411L;
+
+							/**
+							 * (non-Javadoc)
+							 * 
+							 * @see com.fasterxml.jackson.databind.ser.BeanPropertyWriter#serializeAsField(java.lang.Object,
+							 *      com.fasterxml.jackson.core.JsonGenerator,
+							 *      com.fasterxml.jackson.databind.SerializerProvider)
+							 */
+							@Override
+							public void serializeAsField(Object bean, JsonGenerator gen, SerializerProvider prov)
+									throws Exception {
+								for (ScoreFunction func : ((NestedScoreFunction) bean).getFunctions()) {
+									writeScoreFunctionAsField(func, gen, prov);
+								}
+							}
+						});
+			}
+		}
+	}
+
+	/**
+	 * write score function as a field
+	 * 
+	 * @param func
+	 *            score function
+	 * @param gen
+	 *            generator
+	 * @param prov
+	 *            provider
+	 * @throws Exception
+	 *             exception
+	 */
+	protected void writeScoreFunctionAsField(ScoreFunction func, JsonGenerator gen, SerializerProvider prov)
+			throws Exception {
+		if (func instanceof WeightFunction) {
+			gen.writeNumberField("weight", ((WeightFunction) func).getValue());
+		} else if (func instanceof RandomScoreFunction) {
+			gen.writeObjectField("random_score", func);
+		} else if (func instanceof FieldValueFactorFunction) {
+			gen.writeObjectField("field_value_factor", func);
+		} else if (func instanceof ScriptScoreFunction) {
+			gen.writeObjectField("script_score", func);
+		} else if (func instanceof DecayFunction) {
+			DecayFunction decay = (DecayFunction) func;
+			gen.writeFieldName(decay.getType().name().toLowerCase());
+			gen.writeStartObject();
+			gen.writeObjectField(decay.getFieldName(), decay);
+			gen.writeEndObject();
+		}
+	}
+
+	/**
+	 * with nested example things
+	 * 
+	 * @param beanDesc
+	 *            bean description
+	 * @param beanProperties
+	 *            bean properties
+	 * @param things
+	 */
+	protected void withNestedExampleThings(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties,
+			List<NestedExampleThing> things) {
+		Iterables.all(things, new Predicate<NestedExampleThing>() {
+			/**
+			 * (non-Javadoc)
+			 * 
+			 * @see com.google.common.base.Predicate#apply(java.lang.Object)
+			 */
+			@Override
+			public boolean apply(NestedExampleThing input) {
+				input.withThing(beanDesc, beanProperties);
+				return true;
+			}
+		});
+	}
+
+	/**
+	 * nested example thing
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.1
+	 * @version 0.0.1
+	 */
+	public static class NestedExampleThing {
+		private Class<?> thingClass = null;
+		// use name after jackson transformed
+		private String propertyName = null;
+		// the property name in final JSON
+		private String targetPropertyName = null;
+		private NestedExampleVisitor nestedExampleVisitor = null;
+
+		public NestedExampleThing(Class<?> thingClass, String propertyName, String targetPropertyName,
+				NestedExampleVisitor nestedExampleVisitor) {
+			super();
+			this.thingClass = thingClass;
+			this.propertyName = propertyName;
+			this.targetPropertyName = targetPropertyName;
+			this.nestedExampleVisitor = nestedExampleVisitor;
+		}
+
+		/**
+		 * @return the thingClass
+		 */
+		public Class<?> getThingClass() {
+			return thingClass;
+		}
+
+		/**
+		 * @return the propertyName
+		 */
+		public String getPropertyName() {
+			return propertyName;
+		}
+
+		/**
+		 * @return the targetPropertyName
+		 */
+		public String getTargetPropertyName() {
+			return targetPropertyName;
+		}
+
+		/**
+		 * @return the nestedExampleVisitor
+		 */
+		public NestedExampleVisitor getNestedExampleVisitor() {
+			return nestedExampleVisitor;
+		}
+
+		/**
+		 * with thing
+		 * 
+		 * @param beanDesc
+		 *            bean description
+		 * @param beanProperties
+		 *            bean properties
+		 */
+		public void withThing(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+			if (!this.getThingClass().isAssignableFrom(beanDesc.getBeanClass())) {
+				return;
+			}
+
+			for (int index = 0, count = beanProperties.size(); index < count; index++) {
+				BeanPropertyWriter property = beanProperties.get(index);
+				if (this.getPropertyName().equals(property.getName())) {
+					beanProperties.set(index, //
+							new DefaultNestedExampleBeanPropertyWriter(property, //
+									this.getTargetPropertyName(), //
+									this.getNestedExampleVisitor()) //
+					);
+				}
 			}
 		}
 	}
@@ -413,11 +723,28 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 		 *      com.fasterxml.jackson.core.JsonGenerator,
 		 *      com.fasterxml.jackson.databind.SerializerProvider)
 		 */
+		@SuppressWarnings("rawtypes")
 		@Override
 		public void serializeAsField(Object bean, JsonGenerator gen, SerializerProvider prov) throws Exception {
 			gen.writeFieldName(this.getFieldName());
+			Object nestedExample = this.getNestedExample(bean);
+			if (nestedExample instanceof Example) {
+				// a single example
+				this.writeExample(gen, (Example) nestedExample);
+			} else if (nestedExample instanceof Iterable) {
+				// an example iterable
+				gen.writeStartArray();
+				Iterator nestedExamples = ((Iterable) nestedExample).iterator();
+				while (nestedExamples.hasNext()) {
+					this.writeExample(gen, (Example) nestedExamples.next());
+				}
+				gen.writeEndArray();
+			}
+		}
+
+		protected void writeExample(JsonGenerator gen, Example example) throws IOException {
 			gen.writeStartObject();
-			Example wrappedExample = RestCommandUtil.wrapExample(this.getNestedExample(bean));
+			Example wrappedExample = RestCommandUtil.wrapExample(example);
 			gen.writeObjectField(wrappedExample.getExampleType().getType().toLowerCase(), wrappedExample);
 			gen.writeEndObject();
 		}
@@ -436,7 +763,7 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 		 *            original bean
 		 * @return nested example
 		 */
-		protected abstract Example getNestedExample(Object bean);
+		protected abstract Object getNestedExample(Object bean);
 	}
 
 	/**
@@ -479,7 +806,7 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 		 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.AbstractNestedExampleBeanPropertyWriter#getNestedExample(java.lang.Object)
 		 */
 		@Override
-		protected Example getNestedExample(Object bean) {
+		protected Object getNestedExample(Object bean) {
 			return this.nestedExampleVisitor.get(bean);
 		}
 	}
@@ -499,6 +826,6 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 		 *            bean
 		 * @return nested example
 		 */
-		Example get(Object bean);
+		Object get(Object bean);
 	}
 }

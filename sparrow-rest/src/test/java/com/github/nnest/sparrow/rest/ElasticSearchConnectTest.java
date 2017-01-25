@@ -48,17 +48,25 @@ import com.github.nnest.sparrow.command.document.UpdateResultData;
 import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunction;
 import com.github.nnest.sparrow.command.document.query.attrs.ParseFeatureFlag;
 import com.github.nnest.sparrow.command.document.query.attrs.RegexpFlag;
+import com.github.nnest.sparrow.command.document.query.attrs.ScoreMode;
 import com.github.nnest.sparrow.command.document.query.attrs.ZeroTermsQuery;
 import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.Fuzziness;
 import com.github.nnest.sparrow.command.document.query.attrs.fuzzy.ValuedFuzziness;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.ConstantRewrite;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.TopTermsRewrite;
 import com.github.nnest.sparrow.command.document.query.attrs.rewrite.TopTermsRewrite.DefaultTopTermsRewriteType;
+import com.github.nnest.sparrow.command.document.query.attrs.score.NestedScoreFunction;
+import com.github.nnest.sparrow.command.document.query.attrs.score.RandomScoreFunction;
+import com.github.nnest.sparrow.command.document.query.attrs.score.WeightFunction;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.CombinationMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MultipleCombinationMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.NumericMinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.PercentageMinimumShouldMatch;
+import com.github.nnest.sparrow.command.document.query.compound.Bool;
+import com.github.nnest.sparrow.command.document.query.compound.Boosting;
 import com.github.nnest.sparrow.command.document.query.compound.ConstantScore;
+import com.github.nnest.sparrow.command.document.query.compound.DisMax;
+import com.github.nnest.sparrow.command.document.query.compound.FunctionScore;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.command.document.query.fulltext.Match;
 import com.github.nnest.sparrow.command.document.query.fulltext.MatchPhrase;
@@ -1134,6 +1142,141 @@ public class ElasticSearchConnectTest {
 						new Term("message") //
 								.withExampleText("user") //
 				).withBoost(new BigDecimal("1.2")) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test041Boosting() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new Boosting() //
+						.withNegative(new Term("message") //
+								.withExampleText("user") //
+						) //
+						.withPositive(new Term("message") //
+								.withExampleText("user") //
+						) //
+						.withBoost(new BigDecimal("1.2")) //
+						.withNegativeBoost(new BigDecimal("1.3")) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test042Bool() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new Bool() //
+						.withMust(new Term("message") //
+								.withExampleText("user") //
+						) //
+						.withShould(new Term("message") //
+								.withExampleText("user") //
+						) //
+						.withMustNot(new Term("message") //
+								.withExampleText("user") //
+						) //
+						.withFilter(new Term("message") //
+								.withExampleText("user") //
+						) //
+						.withBoost(new BigDecimal("1.2")) //
+						.with(NumericMinimumShouldMatch.valueOf(1)) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test043DisMax() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new DisMax(new Term("message") //
+						.withExampleText("user")) //
+								.withBoost(new BigDecimal("1.2")) //
+								.withTieBreaker(new BigDecimal("0.3")) //
+		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		// MultiGetResponse response = result.getResultData();
+		// assertEquals(3, response.getInnerCommandCount());
+		// assertEquals(2, response.getSuccessCount());
+		// assertEquals(1, response.getFailCount());
+		// assertTrue(response.isPartialSuccessful());
+		//
+		// assertEquals("3", ((TwitterTweet)
+		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test044FunctionScore() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new FunctionScore() //
+						.with(new Term("message") //
+								.withExampleText("user") //
+						) //
+						.withBoost(new BigDecimal("1.2")) //
+						.withBoostMode(ScoreMode.AVG) //
+						// .withFunction(WeightFunction.valueOf(new
+						// BigDecimal("1"))) //
+						// .withFunction(new RandomScoreFunction()) //
+						// .withFunction(new ScriptScoreFunction( //
+						// new PainlessElasticScript() //
+						// .withScript("_score * 1.5") //
+						// .withParam("p1", "5")) //
+						// ) //
+						// .withFunction(new
+						// DecayFunction(DecayFunctionType.GAUSS, "message") //
+						// .withDecay(new BigDecimal("0.33")) //
+						// .withOffset("0") //
+						// .withOrigin("11") //
+						// .withScale("2")) //
+						.withFunctions(new NestedScoreFunction( //
+								new Term("message").withExampleText("user"), //
+								new RandomScoreFunction(), //
+								WeightFunction.valueOf(new BigDecimal("1"))))
+						.withMaxBoost(new BigDecimal("10")) //
+						.withMinScore(new BigDecimal("2")) //
+						.withScoreMode(ScoreMode.SUM) //
 		).withScope(TwitterTweet.class).withHit(TwitterTweet.class);
 
 		ElasticCommandResult result = client.execute(cmd);

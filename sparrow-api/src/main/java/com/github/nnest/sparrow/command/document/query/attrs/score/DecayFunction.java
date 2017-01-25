@@ -76,7 +76,7 @@ public class DecayFunction implements ScoreFunction {
 	 *            the origin to set
 	 * @return this
 	 */
-	public DecayFunction setOrigin(String origin) {
+	public DecayFunction withOrigin(String origin) {
 		assert Strings.nullToEmpty(origin).trim().length() != 0 : "Origin cannot be null or blank.";
 
 		this.origin = origin;
@@ -95,7 +95,7 @@ public class DecayFunction implements ScoreFunction {
 	 *            the scale to set
 	 * @return this
 	 */
-	public DecayFunction setScale(String scale) {
+	public DecayFunction withScale(String scale) {
 		assert Strings.nullToEmpty(scale).trim().length() != 0 : "Scale cannot be null or blank.";
 
 		this.scale = scale;
@@ -114,7 +114,7 @@ public class DecayFunction implements ScoreFunction {
 	 *            the offset to set
 	 * @return this
 	 */
-	public DecayFunction setOffset(String offset) {
+	public DecayFunction withOffset(String offset) {
 		assert Strings.nullToEmpty(offset).trim().length() != 0 : "Offset cannot be null or blank.";
 
 		this.offset = offset;
@@ -133,7 +133,7 @@ public class DecayFunction implements ScoreFunction {
 	 *            the decay to set
 	 * @return this
 	 */
-	public DecayFunction setDecay(BigDecimal decay) {
+	public DecayFunction withDecay(BigDecimal decay) {
 		assert decay != null : "Decay cannot be null.";
 
 		this.decay = decay;

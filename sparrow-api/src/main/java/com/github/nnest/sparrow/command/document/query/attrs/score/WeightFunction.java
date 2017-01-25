@@ -37,4 +37,15 @@ public class WeightFunction implements ScoreFunction {
 		this.value = value;
 		return this;
 	}
+
+	/**
+	 * value of weight
+	 * 
+	 * @param value
+	 *            value
+	 * @return weight function
+	 */
+	public static WeightFunction valueOf(BigDecimal value) {
+		return new WeightFunction(value);
+	}
 }
