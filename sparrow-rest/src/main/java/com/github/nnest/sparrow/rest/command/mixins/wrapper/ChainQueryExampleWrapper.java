@@ -30,7 +30,7 @@ public interface ChainQueryExampleWrapper extends QueryExampleWrapper {
 	/**
 	 * get previous wrapper
 	 * 
-	 * @return
+	 * @return previous wrapper
 	 */
 	ChainQueryExampleWrapper getPrevious();
 
@@ -64,7 +64,7 @@ public interface ChainQueryExampleWrapper extends QueryExampleWrapper {
 	 * eg.<br>
 	 * Wrapper {@code A} has next {@code B} has next {@code C}, now twist a new
 	 * wrapper {@code D} which has next {@code E} has next {@code F}. after
-	 * twisting, the chain is change to A->D->E->F->B->C.<br>
+	 * twisting, the chain is change to A-&gt;D-&gt;E-&gt;F-&gt;B-&gt;C.<br>
 	 * the purpose is if a wrapper can wrap a super class or interface, but when
 	 * a specific instance which implements the super class or interface, find
 	 * the original wrapper and twist the new wrapper into its previous wrapper,

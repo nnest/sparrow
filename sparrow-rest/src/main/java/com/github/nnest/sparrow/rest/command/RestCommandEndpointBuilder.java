@@ -156,8 +156,6 @@ public final class RestCommandEndpointBuilder {
 		/**
 		 * get value as string
 		 * 
-		 * @param value
-		 *            value
 		 * @return string value
 		 */
 		String getValueAsString();

@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.github.nnest.sparrow.command.document.query.ExampleType;
+import com.github.nnest.sparrow.command.document.query.MatchAll;
+import com.github.nnest.sparrow.command.document.query.MatchNone;
 
 /**
  * match all and none mixin, see {@linkplain MatchAll} and

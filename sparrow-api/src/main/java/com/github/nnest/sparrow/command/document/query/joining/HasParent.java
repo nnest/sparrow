@@ -9,8 +9,7 @@ import com.github.nnest.sparrow.command.document.query.ExampleType;
 import com.google.common.base.Strings;
 
 /**
- * has parent query.<br>
- * {@linkplain type} is parent type.
+ * has parent query.
  * 
  * @author brad.wu
  * @since 0.0.1

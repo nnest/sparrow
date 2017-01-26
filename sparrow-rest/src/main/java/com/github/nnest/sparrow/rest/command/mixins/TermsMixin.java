@@ -66,7 +66,7 @@ public interface TermsMixin {
 	/**
 	 * get external document terms
 	 * 
-	 * @return
+	 * @return terms
 	 */
 	@JsonIgnore
 	List<ExternalDocumentTerm> getTerms();

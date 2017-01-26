@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.nnest.sparrow.command.document.Get;
+import com.github.nnest.sparrow.command.document.GetResultData;
 import com.github.nnest.sparrow.command.document.MultiGetResultData;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -24,7 +25,7 @@ import com.google.common.collect.Iterables;
  */
 public class MultiGetResponse implements MultiGetResultData {
 	@JsonProperty("docs")
-	private List<InnerGetResponse> innerResponses = null;
+	private List<InnerGetResultData> innerResponses = null;
 
 	private int count = 0;
 	private int successCount = 0;
@@ -74,7 +75,7 @@ public class MultiGetResponse implements MultiGetResultData {
 	/**
 	 * @return the innerResponses
 	 */
-	public List<InnerGetResponse> getInnerResponses() {
+	public List<InnerGetResultData> getInnerResponses() {
 		return this.innerResponses;
 	}
 
@@ -83,22 +84,22 @@ public class MultiGetResponse implements MultiGetResultData {
 	 *            the innerResponses to set
 	 */
 	@JsonDeserialize(contentAs = InnerGetResponseReceiver.class)
-	public void setInnerResponses(List<InnerGetResponse> innerResponses) {
+	public void setInnerResponses(List<InnerGetResultData> innerResponses) {
 		// reset counting
 		count = 0;
 		successCount = 0;
 		failCount = 0;
-		
+
 		this.innerResponses = innerResponses;
 		if (this.innerResponses != null && this.innerResponses.size() > 0) {
-			Iterables.all(innerResponses, new Predicate<GetResponse>() {
+			Iterables.all(innerResponses, new Predicate<GetResultData>() {
 				/**
 				 * (non-Javadoc)
 				 * 
 				 * @see com.google.common.base.Predicate#apply(java.lang.Object)
 				 */
 				@Override
-				public boolean apply(GetResponse response) {
+				public boolean apply(GetResultData response) {
 					count++;
 					if (response.isSuccessful()) {
 						successCount++;
@@ -112,15 +113,13 @@ public class MultiGetResponse implements MultiGetResultData {
 	}
 
 	/**
-	 * inner get response.<br>
-	 * {@linkplain #jsonNode} should be clear after convert to document. see
-	 * {@linkplain RestCommandMultiGet#readResponse(com.github.nnest.sparrow.command.document.MultiGet, java.io.InputStream)}
+	 * inner get response.
 	 * 
 	 * @author brad.wu
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
-	public static class InnerGetResponse extends GetResponse {
+	public static class InnerGetResponse extends GetResponse implements InnerGetResultData {
 		private Get command = null;
 
 		/**
@@ -134,8 +133,11 @@ public class MultiGetResponse implements MultiGetResultData {
 		}
 
 		/**
-		 * @return the command
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.command.document.MultiGetResultData.InnerGetResultData#getCommand()
 		 */
+		@Override
 		public Get getCommand() {
 			return command;
 		}
@@ -339,9 +341,12 @@ public class MultiGetResponse implements MultiGetResultData {
 		 * @param documentType
 		 *            document type
 		 * @throws JsonProcessingException
+		 *             exception
 		 */
 		public void transformDocument(ObjectMapper mapper, Class<?> documentType) throws JsonProcessingException {
-			this.setDocument(mapper.treeToValue(this.getJsonNode(), documentType));
+			if (this.getJsonNode() != null) {
+				this.setDocument(mapper.treeToValue(this.getJsonNode(), documentType));
+			}
 		}
 	}
 }

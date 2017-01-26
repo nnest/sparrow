@@ -37,7 +37,7 @@ public interface JoiningQueryMixin {
 	/**
 	 * get score mode, from {@linkplain HasChild} and {@linkplain Nested}
 	 * 
-	 * @return
+	 * @return score mode
 	 */
 	@JsonSerialize(using = ScoreModeSerilaizer.class)
 	ScoreMode getScoreMode();

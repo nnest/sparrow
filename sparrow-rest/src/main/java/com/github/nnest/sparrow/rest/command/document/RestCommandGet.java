@@ -14,6 +14,7 @@ import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder.SetQueryParam;
+import com.github.nnest.sparrow.rest.command.document.GetResponse.GetResponseReceiver;
 
 /**
  * rest command get, {@linkplain ElasticCommandKind#GET}

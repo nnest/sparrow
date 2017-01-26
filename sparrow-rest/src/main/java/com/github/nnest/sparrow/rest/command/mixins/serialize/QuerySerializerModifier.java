@@ -634,7 +634,7 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 	 *            bean description
 	 * @param beanProperties
 	 *            bean properties
-	 * @param things
+	 * @param things things
 	 */
 	protected void withNestedExampleThings(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties,
 			List<NestedExampleThing> things) {

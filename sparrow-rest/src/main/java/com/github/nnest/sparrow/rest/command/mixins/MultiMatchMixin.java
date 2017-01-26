@@ -38,7 +38,7 @@ public interface MultiMatchMixin {
 	/**
 	 * get analyzer name
 	 * 
-	 * @return
+	 * @return analyzer name
 	 */
 	@JsonProperty("analyzer")
 	String getAnalyzerName();
@@ -55,7 +55,7 @@ public interface MultiMatchMixin {
 	/**
 	 * get example text
 	 * 
-	 * @return
+	 * @return example text
 	 */
 	@JsonProperty("query")
 	String getExampleText();
@@ -63,7 +63,7 @@ public interface MultiMatchMixin {
 	/**
 	 * get example type
 	 * 
-	 * @return
+	 * @return example type
 	 */
 	@JsonProperty("type")
 	@JsonSerialize(using = ExampleTypeSeralizer.class)
@@ -72,7 +72,7 @@ public interface MultiMatchMixin {
 	/**
 	 * get field names
 	 * 
-	 * @return
+	 * @return field names
 	 */
 	@JsonProperty("fields")
 	Set<String> getFieldNames();

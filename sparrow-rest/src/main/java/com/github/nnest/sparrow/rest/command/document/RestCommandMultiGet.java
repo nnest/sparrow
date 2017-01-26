@@ -21,10 +21,10 @@ import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.Get;
 import com.github.nnest.sparrow.command.document.MultiGet;
+import com.github.nnest.sparrow.command.document.MultiGetResultData.InnerGetResultData;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandUtil;
-import com.github.nnest.sparrow.rest.command.document.MultiGetResponse.InnerGetResponse;
 import com.github.nnest.sparrow.rest.command.document.MultiGetResponse.InnerGetResponseReceiver;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -51,7 +51,7 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 		try {
 			ObjectMapper mapper = this.createResponseObjectMapper(this.getResponseClass());
 			MultiGetResponse response = mapper.readValue(stream, MultiGetResponse.class);
-			List<InnerGetResponse> innerResponses = response.getInnerResponses();
+			List<InnerGetResultData> innerResponses = response.getInnerResponses();
 			if (innerResponses != null) {
 				for (int index = 0, count = innerResponses.size(); index < count; index++) {
 					InnerGetResponseReceiver innerResponse = (InnerGetResponseReceiver) innerResponses.get(index);
@@ -76,14 +76,14 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 				}
 				// unwrap and discard json node objects in receiver
 				response.setInnerResponses(
-						Lists.transform(innerResponses, new Function<InnerGetResponse, InnerGetResponse>() {
+						Lists.transform(innerResponses, new Function<InnerGetResultData, InnerGetResultData>() {
 							/**
 							 * (non-Javadoc)
 							 * 
 							 * @see com.google.common.base.Function#apply(java.lang.Object)
 							 */
 							@Override
-							public InnerGetResponse apply(InnerGetResponse input) {
+							public InnerGetResultData apply(InnerGetResultData input) {
 								return ((InnerGetResponseReceiver) input).unwrap();
 							}
 						}));

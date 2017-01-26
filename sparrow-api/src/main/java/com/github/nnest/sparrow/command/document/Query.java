@@ -4,7 +4,6 @@
 package com.github.nnest.sparrow.command.document;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +13,7 @@ import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -31,7 +31,7 @@ public class Query implements ElasticCommand {
 	private Map<Class<?>, ElasticDocumentDescriptor> scope = null;
 	private Map<Class<?>, Object> typeIgnoredInScope = new HashMap<>();
 	// hits
-	private Set<Class<?>> hitTypes = new HashSet<>();
+	private Map<Class<?>, String> hitTypes = new HashMap<>();
 	private Map<String, ElasticDocumentDescriptor> hitDocumentDescriptors = new HashMap<>();
 	// example
 	private Example example = null;
@@ -150,7 +150,7 @@ public class Query implements ElasticCommand {
 	 * @return the hitTypes
 	 */
 	public Set<Class<?>> getHitTypes() {
-		return hitTypes;
+		return hitTypes.keySet();
 	}
 
 	/**
@@ -165,7 +165,7 @@ public class Query implements ElasticCommand {
 
 		// put into hit mapping using qualified class name
 		for (Class<?> documentType : documentTypes) {
-			this.hitTypes.add(documentType);
+			this.hitTypes.put(documentType, null);
 		}
 		return this;
 	}
@@ -181,6 +181,70 @@ public class Query implements ElasticCommand {
 		assert documentTypes != null && documentTypes.length != 0 : "Document types cannot be null.";
 
 		return this.withHit(Sets.newHashSet(documentTypes));
+	}
+
+	/**
+	 * with hit document type, add, for given index
+	 * 
+	 * @param documentType
+	 *            document type
+	 * @param index
+	 *            index name
+	 * @return this
+	 */
+	public Query withHit(Class<?> documentType, String index) {
+		assert documentType != null : "Document type cannot be null.";
+		assert Strings.nullToEmpty(index).trim().length() != 0 : "Index name cannot be null or blank.";
+
+		this.hitTypes.put(documentType, index);
+		return this;
+	}
+
+	/**
+	 * with hit document type, add for given index and type
+	 * 
+	 * @param documentType
+	 *            document type
+	 * @param index
+	 *            index name
+	 * @param type
+	 *            type name
+	 * @return this
+	 */
+	public Query withHit(Class<?> documentType, String index, String type) {
+		assert documentType != null : "Document type cannot be null.";
+		assert Strings.nullToEmpty(index).trim().length() != 0 : "Index name cannot be null or blank.";
+		assert Strings.nullToEmpty(type).trim().length() != 0 : "Type name cannot be null or blank.";
+
+		this.hitTypes.put(documentType, index + "/" + type);
+		return this;
+	}
+
+	/**
+	 * get hit document descriptor
+	 * 
+	 * @param index
+	 *            index name
+	 * @param type
+	 *            type name
+	 * @return document descriptor
+	 */
+	public ElasticDocumentDescriptor getHitDocumentDescriptor(String index, String type) {
+		// find by index/type
+		ElasticDocumentDescriptor documentDescriptor = this.hitDocumentDescriptors.get(index + "/" + type);
+		// find by index only
+		if (documentDescriptor == null) {
+			documentDescriptor = this.hitDocumentDescriptors.get(index);
+		}
+		// find in scopes
+		if (documentDescriptor == null && this.scope != null) {
+			for (ElasticDocumentDescriptor descriptor : this.scope.values()) {
+				if (descriptor.getIndex().equals(index) && descriptor.getType().equals(type)) {
+					return descriptor;
+				}
+			}
+		}
+		return documentDescriptor;
 	}
 
 	/**
@@ -201,10 +265,14 @@ public class Query implements ElasticCommand {
 	@Override
 	public ElasticCommand analysis(ElasticDocumentAnalyzer documentAnalyzer) {
 		// analyze hits
-		for (Class<?> documentType : this.getHitTypes()) {
-			ElasticDocumentDescriptor descriptor = documentAnalyzer.analysis(documentType);
-			// change key from class name to "index/type"
-			this.hitDocumentDescriptors.put(descriptor.getIndex() + "/" + descriptor.getType(), descriptor);
+		for (Map.Entry<Class<?>, String> entry : this.hitTypes.entrySet()) {
+			ElasticDocumentDescriptor descriptor = documentAnalyzer.analysis(entry.getKey());
+			String value = entry.getValue();
+			if (value == null) {
+				this.hitDocumentDescriptors.put(descriptor.getIndex() + "/" + descriptor.getType(), descriptor);
+			} else {
+				this.hitDocumentDescriptors.put(value, descriptor);
+			}
 		}
 
 		// analyze scope

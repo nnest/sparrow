@@ -40,7 +40,7 @@ public interface QueryStringMixin {
 	/**
 	 * get analyzer name
 	 * 
-	 * @return
+	 * @return analyzer name
 	 */
 	@JsonProperty("analyzer")
 	String getAnalyzerName();
@@ -57,7 +57,7 @@ public interface QueryStringMixin {
 	/**
 	 * get example text
 	 * 
-	 * @return
+	 * @return example text
 	 */
 	@JsonProperty("query")
 	String getExampleText();
@@ -65,7 +65,7 @@ public interface QueryStringMixin {
 	/**
 	 * get example type
 	 * 
-	 * @return
+	 * @return example type
 	 */
 	@JsonIgnore
 	ExampleType getExampleType();
@@ -73,7 +73,7 @@ public interface QueryStringMixin {
 	/**
 	 * get field names
 	 * 
-	 * @return
+	 * @return field names
 	 */
 	@JsonProperty("fields")
 	Set<String> getFieldNames();

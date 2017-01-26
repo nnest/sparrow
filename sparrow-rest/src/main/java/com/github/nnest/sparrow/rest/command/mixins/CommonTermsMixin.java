@@ -15,6 +15,7 @@ import com.github.nnest.sparrow.command.document.query.attrs.ExampleTextConjunct
 import com.github.nnest.sparrow.command.document.query.attrs.shouldmatch.MinimumShouldMatch;
 import com.github.nnest.sparrow.command.document.query.fulltext.CommonTerms;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.ExampleTextConjunctionSerializer;
+import com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier;
 
 /**
  * common terms mixin, see {@linkplain CommonTerms}
@@ -70,10 +71,10 @@ public interface CommonTermsMixin {
 	/**
 	 * get high minimum should match.<br>
 	 * this property always be included for serialize the "minimum_should_match"
-	 * part in json output. see {@linkplain CommonTermsSerializerModifier} for
-	 * more details.
+	 * part in json output. see {@linkplain QuerySerializerModifier} for more
+	 * details.
 	 * 
-	 * @return
+	 * @return minimum should match
 	 */
 	@JsonInclude()
 	MinimumShouldMatch getHighMinimumShouldMatch();
@@ -92,7 +93,7 @@ public interface CommonTermsMixin {
 	 * this property always be excluded for serialize. it will be serialized by
 	 * {@linkplain #getHighMinimumShouldMatch()}
 	 * 
-	 * @return
+	 * @return minimum should match
 	 */
 	@JsonIgnore
 	MinimumShouldMatch getLowMinimumShouldMatch();

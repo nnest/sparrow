@@ -39,7 +39,7 @@ public interface SingleMatchMixin {
 	/**
 	 * get analyzer name
 	 * 
-	 * @return
+	 * @return analyzer name
 	 */
 	@JsonProperty("analyzer")
 	String getAnalyzerName();
@@ -56,7 +56,7 @@ public interface SingleMatchMixin {
 	/**
 	 * get example text
 	 * 
-	 * @return
+	 * @return example text
 	 */
 	@JsonProperty("query")
 	String getExampleText();
@@ -64,7 +64,7 @@ public interface SingleMatchMixin {
 	/**
 	 * get example type
 	 * 
-	 * @return
+	 * @return example type
 	 */
 	@JsonIgnore
 	ExampleType getExampleType();
@@ -72,7 +72,7 @@ public interface SingleMatchMixin {
 	/**
 	 * get field name
 	 * 
-	 * @return
+	 * @return field name
 	 */
 	@JsonIgnore
 	String getFieldName();
