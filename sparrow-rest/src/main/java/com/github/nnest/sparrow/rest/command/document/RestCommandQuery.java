@@ -184,8 +184,13 @@ public class RestCommandQuery extends AbstractRestCommand<Query, QueryResponse> 
 		@JsonTypeIdResolver(ExampleTypeAsIdResolver.class)
 		private Example example = null;
 
+		private Integer from = null;
+		private Integer size = null;
+
 		public QueryRequestObject(Query command) {
 			this.example = RestCommandUtil.wrapExample(command.getExample());
+			this.from = command.getFrom();
+			this.size = command.getSize();
 		}
 
 		/**
@@ -193,6 +198,14 @@ public class RestCommandQuery extends AbstractRestCommand<Query, QueryResponse> 
 		 */
 		public Example getExample() {
 			return this.example;
+		}
+
+		public Integer getFrom() {
+			return this.from;
+		}
+
+		public Integer getSize() {
+			return this.size;
 		}
 	}
 }

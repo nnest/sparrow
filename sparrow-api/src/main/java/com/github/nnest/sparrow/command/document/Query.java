@@ -36,6 +36,9 @@ public class Query implements ElasticCommand {
 	// example
 	private Example example = null;
 
+	private Integer from = null;
+	private Integer size = null;
+
 	public Query(Example example) {
 		this.withExample(example);
 	}
@@ -57,6 +60,36 @@ public class Query implements ElasticCommand {
 
 		this.example = example;
 		return this;
+	}
+
+	/**
+	 * @return the from
+	 */
+	public Integer getFrom() {
+		return from;
+	}
+
+	/**
+	 * @param from
+	 *            the from to set
+	 */
+	public void setFrom(Integer from) {
+		this.from = from;
+	}
+
+	/**
+	 * @return the size
+	 */
+	public Integer getSize() {
+		return size;
+	}
+
+	/**
+	 * @param size
+	 *            the size to set
+	 */
+	public void setSize(Integer size) {
+		this.size = size;
 	}
 
 	/**
