@@ -32,7 +32,7 @@ public class AnnotationTest {
 
 	@Test
 	public void test002NoId() {
-		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_ID_NOT_FOUND));
+		thrown.expect(this.createExceptionMatcher(ElasticErrorCodes.ERR_ID_NOT_FOUND));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
 		validator.validate(AnnotatedDocumentNoId.class);
@@ -40,7 +40,7 @@ public class AnnotationTest {
 
 	@Test
 	public void test003DuplicatedId() {
-		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_DUPLICATED_ID));
+		thrown.expect(this.createExceptionMatcher(ElasticErrorCodes.ERR_DUPLICATED_ID));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
 		validator.validate(AnnotatedDocumentDuplicatedId.class);
@@ -48,7 +48,7 @@ public class AnnotationTest {
 
 	@Test
 	public void test004DuplicatedIdOnFields() {
-		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_DUPLICATED_ID));
+		thrown.expect(this.createExceptionMatcher(ElasticErrorCodes.ERR_DUPLICATED_ID));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
 		validator.validate(AnnotatedDocumentDuplicatedIdOnFields.class);
@@ -56,7 +56,7 @@ public class AnnotationTest {
 
 	@Test
 	public void test005InvalidIdAssignOnField() {
-		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN));
+		thrown.expect(this.createExceptionMatcher(ElasticErrorCodes.ERR_ILLEGAL_ID_ASSIGN));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
 		validator.validate(AnnotatedDocumentInvalidIdAssignOnField.class);
@@ -64,7 +64,7 @@ public class AnnotationTest {
 
 	@Test
 	public void test006InvalidIdAssignOnGetter() {
-		thrown.expect(this.createExceptionMatcher(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN));
+		thrown.expect(this.createExceptionMatcher(ElasticErrorCodes.ERR_ILLEGAL_ID_ASSIGN));
 
 		AnnotatedElasticDocumentValidator validator = createValidator();
 		validator.validate(AnnotatedDocumentInvalidIdAssignOnGetter.class);

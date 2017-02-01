@@ -191,6 +191,7 @@ public class QueryResponse implements QueryResultData {
 		private String id = null;
 		private BigDecimal score = null;
 		private Object document = null;
+		private List<String> sortResults = null;
 
 		/**
 		 * @return the index
@@ -272,6 +273,21 @@ public class QueryResponse implements QueryResultData {
 		 */
 		public void setDocument(Object document) {
 			this.document = document;
+		}
+
+		/**
+		 * @return the sortResults
+		 */
+		public List<String> getSortResults() {
+			return sortResults;
+		}
+
+		/**
+		 * @param sortResults
+		 *            the sortResults to set
+		 */
+		public void setSortResults(List<String> sortResults) {
+			this.sortResults = sortResults;
 		}
 	}
 
@@ -413,6 +429,27 @@ public class QueryResponse implements QueryResultData {
 		@Override
 		public void setDocument(Object document) {
 			item.setDocument(document);
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.QueryResponse.QueryHitItem#getSortResults()
+		 */
+		@Override
+		public List<String> getSortResults() {
+			return super.getSortResults();
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see com.github.nnest.sparrow.rest.command.document.QueryResponse.QueryHitItem#setSortResults(java.util.List)
+		 */
+		@JsonProperty("sort")
+		@Override
+		public void setSortResults(List<String> sortResults) {
+			super.setSortResults(sortResults);
 		}
 
 		/**

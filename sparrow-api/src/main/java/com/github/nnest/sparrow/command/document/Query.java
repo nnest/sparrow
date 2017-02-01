@@ -13,6 +13,7 @@ import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.sort.Sort;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -27,6 +28,7 @@ import com.google.common.collect.Sets;
  * @version 0.0.1
  */
 public class Query implements ElasticCommand {
+	private static final String DEFAULT_HINT = "";
 	// scope
 	private Map<Class<?>, ElasticDocumentDescriptor> scope = null;
 	private Map<Class<?>, Object> typeIgnoredInScope = new HashMap<>();
@@ -38,6 +40,9 @@ public class Query implements ElasticCommand {
 
 	private Integer from = null;
 	private Integer size = null;
+
+	private List<Sort> sorts = null;
+	private Boolean trackScores = null;
 
 	public Query(Example example) {
 		this.withExample(example);
@@ -72,9 +77,13 @@ public class Query implements ElasticCommand {
 	/**
 	 * @param from
 	 *            the from to set
+	 * @return this
 	 */
-	public void setFrom(Integer from) {
+	public Query withFrom(Integer from) {
+		assert from != null && from >= 0 : "From cannot be null, and must be zero or positive.";
+
 		this.from = from;
+		return this;
 	}
 
 	/**
@@ -87,9 +96,64 @@ public class Query implements ElasticCommand {
 	/**
 	 * @param size
 	 *            the size to set
+	 * @return this
 	 */
-	public void setSize(Integer size) {
+	public Query withSize(Integer size) {
+		assert size != null && size > 0 : "Size cannot be null, and must be positive.";
+
 		this.size = size;
+		return this;
+	}
+
+	/**
+	 * @return the sorts
+	 */
+	public List<Sort> getSorts() {
+		return sorts;
+	}
+
+	/**
+	 * @param sorts
+	 *            the sorts to set
+	 * @return this
+	 */
+	public Query withSorts(List<Sort> sorts) {
+		assert sorts != null && sorts.size() > 0 : "Sorts cannot be null or empty.";
+
+		this.sorts = sorts;
+		return this;
+	}
+
+	/**
+	 * with sorts
+	 * 
+	 * @param sorts
+	 * @return this
+	 */
+	public Query withSorts(Sort... sorts) {
+		assert sorts != null && sorts.length > 0 : "Sorts cannot be null or empty.";
+
+		this.sorts = Lists.newArrayList(sorts);
+		return this;
+	}
+
+	/**
+	 * @return the trackScores
+	 */
+	public Boolean getTrackScores() {
+		return trackScores;
+	}
+
+	/**
+	 * @param trackScores
+	 *            the trackScores to set
+	 * @return this
+	 */
+	public Query withTrackScores(Boolean trackScores) {
+		assert trackScores != null : "Track scores cannot be null.";
+
+		this.trackScores = trackScores;
+		return this;
 	}
 
 	/**
@@ -254,6 +318,20 @@ public class Query implements ElasticCommand {
 	}
 
 	/**
+	 * with default hint
+	 * 
+	 * @param documentType
+	 *            document type
+	 * @return this
+	 */
+	public Query withDefaultHint(Class<?> documentType) {
+		assert documentType != null : "Document type cannot be null.";
+
+		this.hitTypes.put(documentType, DEFAULT_HINT);
+		return this;
+	}
+
+	/**
 	 * get hit document descriptor
 	 * 
 	 * @param index
@@ -276,6 +354,10 @@ public class Query implements ElasticCommand {
 					return descriptor;
 				}
 			}
+		}
+
+		if (documentDescriptor == null) {
+			documentDescriptor = this.hitDocumentDescriptors.get(DEFAULT_HINT);
 		}
 		return documentDescriptor;
 	}

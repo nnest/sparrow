@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.github.nnest.sparrow.AbstractElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticDocumentValidationException;
-import com.github.nnest.sparrow.ErrorCodes;
+import com.github.nnest.sparrow.ElasticErrorCodes;
 
 /**
  * annotated elastic document analyzer
@@ -189,7 +189,7 @@ public class AnnotatedElasticDocumentAnalyzer extends AbstractElasticDocumentAna
 			} else if (methodName.startsWith("is")) {
 				propertyName = methodName.substring(2);
 			} else if (mustbe) {
-				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
+				throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
 						String.format("Method[%1$s] name should be a java bean getter or setter.", method));
 			} else {
 				return Optional.empty();

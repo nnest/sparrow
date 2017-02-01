@@ -93,8 +93,15 @@ import com.github.nnest.sparrow.command.document.query.term.Terms;
 import com.github.nnest.sparrow.command.document.query.term.TermsLookupExternal;
 import com.github.nnest.sparrow.command.document.query.term.TermsLookupExternal.ExternalDocumentTerm;
 import com.github.nnest.sparrow.command.document.query.term.Wildcard;
+import com.github.nnest.sparrow.command.document.sort.ScriptSortType;
+import com.github.nnest.sparrow.command.document.sort.Sort;
+import com.github.nnest.sparrow.command.document.sort.SortByField;
+import com.github.nnest.sparrow.command.document.sort.SortByScript;
+import com.github.nnest.sparrow.command.document.sort.SortMode;
+import com.github.nnest.sparrow.command.document.sort.SortOrder;
+import com.github.nnest.sparrow.command.document.type.DataType;
 import com.github.nnest.sparrow.command.indices.DropIndex;
-import com.github.nnest.sparrow.command.script.PainlessElasticScript;
+import com.github.nnest.sparrow.command.script.PainlessScript;
 import com.github.nnest.sparrow.rest.command.document.MultiGetResponse;
 import com.github.nnest.sparrow.rest.command.document.UpdateResponse;
 import com.google.common.collect.Lists;
@@ -455,8 +462,7 @@ public class ElasticSearchConnectTest {
 	public void test017UpdateByScript5thUser() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 
-		PainlessElasticScript script = new PainlessElasticScript()
-				.withScript("ctx._source.postDate = \"2017-01-08T20:12:12\"");
+		PainlessScript script = new PainlessScript().withScript("ctx._source.postDate = \"2017-01-08T20:12:12\"");
 		ElasticCommand cmd = new UpdateByScript(TwitterTweet.class, "5").withScript(script);
 		ElasticCommandResult result = client.execute(cmd);
 		assertTrue(result.getCommand() == cmd);
@@ -484,8 +490,8 @@ public class ElasticSearchConnectTest {
 	public void test018UpdateByScriptAndParamsMap5thUser() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 
-		PainlessElasticScript script = new PainlessElasticScript().withScript("ctx._source.postDate = params.post")
-				.withParam("post", "2017-01-08T20:12:12");
+		PainlessScript script = new PainlessScript().withScript("ctx._source.postDate = params.post").withParam("post",
+				"2017-01-08T20:12:12");
 		ElasticCommand cmd = new UpdateByScript(TwitterTweet.class, "5").withScript(script);
 		ElasticCommandResult result = client.execute(cmd);
 		assertTrue(result.getCommand() == cmd);
@@ -520,8 +526,8 @@ public class ElasticSearchConnectTest {
 		tt.setMessage("Message from 6th user");
 
 		// actually the script not run
-		PainlessElasticScript script = new PainlessElasticScript().withScript("ctx._source.postDate = params.post")
-				.withParam("post", "2017-01-08T20:12:12");
+		PainlessScript script = new PainlessScript().withScript("ctx._source.postDate = params.post").withParam("post",
+				"2017-01-08T20:12:12");
 		ElasticCommand cmd = new UpdateByScript(tt).withScript(script);
 		ElasticCommandResult result = client.execute(cmd);
 		assertTrue(result.getCommand() == cmd);
@@ -573,7 +579,7 @@ public class ElasticSearchConnectTest {
 	public void test020MultiGet() throws ElasticCommandException, ElasticExecutorException {
 		ElasticClient client = createClient();
 
-		ElasticCommand cmd = new MultiGet().withCommand(TwitterTweet.class, "3", "4", "5");
+		ElasticCommand cmd = new MultiGet().addCommand(TwitterTweet.class, "3", "4", "5");
 		ElasticCommandResult result = client.execute(cmd);
 		assertTrue(result.getCommand() == cmd);
 
@@ -1414,6 +1420,66 @@ public class ElasticSearchConnectTest {
 		//
 		// assertEquals("3", ((TwitterTweet)
 		// response.getInnerResponses().get(0).getDocument()).getId());
+	}
+
+	@Test
+	public void test050Index1stUser() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+		TwitterTweet tt = new TwitterTweet();
+		tt.setId("1000");
+		tt.setUser("1st User");
+		tt.setPostDate("2017-01-08T14:12:12");
+		tt.setMessage("Message from 1st user");
+		tt.setScore(new BigDecimal("100.5"));
+		tt.setAge(20);
+
+		ElasticCommand cmd = new Index(tt);
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
+
+		IndexResultData data = result.getResultData();
+		assertTrue(data.isSuccessful());
+		assertEquals(IndexResultType.CREATED, data.getResultType());
+		TwitterTweet rtt = data.getDocument();
+		assertTrue(rtt == tt);
+	}
+
+	@Test
+	public void test051Sort() throws ElasticCommandException, ElasticExecutorException {
+		ElasticClient client = createClient();
+
+		ElasticCommand cmd = new Query( //
+				new MatchAll() //
+		) //
+				.withScope(TwitterTweet.class) //
+				.withHit(TwitterTweet.class) //
+				.withFrom(0) //
+				.withSize(10) //
+				.withTrackScores(true) //
+				.withSorts( //
+						new Sort(SortByField.valueOf("score")) //
+								.with(SortOrder.DESC) //
+								.with(SortMode.MAX) //
+								.withMissingValue("50") //
+								.with(DataType.FLOAT), //
+						// .withNestedPath("offer") //
+						// .with(new
+						// Term("offer.color").withExampleText("blue")) //
+						new Sort(SortByScript.valueOf( //
+								PainlessScript.valueOf("params.factor").withParam("factor", 50l) //
+						).with(ScriptSortType.NUMBER)) //
+		// , //
+		// new Sort(new SortByGeoDistance("pin.location", //
+		// Coordinate.valueOf(new BigDecimal("-70"), new BigDecimal("40")), //
+		// Coordinate.valueOf(new BigDecimal("-71.1"), new BigDecimal("42.3"))
+		// //
+		// ).with(DistanceType.PLANE) //
+		// .with(DistanceUnit.KM) //
+		// ) //
+		);
+
+		ElasticCommandResult result = client.execute(cmd);
+		assertTrue(result.getCommand() == cmd);
 	}
 
 	private ElasticClient createClient() {

@@ -3,6 +3,8 @@
  */
 package com.github.nnest.sparrow.rest;
 
+import java.math.BigDecimal;
+
 import com.github.nnest.sparrow.annotation.ElasticDocument;
 import com.github.nnest.sparrow.annotation.ElasticId;
 
@@ -18,6 +20,9 @@ public class TwitterTweet {
 	private String user = null;
 	private String postDate = null;
 	private String message = null;
+
+	private BigDecimal score = null;
+	private Integer age = null;
 
 	/**
 	 * @return the id
@@ -77,5 +82,35 @@ public class TwitterTweet {
 	 */
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	/**
+	 * @return the score
+	 */
+	public BigDecimal getScore() {
+		return score;
+	}
+
+	/**
+	 * @param score
+	 *            the score to set
+	 */
+	public void setScore(BigDecimal score) {
+		this.score = score;
+	}
+
+	/**
+	 * @return the age
+	 */
+	public Integer getAge() {
+		return age;
+	}
+
+	/**
+	 * @param age
+	 *            the age to set
+	 */
+	public void setAge(Integer age) {
+		this.age = age;
 	}
 }

@@ -10,7 +10,7 @@ package com.github.nnest.sparrow;
  * @since 0.0.1
  * @version 0.0.1
  */
-public interface ErrorCodes {
+public interface ElasticErrorCodes {
 	String ERR_ID_NOT_FOUND = "err-00001";
 	String ERR_DUPLICATED_ID = "err-00002";
 	String ERR_ILLEGAL_ID_ASSIGN = "err-00003";

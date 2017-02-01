@@ -7,7 +7,7 @@ import com.github.nnest.sparrow.ElasticCommand;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticDocumentAnalyzer;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
-import com.github.nnest.sparrow.command.script.ElasticScript;
+import com.github.nnest.sparrow.command.script.Script;
 import com.google.common.base.Strings;
 
 /**
@@ -28,7 +28,7 @@ public class UpdateByScript implements ElasticCommand {
 	private Class<?> documentType = null;
 	private String id = null;
 	private String version = null;
-	private ElasticScript script = null;
+	private Script script = null;
 	private boolean asUpsert = false;
 	private ElasticDocumentDescriptor documentDescriptor = null;
 
@@ -122,7 +122,7 @@ public class UpdateByScript implements ElasticCommand {
 	/**
 	 * @return the script
 	 */
-	public ElasticScript getScript() {
+	public Script getScript() {
 		return script;
 	}
 
@@ -131,7 +131,7 @@ public class UpdateByScript implements ElasticCommand {
 	 *            the script to set
 	 * @return this
 	 */
-	public UpdateByScript withScript(ElasticScript script) {
+	public UpdateByScript withScript(Script script) {
 		this.script = script;
 		return this;
 	}

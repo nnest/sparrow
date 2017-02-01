@@ -5,17 +5,20 @@ package com.github.nnest.sparrow.rest.command.mixins.serialize;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
-import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.sort.Sort;
+import com.github.nnest.sparrow.command.document.sort.SortBy;
+import com.github.nnest.sparrow.command.document.sort.SortByField;
+import com.github.nnest.sparrow.command.document.sort.SortByGeoDistance;
+import com.github.nnest.sparrow.command.document.sort.SortByScript;
 
 /**
- * example type as id type id resolver. see
- * {@linkplain Example#getExampleType()}
+ * sort by id resolver
  * 
  * @author brad.wu
  * @since 0.0.1
  * @version 0.0.1
  */
-public class ExampleTypeAsIdResolver extends TypeIdResolverBase {
+public class SortByAsIdResolver extends TypeIdResolverBase {
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -34,11 +37,19 @@ public class ExampleTypeAsIdResolver extends TypeIdResolverBase {
 	 */
 	@Override
 	public String idFromValueAndType(Object value, Class<?> suggestedType) {
-		if (value instanceof Example) {
-			Example example = (Example) value;
-			return example.getExampleType().getName().toLowerCase();
+		if (!(value instanceof Sort)) {
+			throw new IllegalArgumentException("Value must be an instance of " + Sort.class);
 		}
-		throw new IllegalArgumentException("Value must be an instance of " + Example.class);
+		SortBy by = ((Sort) value).getBy();
+		if (by instanceof SortByField) {
+			return ((SortByField) by).getFieldName();
+		} else if (by instanceof SortByScript) {
+			return "_script";
+		} else if (by instanceof SortByGeoDistance) {
+			return "_geo_distance";
+		} else {
+			throw new IllegalArgumentException(String.format("Sort by[%1$s] is unsupported", by.getClass()));
+		}
 	}
 
 	/**

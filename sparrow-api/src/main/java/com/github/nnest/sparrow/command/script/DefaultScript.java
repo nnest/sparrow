@@ -16,7 +16,7 @@ import com.google.common.collect.Maps;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class DefaultElasticScript<T extends ElasticScript> implements ElasticScript {
+public class DefaultScript<T extends Script> implements Script {
 	private String script = null;
 	private String language = null;
 	private Object paramsObject = null;
@@ -24,7 +24,7 @@ public class DefaultElasticScript<T extends ElasticScript> implements ElasticScr
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.script.ElasticScript#getScript()
+	 * @see com.github.nnest.sparrow.command.script.Script#getScript()
 	 */
 	@Override
 	public String getScript() {
@@ -45,7 +45,7 @@ public class DefaultElasticScript<T extends ElasticScript> implements ElasticScr
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.script.ElasticScript#getLanguage()
+	 * @see com.github.nnest.sparrow.command.script.Script#getLanguage()
 	 */
 	@Override
 	public String getLanguage() {
@@ -66,7 +66,7 @@ public class DefaultElasticScript<T extends ElasticScript> implements ElasticScr
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.script.ElasticScript#getParamsObject()
+	 * @see com.github.nnest.sparrow.command.script.Script#getParamsObject()
 	 */
 	@Override
 	public Object getParamsObject() {

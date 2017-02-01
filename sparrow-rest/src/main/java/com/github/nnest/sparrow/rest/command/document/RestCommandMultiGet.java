@@ -55,7 +55,7 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 			if (innerResponses != null) {
 				for (int index = 0, count = innerResponses.size(); index < count; index++) {
 					InnerGetResponseReceiver innerResponse = (InnerGetResponseReceiver) innerResponses.get(index);
-					Get innerCommand = command.getInnerCommands().get(index);
+					Get innerCommand = command.getCommands().get(index);
 					innerResponse.setCommand(innerCommand);
 					if (innerResponse.isFound()) {
 						innerResponse.transformDocument(mapper, innerCommand.getDocumentType());
@@ -147,7 +147,7 @@ public class RestCommandMultiGet extends AbstractRestCommand<MultiGet, MultiGetR
 	 */
 	protected CommandContent computeCommandContent(MultiGet command) {
 		final CommandContent content = new CommandContent();
-		Iterables.all(command.getInnerCommands(), new Predicate<Get>() {
+		Iterables.all(command.getCommands(), new Predicate<Get>() {
 			/**
 			 * (non-Javadoc)
 			 * 

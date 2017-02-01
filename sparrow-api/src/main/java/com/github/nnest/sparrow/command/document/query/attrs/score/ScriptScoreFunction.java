@@ -3,7 +3,7 @@
  */
 package com.github.nnest.sparrow.command.document.query.attrs.score;
 
-import com.github.nnest.sparrow.command.script.ElasticScript;
+import com.github.nnest.sparrow.command.script.Script;
 
 /**
  * script score function
@@ -13,16 +13,16 @@ import com.github.nnest.sparrow.command.script.ElasticScript;
  * @version 0.0.1
  */
 public class ScriptScoreFunction implements ScoreFunction {
-	private ElasticScript script = null;
+	private Script script = null;
 
-	public ScriptScoreFunction(ElasticScript script) {
+	public ScriptScoreFunction(Script script) {
 		this.with(script);
 	}
 
 	/**
 	 * @return the script
 	 */
-	public ElasticScript getScript() {
+	public Script getScript() {
 		return script;
 	}
 
@@ -31,7 +31,7 @@ public class ScriptScoreFunction implements ScoreFunction {
 	 *            the script to set
 	 * @return this
 	 */
-	public ScriptScoreFunction with(ElasticScript script) {
+	public ScriptScoreFunction with(Script script) {
 		assert script != null : "Script cannot be null.";
 
 		this.script = script;

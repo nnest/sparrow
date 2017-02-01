@@ -14,7 +14,7 @@ import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.UpdateByScript;
-import com.github.nnest.sparrow.command.script.ElasticScript;
+import com.github.nnest.sparrow.command.script.Script;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
@@ -95,7 +95,7 @@ public class RestCommandUpdateByScript extends AbstractRestCommand<UpdateByScrip
 	 */
 	public static class UpdateByScriptRequestObject {
 		@JsonProperty
-		private ElasticScript script = null;
+		private Script script = null;
 		@JsonProperty("upsert")
 		@JsonInclude(Include.NON_NULL)
 		private Object document = null;
@@ -112,7 +112,7 @@ public class RestCommandUpdateByScript extends AbstractRestCommand<UpdateByScrip
 		/**
 		 * @return the script
 		 */
-		public ElasticScript getScript() {
+		public Script getScript() {
 			return script;
 		}
 

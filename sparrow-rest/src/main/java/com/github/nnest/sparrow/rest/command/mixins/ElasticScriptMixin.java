@@ -3,7 +3,7 @@ package com.github.nnest.sparrow.rest.command.mixins;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.github.nnest.sparrow.command.script.ElasticScript;
+import com.github.nnest.sparrow.command.script.Script;
 
 /**
  * annotations for jackson object mapper<br>
@@ -14,11 +14,11 @@ import com.github.nnest.sparrow.command.script.ElasticScript;
  * @since 0.0.1
  * @version 0.0.1
  */
-public interface ElasticScriptMixin extends ElasticScript {
+public interface ElasticScriptMixin extends Script {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.script.ElasticScript#getScript()
+	 * @see com.github.nnest.sparrow.command.script.Script#getScript()
 	 */
 	@Override
 	@JsonProperty("inline")
@@ -27,7 +27,7 @@ public interface ElasticScriptMixin extends ElasticScript {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.script.ElasticScript#getLanguage()
+	 * @see com.github.nnest.sparrow.command.script.Script#getLanguage()
 	 */
 	@Override
 	@JsonProperty("lang")
@@ -36,7 +36,7 @@ public interface ElasticScriptMixin extends ElasticScript {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.command.script.ElasticScript#getParamsObject()
+	 * @see com.github.nnest.sparrow.command.script.Script#getParamsObject()
 	 */
 	@Override
 	@JsonProperty("params")

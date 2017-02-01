@@ -6,6 +6,7 @@ package com.github.nnest.sparrow.rest.command.mixins.serialize;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -13,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.github.nnest.sparrow.command.document.geo.Coordinate;
 import com.github.nnest.sparrow.command.document.query.Example;
 import com.github.nnest.sparrow.command.document.query.attrs.score.DecayFunction;
 import com.github.nnest.sparrow.command.document.query.attrs.score.FieldValueFactorFunction;
@@ -33,6 +35,11 @@ import com.github.nnest.sparrow.command.document.query.term.Range;
 import com.github.nnest.sparrow.command.document.query.term.Terms;
 import com.github.nnest.sparrow.command.document.query.term.TermsLookupExternal;
 import com.github.nnest.sparrow.command.document.query.term.TermsLookupExternal.ExternalDocumentTerm;
+import com.github.nnest.sparrow.command.document.sort.Sort;
+import com.github.nnest.sparrow.command.document.sort.SortBy;
+import com.github.nnest.sparrow.command.document.sort.SortByField;
+import com.github.nnest.sparrow.command.document.sort.SortByGeoDistance;
+import com.github.nnest.sparrow.command.document.sort.SortByScript;
 import com.github.nnest.sparrow.rest.command.RestCommandUtil;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.CommonTermsWrapper.WrappedCommonTerms;
 import com.github.nnest.sparrow.rest.command.mixins.wrapper.SingleMatchWrapper.WrappedSingleMatch;
@@ -84,7 +91,88 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 		// joining query
 		this.withExampleJoiningQuery(beanDesc, beanProperties);
 
+		// sort
+		this.withSort(beanDesc, beanProperties);
+
 		return super.changeProperties(config, beanDesc, beanProperties);
+	}
+
+	/**
+	 * with sort
+	 * 
+	 * @param beanDesc
+	 *            bean description
+	 * @param beanProperties
+	 *            bean properties
+	 */
+	protected void withSort(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+		this.withNestedExampleThings(beanDesc, beanProperties, Lists.newArrayList(
+				new NestedExampleThing(Sort.class, "nested_filter", "nested_filter", new NestedExampleVisitor() {
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier.NestedExampleVisitor#get(java.lang.Object)
+					 */
+					public Object get(Object bean) {
+						return ((Sort) bean).getNestedFilter();
+					}
+				})));
+
+		if (!Sort.class.isAssignableFrom(beanDesc.getBeanClass())) {
+			return;
+		}
+		for (int index = 0, count = beanProperties.size(); index < count; index++) {
+			BeanPropertyWriter property = beanProperties.get(index);
+			if ("by".equals(property.getName())) {
+				beanProperties.set(index, new BeanPropertyWriter(property) {
+					private static final long serialVersionUID = 47887587807232352L;
+
+					/**
+					 * (non-Javadoc)
+					 * 
+					 * @see com.fasterxml.jackson.databind.ser.BeanPropertyWriter#serializeAsField(java.lang.Object,
+					 *      com.fasterxml.jackson.core.JsonGenerator,
+					 *      com.fasterxml.jackson.databind.SerializerProvider)
+					 */
+					@Override
+					public void serializeAsField(Object bean, JsonGenerator gen, SerializerProvider prov)
+							throws Exception {
+						Sort sort = (Sort) bean;
+						SortBy by = sort.getBy();
+						if (by instanceof SortByField) {
+							// write nothing
+						} else if (by instanceof SortByScript) {
+							SortByScript script = (SortByScript) by;
+							if (script.getType() != null) {
+								gen.writeStringField("type", script.getType().name().toLowerCase());
+							}
+							gen.writeObjectField("script", script.getScript());
+						} else if (by instanceof SortByGeoDistance) {
+							SortByGeoDistance geo = (SortByGeoDistance) by;
+							if (geo.getUnit() != null) {
+								gen.writeStringField("unit", geo.getUnit().name().toLowerCase());
+							}
+							if (geo.getDistanceType() != null) {
+								gen.writeStringField("distance_type", geo.getDistanceType().name().toLowerCase());
+							}
+							gen.writeFieldName(geo.getFieldName());
+							Set<Coordinate> coordinates = geo.getCoordinates();
+							gen.writeStartArray();
+							for (Coordinate coordinate : coordinates) {
+								gen.writeStartArray();
+								gen.writeNumber(coordinate.getLongitude());
+								gen.writeNumber(coordinate.getLatitude());
+								gen.writeEndArray();
+							}
+							gen.writeEndArray();
+						} else {
+							throw new IllegalArgumentException(
+									String.format("Sort by[%1$s] is unsupported", by.getClass()));
+						}
+					}
+				});
+			}
+		}
 	}
 
 	/**
@@ -634,7 +722,8 @@ public class QuerySerializerModifier extends BeanSerializerModifier {
 	 *            bean description
 	 * @param beanProperties
 	 *            bean properties
-	 * @param things things
+	 * @param things
+	 *            things
 	 */
 	protected void withNestedExampleThings(BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties,
 			List<NestedExampleThing> things) {

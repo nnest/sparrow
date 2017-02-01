@@ -10,7 +10,7 @@ import java.lang.reflect.Modifier;
 
 import com.github.nnest.sparrow.AbstractElasticDocumentValidator;
 import com.github.nnest.sparrow.ElasticDocumentValidationException;
-import com.github.nnest.sparrow.ErrorCodes;
+import com.github.nnest.sparrow.ElasticErrorCodes;
 import com.google.common.base.Strings;
 
 /**
@@ -45,7 +45,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 				if (id != null) {
 					this.checkIdFieldType(field);
 					if (idProperty != null) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID,
+						throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_DUPLICATED_ID,
 								String.format("Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty,
 										field.getName(), documentType));
 					} else {
@@ -53,7 +53,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 					}
 				} else if (version != null) {
 					if (versionProperty != null) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_VERSIONING,
+						throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_DUPLICATED_VERSIONING,
 								String.format("Duplicated versioning fields[%1$s, %2$s] found on document[%3$s].",
 										versionProperty, field.getName(), documentType));
 					} else {
@@ -71,7 +71,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 					// check id on correct method
 					String name = this.checkMethod(documentType, method, id);
 					if (idProperty != null) {
-						throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_ID,
+						throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_DUPLICATED_ID,
 								String.format("Duplicated ids[%1$s, %2$s] found on document[%3$s].", idProperty, method,
 										documentType));
 					} else {
@@ -81,7 +81,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 					String name = this.checkMethod(documentType, method, field);
 					if (version != null) {
 						if (versionProperty != null) {
-							throw new ElasticDocumentValidationException(ErrorCodes.ERR_DUPLICATED_VERSIONING,
+							throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_DUPLICATED_VERSIONING,
 									String.format("Duplicated versioning fields[%1$s, %2$s] found on document[%3$s].",
 											versionProperty, name, documentType));
 						} else {
@@ -92,7 +92,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 			}
 
 			if (idProperty == null) {
-				throw new ElasticDocumentValidationException(ErrorCodes.ERR_ID_NOT_FOUND,
+				throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_ID_NOT_FOUND,
 						String.format("Id not found on document[%1$s]", documentType));
 			}
 		}
@@ -106,7 +106,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	 */
 	protected void checkMethodModifier(Method method) {
 		if ((method.getModifiers() & Modifier.PUBLIC) == 0) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_METHOD_NOT_PUBLIC,
+			throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_METHOD_NOT_PUBLIC,
 					String.format("Method[%1$s] is illegal for assign, it must be public", method));
 		}
 	}
@@ -122,13 +122,13 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	protected void checkDocument(ElasticDocument elasticDoc, Class<?> clazz) {
 		String index = elasticDoc.index();
 		if (Strings.nullToEmpty(index).trim().length() == 0) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_INDEX_NOT_FOUND,
+			throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_INDEX_NOT_FOUND,
 					String.format("Index not found on document[%1$s]", clazz));
 		}
 
 		String type = elasticDoc.type();
 		if (Strings.nullToEmpty(type).trim().length() == 0) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_TYPE_NOT_FOUND,
+			throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_TYPE_NOT_FOUND,
 					String.format("Index not found on document[%1$s]", clazz));
 		}
 	}
@@ -146,8 +146,8 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	 * @return field name
 	 */
 	protected String checkMethod(Class<?> type, Method method, Annotation annotation) {
-		String errorCode = annotation instanceof ElasticId ? ErrorCodes.ERR_ILLEGAL_ID_ASSIGN
-				: ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN;
+		String errorCode = annotation instanceof ElasticId ? ElasticErrorCodes.ERR_ILLEGAL_ID_ASSIGN
+				: ElasticErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN;
 
 		this.checkMethodModifier(method);
 
@@ -237,7 +237,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	protected void checkFieldParamCount(Method method) {
 		Class<?> type = method.getParameterTypes()[0];
 		if (type == Void.class || type == null) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
+			throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
 					String.format("Method[%1$s] is illgeal for assign, parameter type cannot be void.", method));
 		}
 	}
@@ -251,7 +251,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	protected void checkIdParamType(Method method) {
 		Class<?> type = method.getParameterTypes()[0];
 		if (type != Integer.class && type != Long.class && type != String.class) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String.format(
+			throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String.format(
 					"Method[%1$s] is illgeal for assign, parameter type must be Integer, Long or String.", method));
 		}
 	}
@@ -281,7 +281,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	protected void checkFieldReturnType(Method method) {
 		Class<?> type = method.getReturnType();
 		if (type == Void.class || type == null) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
+			throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_ILLEGAL_FIELD_ASSIGN,
 					String.format("Method[%1$s] is illgeal for assign, return type cannot be void.", method));
 		}
 	}
@@ -295,7 +295,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	protected void checkIdReturnType(Method method) {
 		Class<?> type = method.getReturnType();
 		if (type != Integer.class && type != Long.class && type != String.class) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String.format(
+			throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_ILLEGAL_ID_ASSIGN, String.format(
 					"Method[%1$s] is illgeal for assign, return type must be Integer, Long or String.", method));
 		}
 	}
@@ -309,7 +309,7 @@ public class AnnotatedElasticDocumentValidator extends AbstractElasticDocumentVa
 	protected void checkIdFieldType(Field field) {
 		Class<?> type = field.getType();
 		if (type != Integer.class && type != Long.class && type != String.class) {
-			throw new ElasticDocumentValidationException(ErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
+			throw new ElasticDocumentValidationException(ElasticErrorCodes.ERR_ILLEGAL_ID_ASSIGN,
 					String.format(
 							"Field[%1$s] is illgeal for assign ElasticId, return type must be Integer, Long or String.",
 							field.getName()));

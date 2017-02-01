@@ -10,7 +10,7 @@ package com.github.nnest.sparrow;
  * @since 0.0.1
  * @version 0.0.1
  */
-public class ElasticDocumentValidationException extends RuntimeException implements ErrorCodes {
+public class ElasticDocumentValidationException extends RuntimeException implements ElasticErrorCodes {
 	private static final long serialVersionUID = -6747881438852023781L;
 	private String code = null;
 

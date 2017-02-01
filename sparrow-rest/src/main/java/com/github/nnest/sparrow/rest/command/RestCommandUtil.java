@@ -23,7 +23,8 @@ import com.github.nnest.sparrow.command.document.query.term.AbstractTermLevelQue
 import com.github.nnest.sparrow.command.document.query.term.TermLevelQueryExist;
 import com.github.nnest.sparrow.command.document.query.term.Terms;
 import com.github.nnest.sparrow.command.document.query.term.TermsLookupExternal;
-import com.github.nnest.sparrow.command.script.ElasticScript;
+import com.github.nnest.sparrow.command.document.sort.Sort;
+import com.github.nnest.sparrow.command.script.Script;
 import com.github.nnest.sparrow.rest.RestCommand;
 import com.github.nnest.sparrow.rest.command.document.RestCommandCreate;
 import com.github.nnest.sparrow.rest.command.document.RestCommandDelete;
@@ -45,6 +46,7 @@ import com.github.nnest.sparrow.rest.command.mixins.QueryExistMixin;
 import com.github.nnest.sparrow.rest.command.mixins.QueryStringMixin;
 import com.github.nnest.sparrow.rest.command.mixins.ScoreFunctionMixin;
 import com.github.nnest.sparrow.rest.command.mixins.SingleMatchMixin;
+import com.github.nnest.sparrow.rest.command.mixins.SortMixin;
 import com.github.nnest.sparrow.rest.command.mixins.TermLevelQueryMixin;
 import com.github.nnest.sparrow.rest.command.mixins.TermsMixin;
 import com.github.nnest.sparrow.rest.command.mixins.serialize.QuerySerializerModifier;
@@ -83,7 +85,7 @@ public class RestCommandUtil {
 		commands.put(ElasticCommandKind.DROP_INDEX, new RestCommandDropIndex());
 
 		// object mapper settings
-		objectMapper.addMixIn(ElasticScript.class, ElasticScriptMixin.class) //
+		objectMapper.addMixIn(Script.class, ElasticScriptMixin.class) //
 				.addMixIn(AbstractSingleMatch.class, SingleMatchMixin.class) //
 				.addMixIn(CommonTerms.class, CommonTermsMixin.class) //
 				.addMixIn(QueryString.class, QueryStringMixin.class) //
@@ -98,6 +100,7 @@ public class RestCommandUtil {
 				.addMixIn(MatchAll.class, MatchAllAndNoneMixin.class) //
 				.addMixIn(MatchNone.class, MatchAllAndNoneMixin.class) //
 				.addMixIn(AbstractJoiningQuery.class, JoiningQueryMixin.class) //
+				.addMixIn(Sort.class, SortMixin.class) //
 				.registerModule(new SimpleModule() {
 					private static final long serialVersionUID = -6766348162611371496L;
 

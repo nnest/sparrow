@@ -26,6 +26,7 @@ import com.github.nnest.sparrow.ElasticDocumentDescriptor;
 import com.github.nnest.sparrow.ElasticExecutorException;
 import com.github.nnest.sparrow.command.document.Query;
 import com.github.nnest.sparrow.command.document.query.Example;
+import com.github.nnest.sparrow.command.document.sort.Sort;
 import com.github.nnest.sparrow.rest.ElasticRestMethod;
 import com.github.nnest.sparrow.rest.command.AbstractRestCommand;
 import com.github.nnest.sparrow.rest.command.RestCommandEndpointBuilder;
@@ -192,11 +193,15 @@ public class RestCommandQuery extends AbstractRestCommand<Query, QueryResponse> 
 
 		private Integer from = null;
 		private Integer size = null;
+		private List<Sort> sorts = null;
+		private Boolean trackScores = null;
 
 		public QueryRequestObject(Query command) {
 			this.example = RestCommandUtil.wrapExample(command.getExample());
 			this.from = command.getFrom();
 			this.size = command.getSize();
+			this.sorts = command.getSorts();
+			this.trackScores = command.getTrackScores();
 		}
 
 		/**
@@ -206,12 +211,33 @@ public class RestCommandQuery extends AbstractRestCommand<Query, QueryResponse> 
 			return this.example;
 		}
 
+		/**
+		 * @return the from
+		 */
 		public Integer getFrom() {
-			return this.from;
+			return from;
 		}
 
+		/**
+		 * @return the size
+		 */
 		public Integer getSize() {
-			return this.size;
+			return size;
+		}
+
+		/**
+		 * @return the sorts
+		 */
+		@JsonProperty("sort")
+		public List<Sort> getSorts() {
+			return sorts;
+		}
+
+		/**
+		 * @return the trackScores
+		 */
+		public Boolean getTrackScores() {
+			return trackScores;
 		}
 	}
 }

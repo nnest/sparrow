@@ -10,7 +10,7 @@ package com.github.nnest.sparrow.command.script;
  * @since 0.0.1
  * @version 0.0.1
  */
-public interface ElasticScript {
+public interface Script {
 	/**
 	 * get script
 	 * 

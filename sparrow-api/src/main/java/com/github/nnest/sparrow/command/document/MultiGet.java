@@ -36,7 +36,7 @@ public class MultiGet implements ElasticCommand {
 	/**
 	 * @return the gets
 	 */
-	public List<Get> getInnerCommands() {
+	public List<Get> getCommands() {
 		return innerCommands;
 	}
 
@@ -45,10 +45,25 @@ public class MultiGet implements ElasticCommand {
 	 *            the innerCommands to set
 	 * @return this
 	 */
-	public MultiGet withInnerCommands(List<Get> innerCommands) {
+	public MultiGet withCommands(List<Get> innerCommands) {
 		assert innerCommands != null && innerCommands.size() > 0 : "Inner commands cannot be null or empty.";
 
 		this.innerCommands = innerCommands;
+		return this;
+	}
+
+	/**
+	 * add commands
+	 * 
+	 * @param commands
+	 * @return
+	 */
+	public MultiGet addCommands(Get... commands) {
+		if (commands != null) {
+			for (Get command : commands) {
+				this.addCommand(command);
+			}
+		}
 		return this;
 	}
 
@@ -59,8 +74,8 @@ public class MultiGet implements ElasticCommand {
 	 *            inner command
 	 * @return this
 	 */
-	public MultiGet withCommand(Get command) {
-		this.getInnerCommands().add(command);
+	public MultiGet addCommand(Get command) {
+		this.getCommands().add(command);
 		return this;
 	}
 
@@ -73,14 +88,14 @@ public class MultiGet implements ElasticCommand {
 	 *            ids
 	 * @return this
 	 */
-	public MultiGet withCommand(Class<?> documentType, String... ids) {
+	public MultiGet addCommand(Class<?> documentType, String... ids) {
 		if (ids == null || ids.length == 0) {
 			// do nothing
 			return this;
 		}
 
 		for (String id : ids) {
-			this.withCommand(new Get(documentType, id));
+			this.addCommand(new Get(documentType, id));
 		}
 		return this;
 	}
@@ -92,7 +107,7 @@ public class MultiGet implements ElasticCommand {
 	 */
 	@Override
 	public ElasticCommand analysis(ElasticDocumentAnalyzer documentAnalyzer) {
-		Iterables.all(this.getInnerCommands(), new Predicate<Get>() {
+		Iterables.all(this.getCommands(), new Predicate<Get>() {
 			/**
 			 * (non-Javadoc)
 			 * 
