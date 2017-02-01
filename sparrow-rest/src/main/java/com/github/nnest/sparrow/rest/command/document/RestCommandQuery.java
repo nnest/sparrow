@@ -11,11 +11,15 @@ import java.util.Set;
 
 import org.apache.http.entity.StringEntity;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.SnakeCaseStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.github.nnest.sparrow.ElasticCommandKind;
 import com.github.nnest.sparrow.ElasticDocumentDescriptor;
@@ -173,6 +177,8 @@ public class RestCommandQuery extends AbstractRestCommand<Query, QueryResponse> 
 	 * @since 0.0.1
 	 * @version 0.0.1
 	 */
+	@JsonInclude(Include.NON_NULL)
+	@JsonNaming(SnakeCaseStrategy.class)
 	public static class QueryRequestObject {
 		/**
 		 * first an object named "query"<br>
