@@ -25,14 +25,21 @@ public interface CommandTemplate {
 	 * 
 	 * @return http method
 	 */
-	HttpMethod getHttpMethod();
+	HttpMethod getMethod();
 
 	/**
-	 * get url
+	 * get endpoint
 	 * 
-	 * @return url
+	 * @return endpoint
 	 */
-	String getUrl();
+	String getEndpoint();
+
+	/**
+	 * get parameters
+	 * 
+	 * @return parameters
+	 */
+	Map<String, String> getParams();
 
 	/**
 	 * get body
@@ -40,4 +47,11 @@ public interface CommandTemplate {
 	 * @return body
 	 */
 	Map<String, Object> getBody();
+
+	/**
+	 * get headers
+	 * 
+	 * @return headers
+	 */
+	Map<String, String> getHeaders();
 }

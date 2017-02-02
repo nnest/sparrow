@@ -5,6 +5,8 @@ package com.github.nnest.sparrow.simple;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.http.HttpHost;
+import org.elasticsearch.client.RestClient;
 import org.junit.Test;
 
 /**
@@ -21,10 +23,23 @@ public class TestYmlLoader {
 
 		CommandTemplate template = context.find("index").get();
 		assertEquals("index", template.getName());
-		assertEquals("http://localhost:9200/twitter/tweet/100", template.getUrl());
+		assertEquals("/twitter/tweet/100", template.getEndpoint());
 
 		template = context.find("index1").get();
 		assertEquals("index1", template.getName());
-		assertEquals("http://localhost:9200/twitter/tweet/101", template.getUrl());
+		assertEquals("/twitter/tweet/101", template.getEndpoint());
+	}
+
+	@Test
+	public void test002() {
+		SimpleCommandTemplateContext context = new SimpleCommandTemplateContext(
+				"/Users/brad.wu/Documents/GitHub/bradwoo8621/sparrow/sparrow-simple/src/test/resources/test-yml-loader.yml");
+		context.loadTemplates();
+
+		DefaultCommandExecutor executor = new DefaultCommandExecutor();
+		executor.setTemplateContext(context);
+		executor.setRestClientBuilder(RestClient.builder(new HttpHost("localhost", 9200)));
+
+		executor.execute("index", null, new NoopCommandExecutionHandler());
 	}
 }
