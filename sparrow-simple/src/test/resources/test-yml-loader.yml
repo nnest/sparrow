@@ -1,0 +1,19 @@
+---
+name: index
+httpMethod: PUT
+url: http://localhost:9200/twitter/tweet/100
+body:
+  user: kimchy
+  post_date: 2009-11-15T14:12:12
+  message: 
+    from: test user
+    body: abc
+    high: "1"
+---
+name: index1
+httpMethod: PUT
+url: http://localhost:9200/twitter/tweet/101
+body:
+  user: kimchy
+  post_date: 2009-11-15T14:12:12
+  message: trying out Elasticsearch
