@@ -4,14 +4,11 @@
 package com.github.nnest.sparrow.simple;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Lists;
 
 /**
  * abstract command template context
@@ -25,7 +22,7 @@ public abstract class AbstractCommandTemplateContext implements CommandTemplateC
 	private String[] configPath = null;
 	private Map<String, CommandTemplate> templates = new HashMap<String, CommandTemplate>();
 
-	private List<CommandTemplateLoader> loaders = null;
+	private CommandTemplateLoader loader = null;
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -85,34 +82,34 @@ public abstract class AbstractCommandTemplateContext implements CommandTemplateC
 	}
 
 	/**
-	 * @return the loaders
+	 * @return the loader
 	 */
-	public List<CommandTemplateLoader> getLoaders() {
-		if (this.loaders == null) {
+	public CommandTemplateLoader getLoader() {
+		if (this.loader == null) {
 			synchronized (this) {
-				if (this.loaders == null) {
-					this.loaders = this.createLoaders();
+				if (this.loader == null) {
+					this.loader = this.createLoader();
 				}
 			}
 		}
-		return this.loaders;
+		return this.loader;
 	}
 
 	/**
-	 * create loaders
+	 * create loader
 	 * 
-	 * @return loaders
+	 * @return loader
 	 */
-	protected List<CommandTemplateLoader> createLoaders() {
-		return Lists.newArrayList(new YmlCommandTemplateLoader());
+	protected CommandTemplateLoader createLoader() {
+		return new YmlCommandTemplateLoader();
 	}
 
 	/**
-	 * @param loaders
-	 *            the loaders to set
+	 * @param loader
+	 *            the loader to set
 	 */
-	public void setLoaders(List<CommandTemplateLoader> loaders) {
-		this.loaders = loaders;
+	public void setLoader(CommandTemplateLoader loader) {
+		this.loader = loader;
 	}
 
 	/**

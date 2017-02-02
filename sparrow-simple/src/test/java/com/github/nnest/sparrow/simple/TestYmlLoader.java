@@ -17,8 +17,7 @@ import org.junit.Test;
 public class TestYmlLoader {
 	@Test
 	public void test001() {
-		SimpleCommandTemplateContext context = new SimpleCommandTemplateContext(
-				"/Users/brad.wu/Documents/GitHub/bradwoo8621/sparrow/sparrow-simple/src/test/resources/test-yml-loader.yml");
+		SimpleCommandTemplateContext context = new SimpleCommandTemplateContext("/test-yml-loader.yml");
 		context.loadTemplates();
 
 		CommandTemplate template = context.find("index").get();
@@ -32,8 +31,7 @@ public class TestYmlLoader {
 
 	@Test
 	public void test002() {
-		SimpleCommandTemplateContext context = new SimpleCommandTemplateContext(
-				"/Users/brad.wu/Documents/GitHub/bradwoo8621/sparrow/sparrow-simple/src/test/resources/test-yml-loader.yml");
+		SimpleCommandTemplateContext context = new SimpleCommandTemplateContext("/test-yml-loader.yml");
 		context.loadTemplates();
 
 		DefaultCommandExecutor executor = new DefaultCommandExecutor();

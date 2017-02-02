@@ -6,6 +6,7 @@ package com.github.nnest.sparrow.simple;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * simple command template context
@@ -65,10 +66,19 @@ public class SimpleCommandTemplateContext extends AbstractCommandTemplateContext
 	protected void loadTemplates(String path) {
 		File resource = new File(path);
 		if (!resource.exists()) {
-			this.getLogger().info(String.format("Path or file[%1$s] doesn't exist.", path));
+			this.getLogger().info(String.format("Path or file[%1$s] doesn't exist, try to use class path.", path));
+			InputStream stream = this.getClass().getResourceAsStream(path);
+			if (stream == null) {
+				throw new TemplateInitException(String.format("Resource[%1$s] doesn't exist in class path and file system.", path));
+			}
+			try {
+				this.loadTemplates(stream, path);
+			} catch (Exception e) {
+				throw new TemplateInitException(String.format("Failed to load template from resource[%1$s]", path), e);
+			}
+		} else {
+			this.loadTemplates(resource);
 		}
-
-		this.loadTemplates(resource);
 	}
 
 	/**
@@ -83,28 +93,37 @@ public class SimpleCommandTemplateContext extends AbstractCommandTemplateContext
 				this.loadTemplates(file);
 			}
 		} else if (resource.isFile()) {
-			FileInputStream fis = null;
 			try {
-				fis = new FileInputStream(resource);
-				for (CommandTemplateLoader loader : this.getLoaders()) {
-					CommandTemplate[] templates = loader.load(fis);
-					if (templates != null) {
-						for (CommandTemplate template : templates) {
-							this.register(template);
-						}
-					}
-				}
+				loadTemplates(new FileInputStream(resource), resource.getAbsolutePath());
 			} catch (Exception e) {
 				throw new TemplateInitException(
 						String.format("Failed to load template from resource[%1$s]", resource.getAbsolutePath()), e);
-			} finally {
-				if (fis != null) {
-					try {
-						fis.close();
-					} catch (IOException e) {
-						this.getLogger().warn(
-								String.format("Failed to close file input stream of %1$s", resource.getAbsolutePath()));
-					}
+			}
+		}
+	}
+
+	/**
+	 * load templates, and
+	 * 
+	 * @param stream
+	 *            stream
+	 * @param location
+	 *            stream location
+	 */
+	protected void loadTemplates(InputStream stream, String location) {
+		try {
+			CommandTemplate[] templates = this.getLoader().load(stream);
+			if (templates != null) {
+				for (CommandTemplate template : templates) {
+					this.register(template);
+				}
+			}
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					this.getLogger().warn(String.format("Failed to close file input stream of %1$s", location));
 				}
 			}
 		}
