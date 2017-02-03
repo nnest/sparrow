@@ -45,6 +45,8 @@ import com.github.nnest.sparrow.simple.token.Tokens;
  * @version 0.0.1
  */
 public class DefaultCommandExecutor implements CommandExecutor {
+	public static final String BODY_KEY_NOOP = "@noop";
+
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
 	private CommandTemplateContext templateContext = null;
@@ -334,10 +336,18 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 */
 	protected String transformBodyMap(Map<BodyKey, Object> map, Object params) {
 		List<StringBuilder> attrs = new LinkedList<StringBuilder>();
+
+		// if there is at least one property name is null, unwrapp all
+		// properties
+		boolean unwrapped = false;
 		for (Map.Entry<BodyKey, Object> entry : map.entrySet()) {
 			StringBuilder attr = new StringBuilder(128);
 			String propertyName = this.transformBodyKey(entry.getKey(), params);
-			attr.append('"').append(propertyName).append("\":");
+			if (propertyName != null) {
+				attr.append('"').append(propertyName).append("\":");
+			} else {
+				unwrapped = true;
+			}
 			Object propertyValue = this.transformBodyValue(entry.getValue(), params);
 			if (propertyValue == null) {
 				if (this.isNullValueIgnoredInBody()) {
@@ -359,14 +369,18 @@ public class DefaultCommandExecutor implements CommandExecutor {
 		}
 
 		StringBuilder sb = new StringBuilder(1024);
-		sb.append('{');
+		if (!unwrapped) {
+			sb.append('{');
+		}
 		for (int index = 0, count = attrs.size(); index < count; index++) {
 			sb.append(attrs.get(index).toString());
 			if (index < count - 1) {
 				sb.append(',');
 			}
 		}
-		sb.append('}');
+		if (!unwrapped) {
+			sb.append('}');
+		}
 		return sb.toString();
 	}
 
@@ -402,6 +416,11 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 * @return string
 	 */
 	protected String transformBodyKey(BodyKey key, Object params) {
+		if (key.tokenCount() == 1) {
+			if (BODY_KEY_NOOP.equals(key.getTokens().get(0).getToken())) {
+				return null;
+			}
+		}
 		return this.transformTokens(key, params);
 	}
 

@@ -20,3 +20,9 @@ body:
   topic: ${document.topic}
 headers:
   Authorization: Basic Idontknowwhatthehellitis!
+---
+name: index-dyn
+method: PUT
+endpoint: /${index}/${type}/${document.id}
+body: 
+  ${@noop}: ${document}

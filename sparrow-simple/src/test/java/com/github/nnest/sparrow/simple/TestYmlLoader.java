@@ -148,4 +148,29 @@ public class TestYmlLoader {
 			}
 		});
 	}
+
+	@Test
+	public void test005IndexDynamic() {
+		SimpleCommandTemplateContext context = new SimpleCommandTemplateContext("/test-yml-loader.yml");
+		context.loadTemplates();
+
+		DefaultCommandExecutor executor = new DefaultCommandExecutor();
+		executor.setTemplateContext(context);
+		executor.setRestClientBuilder(RestClient.builder(new HttpHost("localhost", 9200)));
+
+		Document doc = new Document();
+		doc.setIndex("twitter");
+		doc.setType("tweet");
+		TwitterTweet tt = new TwitterTweet();
+		tt.setId(101l);
+		tt.setUser("gavin");
+		tt.setPostDate(new Date());
+		tt.setMessage("Message from Gavin");
+		Topic topic = new Topic();
+		topic.setId("998");
+		topic.setLiked(Boolean.TRUE);
+		// tt.setTopic(Lists.newArrayList(topic));
+		doc.setDocument(tt);
+		executor.execute("index-dyn", doc, new NoopCommandExecutionHandler());
+	}
 }
