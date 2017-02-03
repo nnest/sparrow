@@ -54,4 +54,5 @@
 			<artifactId>logback-classic</artifactId>
 		</dependency>
 	</dependencies>
+	<description>sparrow-simple is for elastic search rest client. using configuration file as command template.</description>
 </project>

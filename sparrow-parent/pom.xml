@@ -179,4 +179,5 @@
 			</distributionManagement>
 		</profile>
 	</profiles>
+	<description>sparrow projects is for elastic search rest client</description>
 </project>
