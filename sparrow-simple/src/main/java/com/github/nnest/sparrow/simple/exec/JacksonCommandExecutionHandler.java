@@ -1,16 +1,19 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.exec;
+
+import com.github.nnest.sparrow.simple.CommandExecutionHandler;
 
 /**
- * exactly do nothing but print system
+ * Jackson command executor handler
  * 
  * @author brad.wu
  * @since 0.0.1
  * @version 0.0.1
  */
-public class NoopCommandExecutionHandler implements CommandExecutionHandler {
+public class JacksonCommandExecutionHandler implements CommandExecutionHandler {
+
 	/**
 	 * (non-Javadoc)
 	 * 
@@ -18,7 +21,8 @@ public class NoopCommandExecutionHandler implements CommandExecutionHandler {
 	 */
 	@Override
 	public void onSuccess(Object response) {
-		System.out.println(response);
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -28,7 +32,8 @@ public class NoopCommandExecutionHandler implements CommandExecutionHandler {
 	 */
 	@Override
 	public void onFailure(Exception exception) {
-		exception.printStackTrace();
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -38,7 +43,8 @@ public class NoopCommandExecutionHandler implements CommandExecutionHandler {
 	 */
 	@Override
 	public void onClientCloseFailure(Exception exception) {
-		exception.printStackTrace();
+		// TODO Auto-generated method stub
+
 	}
 
 	/**
@@ -48,6 +54,8 @@ public class NoopCommandExecutionHandler implements CommandExecutionHandler {
 	 */
 	@Override
 	public void onClientPrepareException(Exception exception) {
-		exception.printStackTrace();
+		// TODO Auto-generated method stub
+
 	}
+
 }

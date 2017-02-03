@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.context;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,6 +9,10 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.nnest.sparrow.simple.CommandTemplate;
+import com.github.nnest.sparrow.simple.CommandTemplateContext;
+import com.github.nnest.sparrow.simple.CommandTemplateLoader;
 
 /**
  * abstract command template context

@@ -1,11 +1,20 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.context;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import com.github.nnest.sparrow.simple.CommandTemplate;
+import com.github.nnest.sparrow.simple.template.HttpMethod;
+import com.github.nnest.sparrow.simple.token.BodyKey;
+import com.github.nnest.sparrow.simple.token.BodyValue;
+import com.github.nnest.sparrow.simple.token.Endpoint;
+import com.github.nnest.sparrow.simple.token.HeaderKey;
+import com.github.nnest.sparrow.simple.token.HeaderValue;
+import com.github.nnest.sparrow.simple.token.ParamKey;
+import com.github.nnest.sparrow.simple.token.ParamValue;
 import com.google.common.base.Strings;
 
 /**

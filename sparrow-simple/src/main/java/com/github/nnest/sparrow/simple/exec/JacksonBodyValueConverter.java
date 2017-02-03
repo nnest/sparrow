@@ -1,11 +1,12 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.exec;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.nnest.sparrow.simple.TemplateParseException;
 
 /**
  * jackson body value converter
@@ -21,7 +22,7 @@ public class JacksonBodyValueConverter implements BodyValueConverter {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.BodyValueConverter#convert(java.lang.Object)
+	 * @see com.github.nnest.sparrow.simple.exec.BodyValueConverter#convert(java.lang.Object)
 	 */
 	@Override
 	public String convert(Object value) {
@@ -39,7 +40,7 @@ public class JacksonBodyValueConverter implements BodyValueConverter {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.BodyValueConverter#accept(java.lang.Object)
+	 * @see com.github.nnest.sparrow.simple.exec.BodyValueConverter#accept(java.lang.Object)
 	 */
 	@Override
 	public boolean accept(Object value) {

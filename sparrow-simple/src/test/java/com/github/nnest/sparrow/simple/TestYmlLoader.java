@@ -15,6 +15,12 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.github.nnest.sparrow.simple.TwitterTweet.Topic;
+import com.github.nnest.sparrow.simple.context.SimpleCommandTemplateContext;
+import com.github.nnest.sparrow.simple.exec.DefaultCommandExecutor;
+import com.github.nnest.sparrow.simple.exec.NoopCommandExecutionHandler;
+import com.github.nnest.sparrow.simple.template.Document;
+import com.github.nnest.sparrow.simple.token.AbstractTokens;
+import com.github.nnest.sparrow.simple.token.Token;
 
 /**
  * @author brad.wu

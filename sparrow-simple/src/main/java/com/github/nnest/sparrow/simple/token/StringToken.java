@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.token;
 
 /**
  * string token
@@ -22,7 +22,7 @@ public class StringToken implements Token {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.Token#getToken()
+	 * @see com.github.nnest.sparrow.simple.token.Token#getToken()
 	 */
 	@Override
 	public String getToken() {
@@ -32,7 +32,7 @@ public class StringToken implements Token {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.Token#getValue(java.lang.Object)
+	 * @see com.github.nnest.sparrow.simple.token.Token#getValue(java.lang.Object)
 	 */
 	@Override
 	public Object getValue(Object from) {

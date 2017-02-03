@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.exec;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +19,7 @@ public class PrimitiveBodyValueConverter implements BodyValueConverter {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.BodyValueConverter#convert(java.lang.Object)
+	 * @see com.github.nnest.sparrow.simple.exec.BodyValueConverter#convert(java.lang.Object)
 	 */
 	@Override
 	public String convert(Object value) {
@@ -55,7 +55,7 @@ public class PrimitiveBodyValueConverter implements BodyValueConverter {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.BodyValueConverter#accept(java.lang.Object)
+	 * @see com.github.nnest.sparrow.simple.exec.BodyValueConverter#accept(java.lang.Object)
 	 */
 	@Override
 	public boolean accept(Object value) {

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.token;
 
 /**
  * end point

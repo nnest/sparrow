@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.context;
 
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -9,6 +9,9 @@ import java.util.List;
 
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+
+import com.github.nnest.sparrow.simple.CommandTemplate;
+import com.github.nnest.sparrow.simple.CommandTemplateLoader;
 
 /**
  * YAML command template loader

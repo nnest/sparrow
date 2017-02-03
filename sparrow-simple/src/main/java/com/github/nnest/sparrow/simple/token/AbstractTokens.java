@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.token;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +36,7 @@ public abstract class AbstractTokens implements Tokens {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.Tokens#getTokens()
+	 * @see com.github.nnest.sparrow.simple.token.Tokens#getTokens()
 	 */
 	@Override
 	public List<Token> getTokens() {
@@ -46,7 +46,7 @@ public abstract class AbstractTokens implements Tokens {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.Tokens#tokenCount()
+	 * @see com.github.nnest.sparrow.simple.token.Tokens#tokenCount()
 	 */
 	@Override
 	public int tokenCount() {

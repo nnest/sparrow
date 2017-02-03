@@ -1,7 +1,9 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.token;
+
+import com.github.nnest.sparrow.simple.TemplateParseException;
 
 import ognl.Ognl;
 import ognl.OgnlException;
@@ -21,7 +23,7 @@ public class ReferenceToken extends StringToken {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.StringToken#getValue(java.lang.Object)
+	 * @see com.github.nnest.sparrow.simple.token.StringToken#getValue(java.lang.Object)
 	 */
 	@Override
 	public Object getValue(Object from) {

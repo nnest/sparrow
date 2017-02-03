@@ -1,12 +1,16 @@
 /**
  * 
  */
-package com.github.nnest.sparrow.simple;
+package com.github.nnest.sparrow.simple.context;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import com.github.nnest.sparrow.simple.CommandTemplate;
+import com.github.nnest.sparrow.simple.CommandTemplateContext;
+import com.github.nnest.sparrow.simple.TemplateInitException;
 
 /**
  * simple command template context
@@ -43,7 +47,7 @@ public class SimpleCommandTemplateContext extends AbstractCommandTemplateContext
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.AbstractCommandTemplateContext#loadTemplates()
+	 * @see com.github.nnest.sparrow.simple.context.AbstractCommandTemplateContext#loadTemplates()
 	 */
 	@Override
 	public void loadTemplates() {

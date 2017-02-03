@@ -5,6 +5,14 @@ package com.github.nnest.sparrow.simple;
 
 import java.util.Map;
 
+import com.github.nnest.sparrow.simple.template.HttpMethod;
+import com.github.nnest.sparrow.simple.token.BodyKey;
+import com.github.nnest.sparrow.simple.token.Endpoint;
+import com.github.nnest.sparrow.simple.token.HeaderKey;
+import com.github.nnest.sparrow.simple.token.HeaderValue;
+import com.github.nnest.sparrow.simple.token.ParamKey;
+import com.github.nnest.sparrow.simple.token.ParamValue;
+
 /**
  * command template
  * 
