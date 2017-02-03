@@ -44,6 +44,16 @@ public abstract class AbstractTokens implements Tokens {
 	}
 
 	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.simple.Tokens#tokenCount()
+	 */
+	@Override
+	public int tokenCount() {
+		return this.tokens == null ? 0 : this.tokens.size();
+	}
+
+	/**
 	 * parse string to tokens
 	 * 
 	 * @param str

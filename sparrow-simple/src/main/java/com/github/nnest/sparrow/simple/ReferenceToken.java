@@ -39,11 +39,7 @@ public class ReferenceToken extends StringToken {
 								from.getClass()), //
 						e);
 			}
-			if (value == null) {
-				return null;
-			} else {
-				return value.toString();
-			}
+			return value;
 		}
 	}
 }

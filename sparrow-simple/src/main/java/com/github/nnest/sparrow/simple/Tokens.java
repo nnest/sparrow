@@ -19,4 +19,11 @@ public interface Tokens {
 	 * @return tokens
 	 */
 	List<Token> getTokens();
+
+	/**
+	 * get token count
+	 * 
+	 * @return count
+	 */
+	int tokenCount();
 }

@@ -36,13 +36,18 @@ public class DefaultCommandExecutor implements CommandExecutor {
 
 	private CommandTemplateContext templateContext = null;
 	private RestClientBuilder restClientBuilder = null;
+	private BodyValueConverter bodyValueConverter = null;
 
 	private boolean nullValueIgnoredInBody = true;
 
 	public DefaultCommandExecutor() {
+		this.bodyValueConverter = new BodyValueConverterChain( //
+//				new PrimitiveBodyValueConverter(), //
+				new JacksonBodyValueConverter());
 	}
 
 	public DefaultCommandExecutor(CommandTemplateContext templateContext, RestClientBuilder restClientBuilder) {
+		this();
 		this.setTemplateContext(templateContext);
 		this.setRestClientBuilder(restClientBuilder);
 	}
@@ -75,6 +80,21 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 */
 	public void setRestClientBuilder(RestClientBuilder restClientBuilder) {
 		this.restClientBuilder = restClientBuilder;
+	}
+
+	/**
+	 * @return the bodyValueConverter
+	 */
+	public BodyValueConverter getBodyValueConverter() {
+		return bodyValueConverter;
+	}
+
+	/**
+	 * @param bodyValueConverter
+	 *            the bodyValueConverter to set
+	 */
+	public void setBodyValueConverter(BodyValueConverter bodyValueConverter) {
+		this.bodyValueConverter = bodyValueConverter;
 	}
 
 	/**
@@ -301,7 +321,7 @@ public class DefaultCommandExecutor implements CommandExecutor {
 			StringBuilder attr = new StringBuilder(128);
 			String propertyName = this.transformBodyKey(entry.getKey(), params);
 			attr.append('"').append(propertyName).append("\":");
-			String propertyValue = this.transformBodyValue(entry.getValue(), params);
+			Object propertyValue = this.transformBodyValue(entry.getValue(), params);
 			if (propertyValue == null) {
 				if (this.isNullValueIgnoredInBody()) {
 					// null value ignored
@@ -311,7 +331,7 @@ public class DefaultCommandExecutor implements CommandExecutor {
 					attr.append("null");
 				}
 			} else {
-				attr.append('"').append(propertyValue).append('"');
+				attr.append(this.getBodyValueConverter().convert(propertyValue));
 			}
 			attrs.add(attr);
 		}
@@ -343,30 +363,16 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 * @return string
 	 */
 	@SuppressWarnings("unchecked")
-	protected String transformBodyValue(Object value, Object params) {
+	protected Object transformBodyValue(Object value, Object params) {
 		if (value == null) {
 			return null;
 		} else if (value instanceof Map) {
 			return this.transformBodyMap((Map<BodyKey, Object>) value, params);
 		} else if (value instanceof BodyValue) {
-			return this.convertBodyValue(this.transformTokens((BodyValue) value, params));
+			return this.transformTokensToObject((BodyValue) value, params);
 		} else {
-			return convertBodyValue(value);
+			return value;
 		}
-	}
-
-	/**
-	 * convert body value
-	 * 
-	 * @param value
-	 *            value
-	 * @return string value
-	 */
-	protected String convertBodyValue(Object value) {
-		if (value == null) {
-			return null;
-		}
-		return value.toString();
 	}
 
 	/**
@@ -432,6 +438,23 @@ public class DefaultCommandExecutor implements CommandExecutor {
 			}
 		}
 		return hasValue ? sb.toString() : null;
+	}
+
+	/**
+	 * transform tokens to object
+	 * 
+	 * @param tokens
+	 *            tokens
+	 * @param params
+	 *            params
+	 * @return tokens to object
+	 */
+	protected Object transformTokensToObject(Tokens tokens, Object params) {
+		if (tokens.tokenCount() == 1) {
+			return tokens.getTokens().get(0).getValue(params);
+		} else {
+			return this.transformTokens(tokens, params);
+		}
 	}
 
 	/**
