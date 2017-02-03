@@ -10,8 +10,13 @@ body:
 name: index-dynamic
 method: PUT
 endpoint: /${index}/${type}/${document.id}
+params:
+  timeout: 5m
+  refresh: true
 body:
   user: ${document.user}
   post_date: ${document.postDate}
   message: ${document.message}
   topic: ${document.topic}
+headers:
+  Authorization: Basic Idontknowwhatthehellitis!

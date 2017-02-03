@@ -49,6 +49,13 @@ public interface CommandTemplate {
 	Map<String, String> getParams();
 
 	/**
+	 * get transformed parameters
+	 * 
+	 * @return parameters
+	 */
+	Map<ParamKey, ParamValue> getTransformedParams();
+
+	/**
 	 * get body
 	 * 
 	 * @return body
@@ -68,4 +75,11 @@ public interface CommandTemplate {
 	 * @return headers
 	 */
 	Map<String, String> getHeaders();
+
+	/**
+	 * get transformed headers
+	 * 
+	 * @return headers
+	 */
+	Map<HeaderKey, HeaderValue> getTransformedHeaders();
 }

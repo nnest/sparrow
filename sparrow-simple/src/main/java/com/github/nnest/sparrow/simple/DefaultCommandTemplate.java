@@ -26,7 +26,9 @@ public class DefaultCommandTemplate implements CommandTemplate {
 
 	// transformed objects
 	private Endpoint transformedEndpoint = null;
+	private Map<ParamKey, ParamValue> transformedParams = null;
 	private Map<BodyKey, Object> transformedBody = null;
+	private Map<HeaderKey, HeaderValue> transformedHeaders = null;
 
 	/**
 	 * (non-Javadoc)
@@ -106,11 +108,28 @@ public class DefaultCommandTemplate implements CommandTemplate {
 	}
 
 	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.simple.CommandTemplate#getTransformedParams()
+	 */
+	@Override
+	public Map<ParamKey, ParamValue> getTransformedParams() {
+		return this.transformedParams;
+	}
+
+	/**
 	 * @param params
 	 *            the params to set
 	 */
 	public void setParams(Map<String, String> params) {
 		this.params = params;
+
+		if (params != null) {
+			this.transformedParams = new HashMap<ParamKey, ParamValue>(params.size());
+			for (Map.Entry<String, String> entry : params.entrySet()) {
+				this.transformedParams.put(new ParamKey(entry.getKey()), new ParamValue(entry.getValue()));
+			}
+		}
 	}
 
 	/**
@@ -188,10 +207,27 @@ public class DefaultCommandTemplate implements CommandTemplate {
 	}
 
 	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.simple.CommandTemplate#getTransformedHeaders()
+	 */
+	@Override
+	public Map<HeaderKey, HeaderValue> getTransformedHeaders() {
+		return this.transformedHeaders;
+	}
+
+	/**
 	 * @param headers
 	 *            the headers to set
 	 */
 	public void setHeaders(Map<String, String> headers) {
 		this.headers = headers;
+
+		if (headers != null) {
+			this.transformedHeaders = new HashMap<HeaderKey, HeaderValue>(headers.size());
+			for (Map.Entry<String, String> entry : headers.entrySet()) {
+				this.transformedHeaders.put(new HeaderKey(entry.getKey()), new HeaderValue(entry.getValue()));
+			}
+		}
 	}
 }

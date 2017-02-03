@@ -6,6 +6,7 @@ package com.github.nnest.sparrow.simple;
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -119,9 +120,9 @@ public class DefaultCommandExecutor implements CommandExecutor {
 			Response response = client.performRequest( //
 					template.getMethod().name(), //
 					this.transformEndpoint(template.getTransformedEndpoint(), params), //
-					this.transformParams(template.getParams()), //
+					this.transformParams(template.getTransformedParams(), params), //
 					this.transformBody(template.getTransformedBody(), params), //
-					this.transformHeaders(template.getHeaders()));
+					this.transformHeaders(template.getTransformedHeaders(), params));
 			handler.onSuccess(response);
 		} catch (UnsupportedCharsetException | JsonProcessingException e) {
 			handler.onClientPrepareException(e);
@@ -152,10 +153,10 @@ public class DefaultCommandExecutor implements CommandExecutor {
 			client.performRequestAsync( //
 					template.getMethod().name(), //
 					this.transformEndpoint(template.getTransformedEndpoint(), params), //
-					this.transformParams(template.getParams()), //
+					this.transformParams(template.getTransformedParams(), params), //
 					this.transformBody(template.getTransformedBody(), params), //
 					this.createResponseListener(handler, client), //
-					this.transformHeaders(template.getHeaders()));
+					this.transformHeaders(template.getTransformedHeaders(), params));
 		} catch (Exception e) {
 			handler.onClientPrepareException(e);
 		}
@@ -229,12 +230,32 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	/**
 	 * transform params
 	 * 
+	 * @param transformedParams
+	 *            params
 	 * @param params
 	 *            params
 	 * @return empty map if given params is null, otherwise returns itself
 	 */
-	protected Map<String, String> transformParams(Map<String, String> params) {
-		return params == null ? Collections.emptyMap() : params;
+	protected Map<String, String> transformParams(Map<ParamKey, ParamValue> transformedParams, Object params) {
+		if (transformedParams == null) {
+			return Collections.emptyMap();
+		}
+
+		Map<String, String> targetMap = new HashMap<>();
+		for (Map.Entry<ParamKey, ParamValue> entry : transformedParams.entrySet()) {
+			targetMap.put( //
+					this.transformTokens(entry.getKey(), params), //
+					this.transformTokens(entry.getValue(), params));
+		}
+
+		if (this.getLogger().isDebugEnabled()) {
+			for (Map.Entry<String, String> entry : targetMap.entrySet()) {
+				this.getLogger().debug("The parameters should be sent as below:");
+				this.getLogger().debug(String.format("Query string [%1$s=%2$s]", entry.getKey(), entry.getValue()));
+				this.getLogger().debug("The parameters should be sent ends here.");
+			}
+		}
+		return targetMap;
 	}
 
 	/**
@@ -366,15 +387,25 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 * 
 	 * @param headers
 	 *            given headers in map format
+	 * @param params
+	 *            params
 	 * @return headers as array
 	 */
-	protected Header[] transformHeaders(Map<String, String> headers) {
+	protected Header[] transformHeaders(Map<HeaderKey, HeaderValue> headers, Object params) {
 		if (headers == null || headers.size() == 0) {
 			return new Header[0];
 		}
 		List<Header> list = new LinkedList<Header>();
-		for (Map.Entry<String, String> entry : headers.entrySet()) {
-			list.add(new BasicHeader(entry.getKey(), entry.getValue()));
+		for (Map.Entry<HeaderKey, HeaderValue> entry : headers.entrySet()) {
+			list.add(new BasicHeader(this.transformTokens(entry.getKey(), params),
+					this.transformTokens(entry.getValue(), params)));
+		}
+		if (this.getLogger().isDebugEnabled()) {
+			for (Header header : list) {
+				this.getLogger().debug("The header should be sent as below:");
+				this.getLogger().debug(String.format("Header [%1$s=%2$s]", header.getName(), header.getValue()));
+				this.getLogger().debug("The header should be sent ends here.");
+			}
 		}
 		return list.toArray(new Header[list.size()]);
 	}
