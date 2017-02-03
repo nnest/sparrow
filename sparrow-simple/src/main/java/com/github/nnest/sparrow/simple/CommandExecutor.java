@@ -12,12 +12,19 @@ package com.github.nnest.sparrow.simple;
  */
 public interface CommandExecutor {
 	/**
+	 * is null value ignored in body
+	 * 
+	 * @return boolean
+	 */
+	boolean isNullValueIgnoredInBody();
+
+	/**
 	 * execute synchronized
 	 * 
 	 * @param templateName
 	 * @param params
 	 */
-	public void execute(String templateName, Object params, CommandExecutionHandler handler);
+	void execute(String templateName, Object params, CommandExecutionHandler handler);
 
 	/**
 	 * execute asynchronized
@@ -25,5 +32,5 @@ public interface CommandExecutor {
 	 * @param templateName
 	 * @param params
 	 */
-	public void executeAsync(String templateName, Object params, CommandExecutionHandler handler);
+	void executeAsync(String templateName, Object params, CommandExecutionHandler handler);
 }

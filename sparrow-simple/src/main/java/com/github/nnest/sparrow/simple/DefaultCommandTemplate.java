@@ -3,7 +3,10 @@
  */
 package com.github.nnest.sparrow.simple;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import com.google.common.base.Strings;
 
 /**
  * default command template
@@ -13,12 +16,17 @@ import java.util.Map;
  * @version 0.0.1
  */
 public class DefaultCommandTemplate implements CommandTemplate {
+	// plain settings
 	private String name = null;
 	private HttpMethod method = null;
 	private String endpoint = null;
 	private Map<String, String> params = null;
 	private Map<String, Object> body = null;
 	private Map<String, String> headers = null;
+
+	// transformed objects
+	private Endpoint transformedEndpoint = null;
+	private Map<BodyKey, Object> transformedBody = null;
 
 	/**
 	 * (non-Javadoc)
@@ -69,11 +77,11 @@ public class DefaultCommandTemplate implements CommandTemplate {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see com.github.nnest.sparrow.simple.CommandTemplate#get()
+	 * @see com.github.nnest.sparrow.simple.CommandTemplate#getTransformedEndpoint()
 	 */
 	@Override
-	public Endpoint get() {
-		return new Endpoint(this.getEndpoint());
+	public Endpoint getTransformedEndpoint() {
+		return this.transformedEndpoint;
 	}
 
 	/**
@@ -81,7 +89,10 @@ public class DefaultCommandTemplate implements CommandTemplate {
 	 *            the endpoint to set
 	 */
 	public void setEndpoint(String endpoint) {
+		assert Strings.nullToEmpty(endpoint).trim().length() != 0 : "Endpoint cannot be null or blank.";
+
 		this.endpoint = endpoint;
+		this.transformedEndpoint = new Endpoint(this.endpoint);
 	}
 
 	/**
@@ -113,11 +124,57 @@ public class DefaultCommandTemplate implements CommandTemplate {
 	}
 
 	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.simple.CommandTemplate#getTransformedBody()
+	 */
+	@Override
+	public Map<BodyKey, Object> getTransformedBody() {
+		return this.transformedBody;
+	}
+
+	/**
 	 * @param body
 	 *            the body to set
 	 */
 	public void setBody(Map<String, Object> body) {
 		this.body = body;
+
+		if (body != null) {
+			this.transformedBody = new HashMap<>(this.body.size());
+			this.transformBodyMap(this.body, this.transformedBody);
+		}
+	}
+
+	/**
+	 * transform body map
+	 * 
+	 * @param source
+	 *            source map
+	 * @param target
+	 *            target map
+	 */
+	@SuppressWarnings("unchecked")
+	protected void transformBodyMap(Map<String, Object> source, Map<BodyKey, Object> target) {
+		for (Map.Entry<String, Object> entry : source.entrySet()) {
+			String key = entry.getKey();
+			Object value = entry.getValue();
+			BodyKey bodyKey = new BodyKey(key);
+			Object bodyValue = null;
+			if (value == null) {
+				// keep original
+				bodyValue = null;
+			} else if (value instanceof String) {
+				bodyValue = new BodyValue((String) value);
+			} else if (value instanceof Map) {
+				bodyValue = new HashMap<BodyKey, Object>(((Map<String, Object>) value).size());
+				this.transformBodyMap((Map<String, Object>) value, (Map<BodyKey, Object>) bodyValue);
+			} else {
+				// keep original
+				bodyValue = value;
+			}
+			target.put(bodyKey, bodyValue);
+		}
 	}
 
 	/**

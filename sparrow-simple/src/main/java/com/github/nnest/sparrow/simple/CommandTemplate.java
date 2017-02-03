@@ -33,8 +33,13 @@ public interface CommandTemplate {
 	 * @return endpoint
 	 */
 	String getEndpoint();
-	
-	Endpoint get();
+
+	/**
+	 * get transformed endpoint
+	 * 
+	 * @return endpoint
+	 */
+	Endpoint getTransformedEndpoint();
 
 	/**
 	 * get parameters
@@ -49,6 +54,13 @@ public interface CommandTemplate {
 	 * @return body
 	 */
 	Map<String, Object> getBody();
+
+	/**
+	 * get transformed body
+	 * 
+	 * @return body
+	 */
+	Map<BodyKey, Object> getTransformedBody();
 
 	/**
 	 * get headers

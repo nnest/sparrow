@@ -24,9 +24,9 @@ public class ReferenceToken extends StringToken {
 	 * @see com.github.nnest.sparrow.simple.StringToken#getValue(java.lang.Object)
 	 */
 	@Override
-	public String getValue(Object from) {
+	public Object getValue(Object from) {
 		if (from == null) {
-			return "";
+			return null;
 		} else {
 			Object value;
 			try {
@@ -40,7 +40,7 @@ public class ReferenceToken extends StringToken {
 						e);
 			}
 			if (value == null) {
-				return "";
+				return null;
 			} else {
 				return value.toString();
 			}

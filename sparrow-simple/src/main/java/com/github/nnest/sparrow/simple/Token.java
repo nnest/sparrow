@@ -25,5 +25,5 @@ public interface Token {
 	 *            object
 	 * @return string value
 	 */
-	String getValue(Object from);
+	Object getValue(Object from);
 }

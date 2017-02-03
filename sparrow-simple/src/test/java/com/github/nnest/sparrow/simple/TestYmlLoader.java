@@ -5,6 +5,7 @@ package com.github.nnest.sparrow.simple;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpHost;
@@ -40,7 +41,7 @@ public class TestYmlLoader {
 
 		template = context.find("index-dynamic").get();
 		assertEquals("index-dynamic", template.getName());
-		assertEquals("/${index}/${type}/101", template.getEndpoint());
+		assertEquals("/${index}/${type}/${document.id}", template.getEndpoint());
 	}
 
 	@Test
@@ -67,6 +68,12 @@ public class TestYmlLoader {
 		Document doc = new Document();
 		doc.setIndex("twitter");
 		doc.setType("tweet");
+		TwitterTweet tt = new TwitterTweet();
+		tt.setId(101l);
+		tt.setUser("gavin");
+		tt.setPostDate(new Date());
+		tt.setMessage("Message from Gavin");
+		doc.setDocument(tt);
 		executor.execute("index-dynamic", doc, new NoopCommandExecutionHandler());
 	}
 }

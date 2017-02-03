@@ -9,8 +9,9 @@ body:
 ---
 name: index-dynamic
 method: PUT
-endpoint: /${index}/${type}/101
+endpoint: /${index}/${type}/${document.id}
 body:
-  user: kimchy
-  post_date: 2009-11-15T14:12:12
-  message: trying out Elasticsearch
+  user: ${document.user}
+  post_date: ${document.postDate}
+  message: ${document.message}
+  topic: ${document.topic}

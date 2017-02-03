@@ -35,7 +35,7 @@ public class StringToken implements Token {
 	 * @see com.github.nnest.sparrow.simple.Token#getValue(java.lang.Object)
 	 */
 	@Override
-	public String getValue(Object from) {
+	public Object getValue(Object from) {
 		return this.getToken();
 	}
 
