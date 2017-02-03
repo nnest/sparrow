@@ -16,11 +16,15 @@ import org.junit.runners.MethodSorters;
 
 import com.github.nnest.sparrow.simple.TwitterTweet.Topic;
 import com.github.nnest.sparrow.simple.context.SimpleCommandTemplateContext;
+import com.github.nnest.sparrow.simple.exec.AbstractJacksonCommandExecutionHandler;
 import com.github.nnest.sparrow.simple.exec.DefaultCommandExecutor;
 import com.github.nnest.sparrow.simple.exec.NoopCommandExecutionHandler;
 import com.github.nnest.sparrow.simple.template.Document;
 import com.github.nnest.sparrow.simple.token.AbstractTokens;
 import com.github.nnest.sparrow.simple.token.Token;
+
+import ognl.Ognl;
+import ognl.OgnlException;
 
 /**
  * @author brad.wu
@@ -87,5 +91,61 @@ public class TestYmlLoader {
 		// tt.setTopic(Lists.newArrayList(topic));
 		doc.setDocument(tt);
 		executor.execute("index-dynamic", doc, new NoopCommandExecutionHandler());
+	}
+
+	@Test
+	public void test004Result() {
+		SimpleCommandTemplateContext context = new SimpleCommandTemplateContext("/test-yml-loader.yml");
+		context.loadTemplates();
+
+		DefaultCommandExecutor executor = new DefaultCommandExecutor();
+		executor.setTemplateContext(context);
+		executor.setRestClientBuilder(RestClient.builder(new HttpHost("localhost", 9200)));
+
+		Document doc = new Document();
+		doc.setIndex("twitter");
+		doc.setType("tweet");
+		TwitterTweet tt = new TwitterTweet();
+		tt.setId(101l);
+		tt.setUser("gavin");
+		tt.setPostDate(new Date());
+		tt.setMessage("Message from Gavin");
+		doc.setDocument(tt);
+		executor.execute("index-dynamic", doc, new AbstractJacksonCommandExecutionHandler() {
+			/**
+			 * (non-Javadoc)
+			 * 
+			 * @see com.github.nnest.sparrow.simple.CommandExecutionHandler#onFailure(java.lang.Exception)
+			 */
+			@Override
+			public void onFailure(Exception exception) {
+				exception.printStackTrace();
+			}
+
+			/**
+			 * (non-Javadoc)
+			 * 
+			 * @see com.github.nnest.sparrow.simple.exec.AbstractJacksonCommandExecutionHandler#doOnSuccessNoContent()
+			 */
+			@Override
+			protected void doOnSuccessNoContent() {
+				// never occurred
+			}
+
+			/**
+			 * (non-Javadoc)
+			 * 
+			 * @see com.github.nnest.sparrow.simple.exec.AbstractJacksonCommandExecutionHandler#doOnSuccess(java.lang.Object)
+			 */
+			@Override
+			protected void doOnSuccess(Object response) {
+				System.out.println(response);
+				try {
+					System.out.println(Ognl.getValue("_shards", response));
+				} catch (OgnlException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }
