@@ -33,6 +33,8 @@ public interface CommandTemplate {
 	 * @return endpoint
 	 */
 	String getEndpoint();
+	
+	Endpoint get();
 
 	/**
 	 * get parameters

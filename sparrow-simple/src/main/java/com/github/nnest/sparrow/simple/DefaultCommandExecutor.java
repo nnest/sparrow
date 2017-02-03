@@ -107,7 +107,7 @@ public class DefaultCommandExecutor implements CommandExecutor {
 		try {
 			Response response = client.performRequest( //
 					template.getMethod().name(), //
-					template.getEndpoint(), //
+					this.transformEndpoint(template.get(), params), //
 					this.transformParams(template.getParams()), //
 					this.transformBody(template.getBody()), //
 					this.transformHeaders(template.getHeaders()));
@@ -140,50 +140,86 @@ public class DefaultCommandExecutor implements CommandExecutor {
 		try {
 			client.performRequestAsync( //
 					template.getMethod().name(), //
-					template.getEndpoint(), //
+					this.transformEndpoint(template.get(), params), //
 					this.transformParams(template.getParams()), //
 					this.transformBody(template.getBody()), //
-					new ResponseListener() {
-						/**
-						 * (non-Javadoc)
-						 * 
-						 * @see org.elasticsearch.client.ResponseListener#onSuccess(org.elasticsearch.client.Response)
-						 */
-						@Override
-						public void onSuccess(Response response) {
-							try {
-								handler.onSuccess(response);
-							} finally {
-								try {
-									client.close();
-								} catch (IOException e) {
-									handler.onClientCloseFailure(e);
-								}
-							}
-						}
-
-						/**
-						 * (non-Javadoc)
-						 * 
-						 * @see org.elasticsearch.client.ResponseListener#onFailure(java.lang.Exception)
-						 */
-						@Override
-						public void onFailure(Exception exception) {
-							try {
-								handler.onFailure(exception);
-							} finally {
-								try {
-									client.close();
-								} catch (IOException e) {
-									handler.onClientCloseFailure(e);
-								}
-							}
-						}
-					}, //
+					this.createResponseListener(handler, client), //
 					this.transformHeaders(template.getHeaders()));
 		} catch (Exception e) {
 			handler.onClientPrepareException(e);
 		}
+	}
+
+	/**
+	 * create response listener
+	 * 
+	 * @param handler
+	 *            handler
+	 * @param client
+	 *            client
+	 * @return listener
+	 */
+	protected ResponseListener createResponseListener(CommandExecutionHandler handler, RestClient client) {
+		return new ResponseListener() {
+			/**
+			 * (non-Javadoc)
+			 * 
+			 * @see org.elasticsearch.client.ResponseListener#onSuccess(org.elasticsearch.client.Response)
+			 */
+			@Override
+			public void onSuccess(Response response) {
+				try {
+					handler.onSuccess(response);
+				} finally {
+					try {
+						client.close();
+					} catch (IOException e) {
+						handler.onClientCloseFailure(e);
+					}
+				}
+			}
+
+			/**
+			 * (non-Javadoc)
+			 * 
+			 * @see org.elasticsearch.client.ResponseListener#onFailure(java.lang.Exception)
+			 */
+			@Override
+			public void onFailure(Exception exception) {
+				try {
+					handler.onFailure(exception);
+				} finally {
+					try {
+						client.close();
+					} catch (IOException e) {
+						handler.onClientCloseFailure(e);
+					}
+				}
+			}
+		};
+	}
+
+	/**
+	 * tranform endpoint
+	 * 
+	 * @param endpoint
+	 *            endpoint
+	 * @param params
+	 * @return endpoint as string
+	 */
+	protected String transformEndpoint(Endpoint endpoint, Object params) {
+		StringBuilder sb = new StringBuilder(200);
+
+		List<Token> tokens = endpoint.getTokens();
+		for (Token token : tokens) {
+			sb.append(token.getValue(params));
+		}
+
+		String endpointAsString = sb.toString();
+		if (this.getLogger().isDebugEnabled()) {
+			this.getLogger().debug("The endpoint[" + endpointAsString + "] should be sent.");
+		}
+		return endpointAsString;
 	}
 
 	/**
@@ -211,14 +247,14 @@ public class DefaultCommandExecutor implements CommandExecutor {
 		if (body == null) {
 			return null;
 		}
-		
+
 		String bodyAsString = new ObjectMapper().writeValueAsString(body);
 		if (this.getLogger().isDebugEnabled()) {
 			this.getLogger().debug("The body should be sent as below:");
 			this.getLogger().debug(bodyAsString);
 			this.getLogger().debug("The body should be sent ends here.");
 		}
-		
+
 		return new StringEntity(bodyAsString, "UTF-8");
 	}
 

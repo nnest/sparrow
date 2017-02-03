@@ -67,6 +67,16 @@ public class DefaultCommandTemplate implements CommandTemplate {
 	}
 
 	/**
+	 * (non-Javadoc)
+	 * 
+	 * @see com.github.nnest.sparrow.simple.CommandTemplate#get()
+	 */
+	@Override
+	public Endpoint get() {
+		return new Endpoint(this.getEndpoint());
+	}
+
+	/**
 	 * @param endpoint
 	 *            the endpoint to set
 	 */

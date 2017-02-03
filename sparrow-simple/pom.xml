@@ -42,6 +42,10 @@
 			<artifactId>snakeyaml</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>ognl</groupId>
+			<artifactId>ognl</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>

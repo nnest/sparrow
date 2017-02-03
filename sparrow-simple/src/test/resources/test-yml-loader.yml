@@ -1,5 +1,5 @@
 ---
-name: index
+name: index-static
 method: PUT
 endpoint: /twitter/tweet/100
 body:
@@ -7,9 +7,9 @@ body:
   post_date: 2009-11-15T14:12:12
   message: trying out Elasticsearch on 100
 ---
-name: index1
+name: index-dynamic
 method: PUT
-endpoint: /twitter/tweet/101
+endpoint: /${index}/${type}/101
 body:
   user: kimchy
   post_date: 2009-11-15T14:12:12
