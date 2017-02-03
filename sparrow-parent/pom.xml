@@ -56,8 +56,8 @@
 	</properties>
 
 	<modules>
-		<module>../sparrow-api</module>
-		<module>../sparrow-rest</module>
+		
+		
 		<module>../sparrow-simple</module>
 	</modules>
 

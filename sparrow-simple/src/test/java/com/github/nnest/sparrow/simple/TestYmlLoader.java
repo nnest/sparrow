@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
 import com.github.nnest.sparrow.simple.TwitterTweet.Topic;
-import com.google.common.collect.Lists;
 
 /**
  * @author brad.wu
