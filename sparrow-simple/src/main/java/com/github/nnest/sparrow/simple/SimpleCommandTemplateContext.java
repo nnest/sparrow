@@ -69,7 +69,8 @@ public class SimpleCommandTemplateContext extends AbstractCommandTemplateContext
 			this.getLogger().info(String.format("Path or file[%1$s] doesn't exist, try to use class path.", path));
 			InputStream stream = this.getClass().getResourceAsStream(path);
 			if (stream == null) {
-				throw new TemplateInitException(String.format("Resource[%1$s] doesn't exist in class path and file system.", path));
+				throw new TemplateInitException(
+						String.format("Resource[%1$s] doesn't exist in class path and file system.", path));
 			}
 			try {
 				this.loadTemplates(stream, path);
@@ -85,6 +86,7 @@ public class SimpleCommandTemplateContext extends AbstractCommandTemplateContext
 	 * load templates by given resource
 	 * 
 	 * @param resource
+	 *            resource
 	 */
 	protected void loadTemplates(File resource) {
 		if (resource.isDirectory()) {

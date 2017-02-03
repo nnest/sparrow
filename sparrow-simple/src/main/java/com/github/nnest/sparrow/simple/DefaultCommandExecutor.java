@@ -42,7 +42,7 @@ public class DefaultCommandExecutor implements CommandExecutor {
 
 	public DefaultCommandExecutor() {
 		this.bodyValueConverter = new BodyValueConverterChain( //
-//				new PrimitiveBodyValueConverter(), //
+				// new PrimitiveBodyValueConverter(), //
 				new JacksonBodyValueConverter());
 	}
 
@@ -237,6 +237,7 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 * @param endpoint
 	 *            endpoint
 	 * @param params
+	 *            params
 	 * @return endpoint as string
 	 */
 	protected String transformEndpoint(Endpoint endpoint, Object params) {
@@ -284,9 +285,12 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 * @param body
 	 *            body
 	 * @param params
+	 *            params
 	 * @return http entity
 	 * @throws UnsupportedCharsetException
+	 *             exception
 	 * @throws JsonProcessingException
+	 *             exception
 	 */
 	protected HttpEntity transformBody(Map<BodyKey, Object> body, Object params)
 			throws UnsupportedCharsetException, JsonProcessingException {

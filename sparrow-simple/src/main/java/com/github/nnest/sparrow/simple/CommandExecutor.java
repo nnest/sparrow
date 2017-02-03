@@ -22,7 +22,11 @@ public interface CommandExecutor {
 	 * execute synchronized
 	 * 
 	 * @param templateName
+	 *            template name
 	 * @param params
+	 *            params
+	 * @param handler
+	 *            result handler
 	 */
 	void execute(String templateName, Object params, CommandExecutionHandler handler);
 
@@ -30,7 +34,11 @@ public interface CommandExecutor {
 	 * execute asynchronized
 	 * 
 	 * @param templateName
+	 *            template name
 	 * @param params
+	 *            params
+	 * @param handler
+	 *            result handler
 	 */
 	void executeAsync(String templateName, Object params, CommandExecutionHandler handler);
 }
