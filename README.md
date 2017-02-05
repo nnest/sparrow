@@ -36,7 +36,7 @@ headers:
   Authorization: Basic Idontknowwhatthehellitis!
 ```
 
-Support noop key. In the following sample, ${document} should be generated as a JSON body.  
+Support noop key. In the following sample, `${document}` should be generated as a JSON body.  
 ```yaml
 name: index-dyn
 method: PUT
@@ -57,6 +57,8 @@ body:
   ${@3}: {"index": {"_index": "twitter", "_type": "tweet", "_id": "301" }}
   ${@4}: {"user": "bulk-two", "message": "From Bulk Command"}
 ```
+
+To handle the response, implements the `CommandExecutionHandler`. No matter how the request sending, sync or async, always use execution handler to handle response. There are `NoopCommandExecutionHandler` and `AbstractJacksonCommandExecutionHandler` for quickly implementation.
 
 # License
 MIT
