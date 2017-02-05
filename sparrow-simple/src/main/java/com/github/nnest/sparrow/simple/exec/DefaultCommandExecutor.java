@@ -536,7 +536,7 @@ public class DefaultCommandExecutor implements CommandExecutor {
 		/**
 		 * size of properties
 		 * 
-		 * @return
+		 * @return size
 		 */
 		public int count() {
 			return properties.size();
