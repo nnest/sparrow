@@ -73,7 +73,7 @@ Template contains:
 * `params`, query string, One level map.
 * `headers`, Http headers. One level map.
 
-`endpoint`, `body`, `params` and `headers` can contains dynamic patterns. `Dynamic Patterns` is wrapped by `${}`, eg. `${document}` means get value of `document` property.  
+`endpoint`, `body`, `params` and `headers` can contains dynamic patterns. `Dynamic Patterns` is wrapped by `${}`, eg. `${document}` means get value of `document` property.  Both key and value of map can be defined by dynamic patterns or in mix mode.
 To fetch value from given `params`, the OGNL library is used, which means format of dynamic pattern must follow the OGNL rules.
 See test case [TestYmlLoader](https://github.com/nnest/sparrow/blob/master/sparrow-simple/src/test/java/com/github/nnest/sparrow/simple/TestYmlLoader.java) to find more information.
 
@@ -97,7 +97,7 @@ Reason of no standard response handler implementation is, cannot find the standa
 * bulk request, the repsonse only depends on the request itself.   
 * in some case, throw exception when not found, such as update. but in some case, response returned, such as exists.
 
-So read document of Elastic Search, implements your own response handlers to handle the requests.
+So read document of Elastic Search, implements your own response handlers to handle the response.
 
 # License
 MIT

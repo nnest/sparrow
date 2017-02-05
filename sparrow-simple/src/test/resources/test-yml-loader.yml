@@ -16,7 +16,7 @@ params:
 body:
   user: ${document.user}
   post_date: ${document.postDate}
-  message: ${document.message}
+  message: prefix ${document.message} some text ${document.message} suffix
   topic: ${document.topic}
 headers:
   Authorization: Basic Idontknowwhatthehellitis!
