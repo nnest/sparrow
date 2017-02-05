@@ -48,7 +48,8 @@ body:
 ```
 
 Support bulk command. Note the key must start with `@`, and they are ordered by string sorting.  
-In current Elastic Search(5.1.1), it is a JSON object per bulk line, `"` is optional for json attribute key and value.
+In current Elastic Search(5.1.1), it is a JSON object per bulk line.  
+`"` is optional for json attribute key and value.
 ```yaml
 ame: bulk
 method: POST
@@ -72,7 +73,9 @@ Template contains:
 * `params`, query string, One level map.
 * `headers`, Http headers. One level map.
 
-`endpoint`, `body`, `params` and `headers` can contains dynamic patterns. `Dynamic Patterns` is wrapped by `${}`, eg. `${document}` means get value of `document` property. See test case [TestYmlLoader](https://github.com/nnest/sparrow/blob/master/sparrow-simple/src/test/java/com/github/nnest/sparrow/simple/TestYmlLoader.java) to find more information.
+`endpoint`, `body`, `params` and `headers` can contains dynamic patterns. `Dynamic Patterns` is wrapped by `${}`, eg. `${document}` means get value of `document` property.  
+To fetch value from given `params`, the OGNL library is used, which means format of dynamic pattern must follow the OGNL rules.
+See test case [TestYmlLoader](https://github.com/nnest/sparrow/blob/master/sparrow-simple/src/test/java/com/github/nnest/sparrow/simple/TestYmlLoader.java) to find more information.
 
 #### Executor
 To execute the command, there is a `CommandExecutor`, and default implementation `DefaultCommandExecutor`.  
@@ -89,6 +92,8 @@ Executor must have its context, rest client builder and body value converter.
 To handle the response, implements the `CommandExecutionHandler`. No matter how the request sending, sync or async, always use execution handler to handle response. There are 
 * `NoopCommandExecutionHandler`, actually do nothing, just for quickly implementation,
 * `AbstractJacksonCommandExecutionHandler`, using FastXML Jackson object mapper to deserializing.
+
+Reason of no standard response handler implementation is, no standard response format for different rest requests. For specified rest request, the response format is predictable, but because Elastic Search supports very complex request formats, makes response unpredicatable. eg. bulk request, the repsonse depends on the request ifself. So read document of Elastic Search, implements your own response handlers to handle the requests.
 
 # License
 MIT
