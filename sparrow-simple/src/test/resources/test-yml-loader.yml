@@ -26,3 +26,13 @@ method: PUT
 endpoint: /${index}/${type}/${document.id}
 body: 
   ${@noop}: ${document}
+---
+name: bulk
+method: POST
+endpoint: /_bulk
+body: 
+  ${@1}: {index: {_index: twitter, _type: tweet, _id: 300 }}
+  ${@2}: {user: bulk-one, message: From Bulk Command}
+  ${@3}: {"index": {"_index": "twitter", "_type": "tweet", "_id": "301" }}
+  ${@4}: {"user": "bulk-two", "message": "From Bulk Command"}
+  

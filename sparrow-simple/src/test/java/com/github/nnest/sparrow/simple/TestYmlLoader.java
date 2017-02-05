@@ -173,4 +173,16 @@ public class TestYmlLoader {
 		doc.setDocument(tt);
 		executor.execute("index-dyn", doc, new NoopCommandExecutionHandler());
 	}
+
+	@Test
+	public void test006Bulk() {
+		SimpleCommandTemplateContext context = new SimpleCommandTemplateContext("/test-yml-loader.yml");
+		context.loadTemplates();
+
+		DefaultCommandExecutor executor = new DefaultCommandExecutor();
+		executor.setTemplateContext(context);
+		executor.setRestClientBuilder(RestClient.builder(new HttpHost("localhost", 9200)));
+
+		executor.execute("bulk", null, new NoopCommandExecutionHandler());
+	}
 }

@@ -38,7 +38,7 @@ import com.github.nnest.sparrow.simple.token.Token;
 import com.github.nnest.sparrow.simple.token.Tokens;
 
 /**
- * default command executor
+ * default command executor.
  * 
  * @author brad.wu
  * @since 0.0.1
@@ -46,6 +46,7 @@ import com.github.nnest.sparrow.simple.token.Tokens;
  */
 public class DefaultCommandExecutor implements CommandExecutor {
 	public static final String BODY_KEY_NOOP = "@noop";
+	public static final char BODY_KEY_BULK_PREFIX = '@';
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -326,62 +327,34 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	}
 
 	/**
-	 * transform body map
+	 * transform body map.
 	 * 
 	 * @param map
 	 *            map
 	 * @param params
 	 *            params
 	 * @return string
+	 * @version 0.0.3
 	 */
 	protected String transformBodyMap(Map<BodyKey, Object> map, Object params) {
-		List<StringBuilder> attrs = new LinkedList<StringBuilder>();
+		BodyProperties attrs = new BodyProperties();
 
-		// if there is at least one property name is null, unwrapp all
-		// properties
-		boolean unwrapped = false;
 		for (Map.Entry<BodyKey, Object> entry : map.entrySet()) {
-			StringBuilder attr = new StringBuilder(128);
 			String propertyName = this.transformBodyKey(entry.getKey(), params);
-			if (propertyName != null) {
-				attr.append('"').append(propertyName).append("\":");
-			} else {
-				unwrapped = true;
-			}
-			Object propertyValue = this.transformBodyValue(entry.getValue(), params);
+			String propertyValue = this.transformBodyValue(entry.getValue(), params);
 			if (propertyValue == null) {
 				if (this.isNullValueIgnoredInBody()) {
 					// null value ignored
 					continue;
 				} else {
 					// null value not ignored
-					attr.append("null");
+					propertyValue = "null";
 				}
-			} else {
-				attr.append(this.getBodyValueConverter().convert(propertyValue));
 			}
-			attrs.add(attr);
+			attrs.push(propertyName, propertyValue);
 		}
 
-		if (attrs.size() == 0) {
-			// no attributes
-			return null;
-		}
-
-		StringBuilder sb = new StringBuilder(1024);
-		if (!unwrapped) {
-			sb.append('{');
-		}
-		for (int index = 0, count = attrs.size(); index < count; index++) {
-			sb.append(attrs.get(index).toString());
-			if (index < count - 1) {
-				sb.append(',');
-			}
-		}
-		if (!unwrapped) {
-			sb.append('}');
-		}
-		return sb.toString();
+		return attrs.print();
 	}
 
 	/**
@@ -394,15 +367,16 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 * @return string
 	 */
 	@SuppressWarnings("unchecked")
-	protected Object transformBodyValue(Object value, Object params) {
+	protected String transformBodyValue(Object value, Object params) {
 		if (value == null) {
 			return null;
 		} else if (value instanceof Map) {
 			return this.transformBodyMap((Map<BodyKey, Object>) value, params);
 		} else if (value instanceof BodyValue) {
-			return this.transformTokensToObject((BodyValue) value, params);
+			return this.getBodyValueConverter().convert( //
+					this.transformTokensToObject((BodyValue) value, params));
 		} else {
-			return value;
+			return this.getBodyValueConverter().convert(value);
 		}
 	}
 
@@ -417,8 +391,11 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 */
 	protected String transformBodyKey(BodyKey key, Object params) {
 		if (key.tokenCount() == 1) {
-			if (BODY_KEY_NOOP.equals(key.getTokens().get(0).getToken())) {
-				return null;
+			String token = key.getTokens().get(0).getToken();
+			if (BODY_KEY_NOOP.equals(token)) {
+				return BODY_KEY_NOOP;
+			} else if (token.length() > 0 && token.charAt(0) == BODY_KEY_BULK_PREFIX) {
+				return token;
 			}
 		}
 		return this.transformTokens(key, params);
@@ -498,5 +475,184 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 */
 	protected Logger getLogger() {
 		return logger;
+	}
+
+	public static class BodyProperties {
+		private List<BodyProperty> properties = new LinkedList<BodyProperty>();
+		private boolean bulk = false;
+		private boolean noopKey = false;
+
+		/**
+		 * push property into properties
+		 * 
+		 * @param name
+		 *            name
+		 * @param value
+		 *            value
+		 */
+		public void push(String name, String value) {
+			this.push(new BodyProperty(name, value));
+		}
+
+		/**
+		 * push property into properties
+		 * 
+		 * @param property
+		 *            property
+		 */
+		public void push(BodyProperty property) {
+			// check the properties is bulk or not
+			String name = property.getName();
+			if (name.length() > 0 && property.getName().charAt(0) == BODY_KEY_BULK_PREFIX) {
+				this.bulk = true;
+				this.noopKey = true;
+			} else if (BODY_KEY_NOOP.equals(name)) {
+				this.noopKey = true;
+			}
+			this.properties.add(property);
+		}
+
+		/**
+		 * @return the bulk
+		 */
+		public boolean isBulk() {
+			return bulk;
+		}
+
+		/**
+		 * @return the noop key
+		 */
+		public boolean isNoopKey() {
+			return noopKey;
+		}
+
+		/**
+		 * @return the properties
+		 */
+		public List<BodyProperty> getProperties() {
+			return properties;
+		}
+
+		/**
+		 * size of properties
+		 * 
+		 * @return
+		 */
+		public int count() {
+			return properties.size();
+		}
+
+		/**
+		 * print properties to string format
+		 * 
+		 * @return properties string
+		 */
+		public String print() {
+			if (this.count() == 0) {
+				return null;
+			}
+
+			List<BodyProperty> properties = this.getProperties();
+			if (this.isBulk()) {
+				Collections.sort(properties);
+			}
+			StringBuilder sb = new StringBuilder(1024);
+			if (!this.isNoopKey()) {
+				sb.append('{');
+			}
+			for (int index = 0, count = this.count(); index < count; index++) {
+				sb.append(properties.get(index).print());
+				if (index < count - 1) {
+					if (this.isBulk()) {
+						sb.append('\n');
+					} else {
+						sb.append(',');
+					}
+				}
+			}
+			if (this.isBulk()) {
+				sb.append('\n');
+			}
+			if (!this.isNoopKey()) {
+				sb.append('}');
+			}
+			return sb.toString();
+		}
+	}
+
+	/**
+	 * body property
+	 * 
+	 * @author brad.wu
+	 * @since 0.0.3
+	 * @version 0.0.3
+	 */
+	public static class BodyProperty implements Comparable<BodyProperty> {
+		private String name = null;
+		private String value = null;
+
+		public BodyProperty(String name, String value) {
+			this.setName(name);
+			this.setValue(value);
+		}
+
+		/**
+		 * @return the name
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * @param name
+		 *            the name to set
+		 */
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		/**
+		 * @return the value
+		 */
+		public String getValue() {
+			return value;
+		}
+
+		/**
+		 * @param value
+		 *            the value to set
+		 */
+		public void setValue(String value) {
+			this.value = value;
+		}
+
+		/**
+		 * print this
+		 * 
+		 * @return string
+		 */
+		public String print() {
+			StringBuilder sb = new StringBuilder(64);
+			String name = this.getName();
+			if (BODY_KEY_NOOP.equals(name)) {
+				// do nothing
+			} else if (name.length() > 0 && name.charAt(0) == BODY_KEY_BULK_PREFIX) {
+				// do nothing
+			} else {
+				sb.append('"').append(name).append("\":");
+			}
+			sb.append(this.getValue());
+			return sb.toString();
+		}
+
+		/**
+		 * (non-Javadoc)
+		 * 
+		 * @see java.lang.Comparable#compareTo(java.lang.Object)
+		 */
+		@Override
+		public int compareTo(BodyProperty another) {
+			return this.getName().compareTo(another.getName());
+		}
 	}
 }
