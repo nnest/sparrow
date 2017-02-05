@@ -46,6 +46,7 @@ body:
 ```
 
 Support bulk command. Note the key must start with `@`, and they are ordered by string sorting.  
+In current Elastic Search(5.1.1), it is a JSON object per bulk line, `"` is optional for json attribute key and value.
 ```yaml
 ame: bulk
 method: POST
