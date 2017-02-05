@@ -18,7 +18,7 @@ A very simple client for Elastic Search.
 Use Elastic Search 5.1.1, FastXML Jackson, OGNL, SnakeYaml.  
 
 The default usage, see [TestYmlLoader](https://github.com/nnest/sparrow/blob/master/sparrow-simple/src/test/java/com/github/nnest/sparrow/simple/TestYmlLoader.java)  
-Define Yaml files, and follow the test case. Implements your own response listener (not yet implemented, planning in 0.0.2)
+Define Yaml files, and follow the test case. Implements your own response listener.  
 ```yaml
 ---
 name: index-dynamic
@@ -34,6 +34,27 @@ body:
   topic: ${document.topic}
 headers:
   Authorization: Basic Idontknowwhatthehellitis!
+```
+
+Support noop key. In the following sample, ${document} should be generated as a JSON body.  
+```yaml
+name: index-dyn
+method: PUT
+endpoint: /${index}/${type}/${document.id}
+body: 
+  ${@noop}: ${document}
+```
+
+Support bulk command. Note the key must start with `@`, and they are ordered by string sorting.  
+```yaml
+ame: bulk
+method: POST
+endpoint: /_bulk
+body: 
+  ${@1}: {index: {_index: twitter, _type: tweet, _id: 300 }}
+  ${@2}: {user: bulk-one, message: From Bulk Command}
+  ${@3}: {"index": {"_index": "twitter", "_type": "tweet", "_id": "301" }}
+  ${@4}: {"user": "bulk-two", "message": "From Bulk Command"}
 ```
 
 # License
