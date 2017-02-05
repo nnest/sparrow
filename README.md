@@ -18,7 +18,9 @@ A very simple client for Elastic Search.
 Use Elastic Search 5.1.1, FastXML Jackson, OGNL, SnakeYaml.  
 
 The default usage, see [TestYmlLoader](https://github.com/nnest/sparrow/blob/master/sparrow-simple/src/test/java/com/github/nnest/sparrow/simple/TestYmlLoader.java)  
-Define Yaml files, and follow the test case. Implements your own response listener.  
+
+#### Template
+Define Yaml files, and follow the test case.  
 ```yaml
 ---
 name: index-dynamic
@@ -58,7 +60,35 @@ body:
   ${@4}: {"user": "bulk-two", "message": "From Bulk Command"}
 ```
 
-To handle the response, implements the `CommandExecutionHandler`. No matter how the request sending, sync or async, always use execution handler to handle response. There are `NoopCommandExecutionHandler` and `AbstractJacksonCommandExecutionHandler` for quickly implementation.
+#### Context, Loader and Template
+There is a context `CommandTemplateContext`, and a loader `CommandTemplateLoader`.  
+A simple context implementation `SimpleCommandTemplateContext` to support loading templates from file system or class path, also supports context hierarchy.  
+A Yaml loader implementation `YmlCommandTemplateLoader` which using SnakeYaml to load templates.  
+Template contains:  
+* `name`, global unique key to find the template,  
+* `method`, Http Method, mostly is `GET`, `PUT`, `DELETE` or `POST`. According to the document of Elastic Seach and which endpoint used,  
+* `endpoint`, relative location. eg. `/_bulk`, `/${index}/${type}/${document.id}`.
+* `body`, request body. Nested map.
+* `params`, query string, One level map.
+* `headers`, Http headers. One level map.
+
+`endpoint`, `body`, `params` and `headers` can contains dynamic patterns. `Dynamic Patterns` is wrapped by `${}`, eg. `${document}` means get value of `document` property. See test case [TestYmlLoader](https://github.com/nnest/sparrow/blob/master/sparrow-simple/src/test/java/com/github/nnest/sparrow/simple/TestYmlLoader.java) to find more information.
+
+#### Executor
+To execute the command, there is a `CommandExecutor`, and default implementation `DefaultCommandExecutor`.  
+Executor finds values from parameter `params` into template, and transforms to request body, sends to Elastic Search server, and calls response listener to handle repsonse.  
+Executor must have its context, rest client builder and body value converter.  
+* Prepare templates via context,  
+* Configure the rest client settings via rest client builder,  
+* Any body value should be converted to string via `BodyValueConverter`, and there are 
+  * `PrimitiveBodyValueConverter`,
+  * `JacksonBodyValueConverter`, use FastXML Jackson object mapper to serializing, is default converter, 
+  * `BodyValueConverterChain`, chain of converters.
+
+#### Response Handler
+To handle the response, implements the `CommandExecutionHandler`. No matter how the request sending, sync or async, always use execution handler to handle response. There are 
+* `NoopCommandExecutionHandler`, actually do nothing, just for quickly implementation,
+* `AbstractJacksonCommandExecutionHandler`, using FastXML Jackson object mapper to deserializing.
 
 # License
 MIT
