@@ -96,6 +96,7 @@ To handle the response, implements the `CommandExecutionHandler`. No matter how 
 Reason of no standard response handler implementation is, cannot find the standard format(s). For specified rest request, the response format is predictable, but because Elastic Search supports very complex request formats, makes response unpredicatable. eg.  
 * bulk request, the repsonse only depends on the request itself.   
 * in some case, throw exception when not found, such as update. but in some case, response returned, such as exists.
+
 So read document of Elastic Search, implements your own response handlers to handle the requests.
 
 # License
