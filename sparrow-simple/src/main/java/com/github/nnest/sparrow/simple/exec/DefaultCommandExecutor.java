@@ -5,6 +5,7 @@ package com.github.nnest.sparrow.simple.exec;
 
 import java.io.IOException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -36,6 +37,7 @@ import com.github.nnest.sparrow.simple.token.ParamKey;
 import com.github.nnest.sparrow.simple.token.ParamValue;
 import com.github.nnest.sparrow.simple.token.Token;
 import com.github.nnest.sparrow.simple.token.Tokens;
+import com.google.common.base.Joiner;
 
 /**
  * default command executor.
@@ -46,6 +48,7 @@ import com.github.nnest.sparrow.simple.token.Tokens;
  */
 public class DefaultCommandExecutor implements CommandExecutor {
 	public static final String BODY_KEY_NOOP = "@noop";
+	public static final String BODY_VALUE_NOOP_OBJECT = "@noopobj";
 	public static final char BODY_KEY_BULK_PREFIX = '@';
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
@@ -366,13 +369,24 @@ public class DefaultCommandExecutor implements CommandExecutor {
 	 *            params
 	 * @return string
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected String transformBodyValue(Object value, Object params) {
 		if (value == null) {
 			return null;
 		} else if (value instanceof Map) {
 			return this.transformBodyMap((Map<BodyKey, Object>) value, params);
+		} else if (value instanceof List) {
+			List<String> list = new ArrayList<>(((List) value).size());
+			for (Object o : (List<Object>) value) {
+				list.add(this.transformBodyValue(o, params));
+			}
+			return "[" + Joiner.on(',').skipNulls().join(list) + "]";
 		} else if (value instanceof BodyValue) {
+			BodyValue bodyValue = (BodyValue) value;
+			if (bodyValue.tokenCount() == 1 //
+					&& BODY_VALUE_NOOP_OBJECT.equals(bodyValue.getTokens().get(0).getToken())) {
+				return "{}";
+			}
 			return this.getBodyValueConverter().convert( //
 					this.transformTokensToObject((BodyValue) value, params));
 		} else {

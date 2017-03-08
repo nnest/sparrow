@@ -6,7 +6,7 @@
 
 	<groupId>com.github.nnest</groupId>
 	<artifactId>sparrow-parent</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>sparrow-parent</name>
 
@@ -51,7 +51,7 @@
 		<project.target.version>1.8</project.target.version>
 		<project.doc.version>1.8</project.doc.version>
 
-		<project.version>0.0.4</project.version>
+		<project.version>0.0.5-SNAPSHOT</project.version>
 		<jackson.version>2.8.6</jackson.version>
 	</properties>
 

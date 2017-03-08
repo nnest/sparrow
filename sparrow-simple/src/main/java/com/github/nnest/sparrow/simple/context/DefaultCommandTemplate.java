@@ -3,7 +3,9 @@
  */
 package com.github.nnest.sparrow.simple.context;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.nnest.sparrow.simple.CommandTemplate;
@@ -197,12 +199,45 @@ public class DefaultCommandTemplate implements CommandTemplate {
 			} else if (value instanceof Map) {
 				bodyValue = new HashMap<BodyKey, Object>(((Map<String, Object>) value).size());
 				this.transformBodyMap((Map<String, Object>) value, (Map<BodyKey, Object>) bodyValue);
+			} else if (value instanceof List) {
+				bodyValue = this.transformBodyList((List<Object>) value);
 			} else {
 				// keep original
 				bodyValue = value;
 			}
 			target.put(bodyKey, bodyValue);
 		}
+	}
+
+	/**
+	 * transform body list
+	 * 
+	 * @param values
+	 *            source values list
+	 * @return target values list
+	 */
+	@SuppressWarnings("unchecked")
+	private List<Object> transformBodyList(List<Object> values) {
+		List<Object> target = new ArrayList<Object>(values.size());
+		for (Object value : values) {
+			Object bodyValue = null;
+			if (value == null) {
+				// keep original
+				bodyValue = null;
+			} else if (value instanceof String) {
+				bodyValue = new BodyValue((String) value);
+			} else if (value instanceof Map) {
+				bodyValue = new HashMap<BodyKey, Object>(((Map<String, Object>) value).size());
+				this.transformBodyMap((Map<String, Object>) value, (Map<BodyKey, Object>) bodyValue);
+			} else if (value instanceof List) {
+				bodyValue = this.transformBodyList((List<Object>) value);
+			} else {
+				// keep original
+				bodyValue = value;
+			}
+			target.add(bodyValue);
+		}
+		return target;
 	}
 
 	/**
